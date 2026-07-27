@@ -118,13 +118,14 @@ Goal: establish a durable operating model for projects, tasks, and files across 
 - [x] Remove roughly 7.3 GiB of obsolete OneDrive runtime residue and install exact-path next-sign-in cleanup for the final shell-locked files.
 - [x] Pause Google Drive before its broad configured roots can upload additional local product state.
 - [?] In Google Drive Preferences, verify that the selected computer-folder list contains only `C:\Users\dougl\Documents\Agent Backups`; the stopped client currently has no local profile directory to inspect.
-- [x] Complete GitHub CLI browser authorization and verify persistent keyring access to both private repositories.
+- [?] Complete the current GitHub CLI device confirmation, run `gh auth setup-git`, and push the local Docket and harness documentation commits.
 - [?] Create the Docket project, secret, read-only machine account, and access token in Bitwarden Secrets Manager Free using brief 20.
 - [!] Publish the 157 Skills Docket cards after the free Docket secret handoff is complete.
 - [x] Migrate nine inactive repositories with exact tree digests, matching Git dirty state, and passing project verifiers.
 - [x] Migrate Flight Finder with matching Git diffs, staged state, untracked-content digest, file inventory, `git fsck`, and project verifier.
 - [x] Migrate the Flight Tracker coordination folder with an exact tree digest.
 - [x] Replace the incomplete umbrella-copy design with a lean structured `C:\Users\dougl\projects\general-claude` coordination repository.
+- [x] Preserve the IDETC archive in its per-project data folder and verify matching SHA-256 hashes.
 - [?] Receive the active 168 Audit worktree handoff, then move its registered worktree to the lowercase project root.
 - [?] Receive the active Berkeley House auxiliary-worktree handoff, then move or retire that worktree.
 - [!] Retire the old `C:\Users\dougl\OneDrive` data tree after the two active worktrees, Google Drive UI check, and final restore evidence are complete.

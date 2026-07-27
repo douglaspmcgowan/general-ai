@@ -3,3 +3,4 @@
 2026-07-27 | Completed the cross-agent harness adversarial pass: verified 21 repository baselines, hardened four-field Bitwarden command policy, serialized Skills Docket generation, passed the 93-file setup verifier, and recorded the final external boundaries.
 2026-07-27 | Published the private harness and Docket repositories, installed Docket startup, authenticated GitHub CLI, removed OneDrive, and established the 94-file human-readable harness layer.
 2026-07-27 | Migrated and exactly verified ten repositories plus the Flight Tracker coordination folder under the lowercase project root; created the lean general-claude coordination repository and preserved active 168 Audit and Berkeley House worktrees for owner handoff.
+2026-07-27 | Repaired Docket loopback authentication with 73 passing tests, imported five setup handoffs, refreshed the human-readable harness, and preserved the IDETC archive in its per-project data folder.
