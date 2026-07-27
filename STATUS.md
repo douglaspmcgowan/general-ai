@@ -1,10 +1,10 @@
 # Status
 
-- The shared harness is published on private GitHub at commit `36bd3c2`.
+- The shared harness is published on private GitHub `master`; the generated recovery pointer records and verifies its exact current commit.
 - Docket's loopback-authentication repair is published on private GitHub at commit `33b00f4`.
 - The GitHub app connector works for existing repositories. GitHub CLI is authenticated through the Windows keyring, and Git HTTPS uses its reusable credential helper.
 - Docket starts through the limited-privilege `DocketDaemon` task. The repaired local API passes loopback integration tests without a persistent passcode.
-- The 94-file harness verifier and Gitleaks pass. The value-free recovery pointer is remote-verified at `36bd3c2`.
+- The 94-file harness verifier and Gitleaks pass. The value-free recovery pointer is remote-verified.
 - Ten repositories formerly under OneDrive have exact verified copies under `C:\Users\dougl\projects`.
 - The Flight Tracker coordination folder has an exact verified lowercase copy.
 - The 168 Audit and Berkeley House worktrees are actively changing in the old tree and await owner handoff.
