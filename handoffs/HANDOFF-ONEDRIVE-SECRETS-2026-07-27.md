@@ -33,6 +33,11 @@ Paste this prompt:
 > - Google Drive's configuration still contained nine computer-folder backups, including retired OneDrive folders and live agent/project roots.
 > - Local Docket needs no passcode. Its public Vercel API requires `APP_SECRET`; the phone/cloud-sync client uses the same value as `REVIEW_SECRET`.
 > - Bitwarden Password Manager Free supports unlimited personal vault items. Doppler Developer currently allows ten projects. Bitwarden Secrets Manager Free and Infisical Free each cap the relevant free project count at three.
+> - Docket's value-free manifest now has 11 variables. The obsolete `BWS_ACCESS_TOKEN` requirement was removed, the generated view passes its check, all 73 tests pass, and commit `ebd8ede` is pushed.
+> - A fresh read-only Google Drive database query still shows all nine old computer-folder roots. Google Drive has been started and awaits the Preferences change.
+> - Git still registers two worktrees inside OneDrive: `168-audit-redesign` and `berkeley-house\repo-worktree`.
+> - The 168 replacement has the same commit and matching test artifacts; both old and replacement copies contain the additive project baseline. The current-tree Gitleaks scan found five redacted findings, so do not upload or broadly archive that tree.
+> - Berkeley's old branch head `7e74f3a` is published at `origin/agent/property-finance-completion` and is ahead of replacement base `e4e8b53`. Its only meaningful untracked file, `scripts/audit-lease-state.mjs`, was Gitleaks-clean and copied byte-for-byte into the replacement worktree.
 >
 > Keep every open question in the final response. End with full paths for every changed file.
 
@@ -43,3 +48,13 @@ Paste this prompt:
 - A restore test succeeds.
 - No open Codex, Claude, Cursor, terminal, editor, or worktree uses an old OneDrive path.
 - The final comparison reports no old-only file that lacks a preserved local or backup copy.
+
+## Broker design awaiting Douglas's explicit approval
+
+Recommended policy record:
+
+```text
+Bitwarden item + field + destination variable + exact executable + exact argument list
+```
+
+The broker rejects the request before accessing Bitwarden when any field differs. Tests must cover every mismatch, confirm that the child cannot inherit `BW_SESSION`, and confirm parent-environment restoration. Script hosts such as Node receive approval only for the named script and arguments.
