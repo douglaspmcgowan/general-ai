@@ -130,3 +130,4 @@ Goal: establish a durable operating model for projects, tasks, and files across 
 - [x] Preserve the published Berkeley House completion commit in a verified replacement worktree.
 - [!] Remove the old registered worktree rollback copies after this workspace closes and its delete-deny ACL no longer applies.
 - [!] Retire the old `C:\Users\dougl\OneDrive` data tree after the Google Drive UI cleanup, fresh lowercase session, and final restore evidence.
+- [x] Copy missing personal Desktop, non-General-Claude Documents, Pictures, and Attachments files into their normal local Windows folders without overwriting collisions.

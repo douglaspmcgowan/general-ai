@@ -12,6 +12,7 @@
 - The old worktrees remain registered rollback copies because the active workspace ACL denies directory deletion.
 - Google Drive is installed and stopped. Its root-preference database confirms nine unsafe broad selected folders, including live agent state, data, repositories, worktrees, and old OneDrive Desktop/Documents roots.
 - OneDrive is uninstalled. Its old data tree remains the rollback authority during active-path cutover.
+- Missing personal Desktop, non-General-Claude Documents, Pictures, and Attachments files have additive copies in the normal local Windows folders; existing destination files were preserved.
 - Bitwarden Secrets Manager CLI and broker are installed and tested. The web vault needs Douglas's login before the free Docket objects can be created.
 - The local Docket contains 162 cards: 157 Skills Docket cards and five setup handoffs. Cloud publication remains pending the Docket secret handoff.
 - The IDETC archive is preserved under `C:\Users\dougl\Data\Projects\idetc-writing-ide\inputs` with a matching SHA-256 copy check.

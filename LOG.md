@@ -7,3 +7,4 @@
 2026-07-27 | Reauthorized GitHub CLI in the Windows keyring, configured reusable Git HTTPS credentials, pushed Docket and harness updates, and refreshed the remote-verified recovery pointer.
 2026-07-27 | Queried Google Drive's root-preference database read-only and confirmed nine unsafe broad selected folders; kept the client stopped and documented the exact cleanup.
 2026-07-27 | Moved the 168 main repository into lowercase projects, created verified replacement 168 and Berkeley worktrees under Worktrees, and retained ACL-locked old paths as rollback copies.
+2026-07-27 | Copied missing personal files out of OneDrive without overwriting local collisions, verified no missing-file work remains, and stopped Google Drive after it auto-restarted with the same nine unsafe backup roots.
