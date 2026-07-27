@@ -37,7 +37,8 @@ These standing rules travel with the repository so local, cloud, and background 
 - Use code-graph or symbol navigation when available before loading large files.
 - Keep bulk research and large file content out of the main conversation when targeted reads or isolated analysis can answer the question.
 - Use matching repository skills when their trigger applies. Keep task workflows in skills and standing cross-tool invariants in this file.
-- Delegate only independent work with one writer per file or isolated worktree.
+- Douglas grants standing approval to use sub-agents. Default to delegation for eligible non-trivial work with independent streams, context-heavy investigation, or a skill that requires isolated assessment; do not pause for another approval prompt.
+- Keep delegated work independently verifiable, with one writer per file or an isolated worktree. Handle tightly coupled or trivial work in the primary context.
 - For browser-visible changes, run the repositoryâ€™s browser/end-to-end verifier.
 
 ### Completion and durable learning
@@ -47,6 +48,7 @@ These standing rules travel with the repository so local, cloud, and background 
 - Route corrections by evidence and scope. Use the narrowest proven scope and several enforcement mechanisms when they address different failure modes.
 - Append value-free correction records to `.agents/feedback/FEEDBACK-LOG.md`; preserve history through superseding entries.
 - Record failures, blockers, remaining uncertainty, created/updated file paths, and open questions plainly.
+- When a turn ends or work blocks with action required from Douglas, finish with a numbered `Next steps for Douglas` checklist. Each step must name the exact location, action, setting or field, safe value format, and confirmation Douglas should send back.
 <!-- agent-harness:portable-principles:v2:end -->
 
 ## Project identity
