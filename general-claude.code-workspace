@@ -1,0 +1,15 @@
+{
+    "folders":  [
+                    {
+                        "name":  "general-claude",
+                        "path":  "."
+                    },
+                    {
+                        "name":  "PROJECT_DATA_ROOT",
+                        "path":  "C:/Users/dougl/Data/Projects/general-claude"
+                    }
+                ],
+    "settings":  {
+
+                 }
+}

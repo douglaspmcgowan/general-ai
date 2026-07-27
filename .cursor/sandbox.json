@@ -1,0 +1,7 @@
+{
+    "enableSharedBuildCache":  true,
+    "additionalReadwritePaths":  [
+                                     "C:\\Users\\dougl\\Data\\Projects\\general-claude"
+                                 ],
+    "type":  "workspace_readwrite"
+}

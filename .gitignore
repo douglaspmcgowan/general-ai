@@ -1,0 +1,26 @@
+# Local product settings and volatile state
+.claude/settings.local.json
+.claude/*.lock
+.local/
+
+# Credentials and environment material
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Runtime and generated data
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+node_modules/
+dist/
+build/
+coverage/
+
+# Operating-system noise
+Thumbs.db
+Desktop.ini

@@ -1,0 +1,15 @@
+version: 1
+project: "general-claude"
+data_root_env: "PROJECT_DATA_ROOT"
+assets: []
+policy:
+  repository_content: "value-safe coordination documents, manifests, historical research, and project maps"
+  runtime_root: "C:\\Users\\dougl\\Data\\Projects\\general-claude"
+  restricted_root: "C:\\Users\\dougl\\Data\\Restricted\\general-claude"
+  backup_root: "C:\\Users\\dougl\\Documents\\Agent Backups"
+  forbidden_in_git:
+    - "credential values"
+    - "product session stores"
+    - "live databases"
+    - "restricted project records"
+    - "raw environment exports"
