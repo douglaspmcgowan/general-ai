@@ -4,3 +4,4 @@
 2026-07-27 | Published the private harness and Docket repositories, installed Docket startup, authenticated GitHub CLI, removed OneDrive, and established the 94-file human-readable harness layer.
 2026-07-27 | Migrated and exactly verified ten repositories plus the Flight Tracker coordination folder under the lowercase project root; created the lean general-claude coordination repository and preserved active 168 Audit and Berkeley House worktrees for owner handoff.
 2026-07-27 | Repaired Docket loopback authentication with 73 passing tests, imported five setup handoffs, refreshed the human-readable harness, and preserved the IDETC archive in its per-project data folder.
+2026-07-27 | Reauthorized GitHub CLI in the Windows keyring, configured reusable Git HTTPS credentials, pushed Docket and harness updates, and refreshed the remote-verified recovery pointer.

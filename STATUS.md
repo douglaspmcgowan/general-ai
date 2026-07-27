@@ -1,10 +1,10 @@
 # Status
 
-- The shared harness documentation update is committed locally at `15f3d5f`; its push awaits refreshed GitHub CLI authorization.
-- Docket's loopback-authentication repair is committed locally at `672f749`; its push awaits refreshed GitHub CLI authorization.
-- The GitHub app connector works for existing repositories. The GitHub CLI cached credential expired and a browser device confirmation is pending.
+- The shared harness is published on private GitHub at commit `36bd3c2`.
+- Docket's loopback-authentication repair is published on private GitHub at commit `33b00f4`.
+- The GitHub app connector works for existing repositories. GitHub CLI is authenticated through the Windows keyring, and Git HTTPS uses its reusable credential helper.
 - Docket starts through the limited-privilege `DocketDaemon` task. The repaired local API passes loopback integration tests without a persistent passcode.
-- The 94-file harness verifier and Gitleaks pass.
+- The 94-file harness verifier and Gitleaks pass. The value-free recovery pointer is remote-verified at `36bd3c2`.
 - Ten repositories formerly under OneDrive have exact verified copies under `C:\Users\dougl\projects`.
 - The Flight Tracker coordination folder has an exact verified lowercase copy.
 - The 168 Audit and Berkeley House worktrees are actively changing in the old tree and await owner handoff.

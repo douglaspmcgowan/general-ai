@@ -18,8 +18,8 @@ Old paths remain rollback sources until the full OneDrive retirement.
 
 | Project | Canonical path | Evidence |
 |---|---|---|
-| agent-harness | `C:\Users\dougl\projects\agent-harness` | Harness verifier and Gitleaks pass; local documentation commit `15f3d5f` awaits refreshed GitHub CLI authorization |
-| docket | `C:\Users\dougl\projects\docket` | Local repair commit `672f749` awaits refreshed GitHub CLI authorization; 73 tests and Gitleaks pass |
+| agent-harness | `C:\Users\dougl\projects\agent-harness` | Clean remote commit `36bd3c2`; Gitleaks and harness verifier pass |
+| docket | `C:\Users\dougl\projects\docket` | Clean remote commit `33b00f4`; 73 tests and Gitleaks pass |
 | boundaries-reader | `C:\Users\dougl\projects\boundaries-reader` | Exact tree digest, Git dirty state, and project verifier |
 | claude-global-config | `C:\Users\dougl\projects\claude-global-config` | Exact tree digest, Git dirty state, and project verifier |
 | contact-form-caller | `C:\Users\dougl\projects\contact-form-caller` | Exact tree digest, Git dirty state, and project verifier |
