@@ -14,8 +14,8 @@ Paste this prompt:
 >
 > 1. Confirm the current session and every active worktree are outside `C:\Users\dougl\OneDrive`.
 > 2. Reconfirm Windows known folders map to `C:\Users\dougl\Desktop`, `C:\Users\dougl\Documents`, and `C:\Users\dougl\Pictures`.
-> 3. Have Douglas update Google Drive Preferences: remove every retired OneDrive path and live engineering root; add local Desktop, Documents, and optional Pictures; leave streamed My Drive alone. If all Documents is selected, do not add Agent Backups separately.
-> 4. Wait for Google Drive to report “Up to date,” then restore-test one ordinary file from each selected folder.
+> 3. Have Douglas update Google Drive Preferences: keep local Downloads selected; remove every retired OneDrive path and live engineering root; add local Desktop and Documents; leave streamed My Drive alone. Documents already covers Agent Backups, so do not add the nested folder separately.
+> 4. Wait for Google Drive to report “Up to date,” then restore-test one ordinary file from Desktop, Documents, and Downloads.
 > 5. Run a final metadata-only comparison of the old OneDrive Desktop/Documents/Pictures/Attachments against the local folders. Preserve destination collisions for review. Do not read secret values or off-limits vault paths.
 > 6. Clean stale Git worktree registrations that still point into OneDrive after confirming their branches/commits have safe replacements.
 > 7. Remove the retired `C:\Users\dougl\OneDrive` tree only after steps 1–6 prove it is redundant. Report what was removed and recovery status.
