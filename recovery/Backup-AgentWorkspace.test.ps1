@@ -37,6 +37,10 @@ try {
     $manifest = Get-Content -LiteralPath (Join-Path $snapshot 'Recovery\project-recovery.json') -Raw | ConvertFrom-Json
     if (@($manifest.projects).Count -ne 1) { throw 'Repository recovery manifest is incomplete.' }
     if ($manifest.projects[0].remote -ne $remote) { throw 'Repository authority was not recorded.' }
+    if (-not $manifest.projects[0].offlineBundle) { throw 'Offline bundle capability was not recorded.' }
+    if (-not (Test-Path -LiteralPath (Join-Path $snapshot 'Handoffs\sample\Repository.bundle'))) {
+        throw 'Remote-backed repository did not receive an offline bundle.'
+    }
     if (-not (Test-Path -LiteralPath (Join-Path $snapshot 'Application Data\Projects\sample\inputs\ordinary.txt'))) {
         throw 'Approved application data was not copied.'
     }

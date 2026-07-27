@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "accounts": [
+    {
+      "service": "Google",
+      "accountIdentifier": null,
+      "purpose": "Google Drive desktop sync and optional federated application sign-in",
+      "requiredOnNewComputer": true
+    },
+    {
+      "service": "Bitwarden",
+      "accountIdentifier": null,
+      "purpose": "Password Manager Free credential authority",
+      "requiredOnNewComputer": true
+    },
+    {
+      "service": "GitHub",
+      "accountIdentifier": null,
+      "purpose": "Repository remotes and GitHub CLI",
+      "requiredOnNewComputer": true
+    },
+    {
+      "service": "OpenAI",
+      "accountIdentifier": null,
+      "purpose": "Codex application",
+      "requiredOnNewComputer": true
+    },
+    {
+      "service": "Anthropic",
+      "accountIdentifier": null,
+      "purpose": "Claude application",
+      "requiredOnNewComputer": true
+    },
+    {
+      "service": "Cursor",
+      "accountIdentifier": null,
+      "purpose": "Cursor application",
+      "requiredOnNewComputer": true
+    }
+  ],
+  "forbiddenContent": [
+    "passwords",
+    "API keys",
+    "access tokens",
+    "session cookies",
+    "recovery keys"
+  ]
+}

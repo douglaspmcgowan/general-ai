@@ -1,6 +1,6 @@
 {
     "schemaVersion":  1,
-    "project":  "general-claude",
+    "project":  "general-ai",
     "selectionPolicy":  [
                             "recurring-workflow",
                             "fragile-verification",

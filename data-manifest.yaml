@@ -1,11 +1,11 @@
 version: 1
-project: "general-claude"
+project: "general-ai"
 data_root_env: "PROJECT_DATA_ROOT"
 assets: []
 policy:
   repository_content: "value-safe coordination documents, manifests, historical research, and project maps"
-  runtime_root: "C:\\Users\\dougl\\Data\\Projects\\general-claude"
-  restricted_root: "C:\\Users\\dougl\\Data\\Restricted\\general-claude"
+  runtime_root: "C:\\Users\\dougl\\Data\\Projects\\general-ai"
+  restricted_root: "C:\\Users\\dougl\\Data\\Restricted\\general-ai"
   backup_root: "C:\\Users\\dougl\\Documents\\Agent Backups"
   forbidden_in_git:
     - "credential values"

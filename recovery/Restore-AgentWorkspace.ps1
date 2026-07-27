@@ -63,16 +63,17 @@ foreach ($project in @($manifest.projects)) {
     if (Test-Path -LiteralPath $target) {
         throw "Project restore target already exists: $target"
     }
-    $mode = if ($project.PSObject.Properties.Name -contains 'recoveryMode') {
+    $recordedMode = if ($project.PSObject.Properties.Name -contains 'recoveryMode') {
         [string]$project.recoveryMode
     } elseif ([string]$project.remote) { 'remote' } else { 'bundle' }
+    $bundle = Join-Path $snapshotRoot ("Handoffs\$($project.name)\Repository.bundle")
+    $mode = if (Test-Path -LiteralPath $bundle -PathType Leaf) { 'bundle' } else { $recordedMode }
 
     if ($mode -eq 'remote') {
         git clone --branch ([string]$project.branch) --single-branch ([string]$project.remote) $target
         if ($LASTEXITCODE -ne 0) { throw "Clone failed for $($project.name)." }
     }
     elseif ($mode -eq 'bundle') {
-        $bundle = Join-Path $snapshotRoot ("Handoffs\$($project.name)\Repository.bundle")
         git clone $bundle $target
         if ($LASTEXITCODE -ne 0) { throw "Bundle restore failed for $($project.name)." }
     }

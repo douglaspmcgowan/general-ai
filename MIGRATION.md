@@ -40,7 +40,7 @@ Old paths remain rollback sources until the full OneDrive retirement.
 | legal-doc-studio | `C:\Users\dougl\projects\legal-doc-studio` | Existing structured repository |
 | legal-solutions-website | `C:\Users\dougl\projects\legal-solutions-website` | Existing structured repository |
 | redline-idetc | `C:\Users\dougl\projects\redline-idetc` | Existing structured repository |
-| general-claude | `C:\Users\dougl\projects\general-claude` | Lean coordination repository; current migration authority |
+| general-ai | `C:\Users\dougl\projects\general-ai` | Lean coordination repository and current migration authority; `general-claude` retained as session rollback |
 | 168-audit | `C:\Users\dougl\projects\168-audit` | Main repository moved; additive project baseline and Gitleaks pass |
 
 ## Replacement worktrees and rollback copies

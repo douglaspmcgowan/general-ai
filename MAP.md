@@ -1,4 +1,4 @@
-# General Claude project map
+# General AI project map
 
 ## Core documents
 
@@ -33,6 +33,7 @@
 | Docket | Present review cards from local SQLite and optional cloud sync | `C:\Users\dougl\projects\docket` | Docket repository |
 | Coordination state | Track the cross-project migration and remaining human boundaries | Repository root task files and `MIGRATION.md` | This repository |
 | Historical research | Preserve the research that informed the current architecture | `research\` | This repository |
+| Capsule | Rebuild the project fleet, harness, approved app data, and Quick Access on another Windows computer | `C:\Users\dougl\Documents\Capsule\START-HERE.md` | This repository and Nightly Agent Backups |
 
 ## Important paths
 
@@ -42,9 +43,10 @@
 | `C:\Users\dougl\.agents\human-readable` | Human explanations and setup changelog | No | Yes, in the harness repository |
 | `C:\Users\dougl\projects\agent-harness` | Private Git authority for the shared harness | No | Yes |
 | `C:\Users\dougl\projects\docket` | Docket source authority | No | Yes |
-| `C:\Users\dougl\projects\general-claude` | This coordination repository | No | Yes |
-| `C:\Users\dougl\Data\Projects\general-claude` | Local coordination data | Mixed | No |
+| `C:\Users\dougl\projects\general-ai` | This coordination repository | No | Yes |
+| `C:\Users\dougl\Data\Projects\general-ai` | Local coordination data | Mixed | No |
 | `C:\Users\dougl\Documents\Agent Backups` | Curated value-free recovery artifacts | Yes | No |
+| `C:\Users\dougl\Documents\Capsule` | Transferable computer-rebuild package | Yes | No |
 | `C:\Users\dougl\OneDrive` | Retired source and temporary rollback tree | No | No |
 
 ## Data flow
@@ -54,16 +56,17 @@
 3. Mutable databases, private records, inputs, outputs, and caches resolve through each project's data manifest.
 4. GitHub receives versioned source and safe documentation.
 5. SQLite-safe exports and value-free recovery pointers enter `Documents\Agent Backups`.
-6. Google Drive may back up only that curated folder after its desktop folder list is verified.
-7. Docket reads local SQLite and receives cloud credentials only through the exact-command broker.
+6. Capsule captures a selected verified snapshot, portable harness, restore tools, account identifiers, and integrity hashes.
+7. Google Drive syncs the curated backup and Capsule folders.
+8. Secret values reach approved child processes through exact Bitwarden Password Manager broker tuples.
 
 ## Integrations
 
 | System | Direction | Authentication name | Failure behavior |
 |---|---|---|---|
-| GitHub | Both | GitHub Windows keyring | Stop publication; local Git state remains authoritative |
-| Bitwarden Secrets Manager | Inbound | `BWS_ACCESS_TOKEN`, `REVIEW_SECRET` | Broker fails closed; local Docket remains available |
-| Google Drive | Outbound backup | Google account owned by Douglas | Keep client stopped when root coverage is uncertain |
+| GitHub | Both | GitHub Windows keyring | Stop publication; offline Git bundles remain available |
+| Bitwarden Password Manager | Inbound | Interactive `BW_SESSION` plus item/field tuple metadata | Broker fails closed; secret values stay out of files |
+| Google Drive | Outbound backup | Google account owned by Douglas | Capsule and Agent Backups remain locally usable |
 | Docket cloud sync | Both | `REVIEW_SECRET` | Local SQLite and outbox remain authoritative |
 | Claude, Codex, Cursor | Inbound rules and local writes | Product-owned login/session | Project contract remains portable through Git |
 

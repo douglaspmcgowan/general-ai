@@ -68,7 +68,7 @@ Goal: establish a durable operating model for projects, tasks, and files across 
 - [x] Verify the Google Drive folder coverage shown in Douglas's screenshot and record remaining backup recommendations.
 - [x] Define the canonical skill, command alias, product adapter, project binding, and provider/model adapter naming convention.
 - [!] Publish the 157-card cross-platform Skills Docket to the cloud board. The value-free outbox and reviewed local Docket client are complete; the Docket review credential is absent.
-- [!] Create the Bitwarden Secrets Manager Docket project, `REVIEW_SECRET`, and read-only machine account; record only the value-free secret ID.
+- [x] Supersede the Bitwarden Secrets Manager Docket design with Password Manager Free item/field tuples.
 - [x] Diagnose and, when recoverable without overwriting, repair `C:\Users\dougl\Downloads\FOR-DOUGLAS.zip`.
 - [x] Create and live-test a concise cross-platform `skill-audit` skill using the audited skill-writing discipline.
 - [x] Update Setup briefs, shared contracts, product adapters, templates, changelog, setup stamp, and the active Obsidian harness brief.
@@ -119,7 +119,7 @@ Goal: establish a durable operating model for projects, tasks, and files across 
 - [x] Pause Google Drive before its broad configured roots can upload additional local product state.
 - [?] In Google Drive Preferences, remove all nine confirmed broad selected folders. Add only curated, value-free backup exports after a restore test.
 - [x] Complete GitHub CLI device authorization, configure the reusable Git HTTPS helper, and push the Docket and harness documentation commits.
-- [?] Create the Docket project, secret, read-only machine account, and access token in Bitwarden Secrets Manager Free using brief 20.
+- [x] Supersede the three-project Secrets Manager handoff with the Password Manager Free broker procedure.
 - [!] Publish the 157 Skills Docket cards after the free Docket secret handoff is complete.
 - [x] Migrate nine inactive repositories with exact tree digests, matching Git dirty state, and passing project verifiers.
 - [x] Migrate Flight Finder with matching Git diffs, staged state, untracked-content digest, file inventory, `git fsck`, and project verifier.
@@ -143,3 +143,15 @@ Goal: establish a durable operating model for projects, tasks, and files across 
 - [x] Restore-test representative project, application-data, and Quick Access artifacts.
 - [x] Update durable setup documentation, handoff, status, and work log.
 - [x] Run project, harness, Gitleaks, broker, backup, restore, and adversarial verification.
+
+## Capsule and general-ai migration — 2026-07-27
+
+- [x] Research current free secret managers supporting more than three projects.
+- [x] Choose and document the portable secret/account authority.
+- [x] Inventory safe account identifiers, software, repositories, harness authorities, and recovery payloads; leave unknown product identifiers for Douglas's value-safe prompt.
+- [x] Build Capsule bootstrap, refresh, verification, manifests, instructions, and system map.
+- [x] Include local-only repositories, application data, handoffs, and the private harness recovery path.
+- [x] Rename the project identity from general-claude to general-ai.
+- [ ] Create and verify `C:\Users\dougl\projects\general-ai`; retain the current folder as a session-owned rollback copy.
+- [~] Update shared harness documentation and recovery pointers; local private-harness commit complete and remote publication requires refreshed GitHub authorization.
+- [ ] Run assembled Capsule restore, Gitleaks, project, harness, and adversarial verification.

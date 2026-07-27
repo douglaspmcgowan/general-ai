@@ -51,7 +51,7 @@ These standing rules travel with the repository so local, cloud, and background 
 
 ## Project identity
 
-- Name: `general-claude`
+- Name: `general-ai`
 - Purpose: Coordinate Douglas's cross-agent harness, project inventory, migration, shared research, and durable task state across Claude, Codex, and Cursor.
 - Default branch: `master`
 - Local data root variable: `PROJECT_DATA_ROOT`

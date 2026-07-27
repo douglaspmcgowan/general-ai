@@ -2,8 +2,8 @@
 
 The recovery layer combines four authorities:
 
-1. Git remotes provide repository history.
-2. Nightly Agent Backups provide reviewed application data, transactionally consistent SQLite snapshots, per-project handoffs, and Gitleaks-clean uncommitted work.
+1. Git remotes provide published repository history after GitHub login.
+2. Nightly Agent Backups provide offline Git bundles for every repository with a commit, reviewed application data, transactionally consistent SQLite snapshots, per-project handoffs, and Gitleaks-clean uncommitted work.
 3. The private shared-harness repository provides Claude, Codex, and Cursor operating context.
 4. Bitwarden provides credential values after an interactive unlock on the receiving computer.
 
@@ -13,7 +13,11 @@ Run `Backup-AgentWorkspace.cmd` nightly through the `Nightly Agent Backups` sche
 C:\Users\dougl\Documents\Agent Backups\Tools\Restore-AgentWorkspace.cmd -BackupRoot "C:\Users\dougl\Documents\Agent Backups\Workspace"
 ```
 
-The restore clones every recorded project, reapplies any reviewed uncommitted snapshot, restores project application data and selected value-safe product configuration, and repairs Quick Access folder pins. Product sessions, caches, authentication stores, `.env` files, credential exports, and restricted data remain excluded.
+The restore prefers each captured offline bundle, reapplies any reviewed uncommitted snapshot, restores project application data and selected value-safe product configuration, and repairs Quick Access folder pins. Product sessions, caches, authentication stores, `.env` files, credential exports, and restricted data remain excluded.
+
+`C:\Users\dougl\Documents\Capsule` packages one verified snapshot with the portable harness, application list, safe account identifiers, Bitwarden procedure, setup map, restore tools, and SHA-256 integrity records. Run its `tools\Bootstrap-Capsule.cmd` on a clean receiving Windows profile.
+
+The default backup excludes the retained `general-claude` rollback repository after the canonical rename to `general-ai`.
 
 To repair File Explorer pins on the current computer without restoring projects, run `Repair-QuickAccess.cmd` with the latest snapshot's `Recovery\quick-access.json`.
 

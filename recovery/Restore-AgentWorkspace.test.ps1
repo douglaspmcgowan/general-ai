@@ -24,10 +24,14 @@ try {
         schemaVersion = 1
         projects = @([ordered]@{ name='sample'; remote=$remote; branch='master'; commit=$commit })
     }
+    New-Item -ItemType Directory -Path (Join-Path $backup 'Handoffs\sample') -Force | Out-Null
+    git -C $seed bundle create (Join-Path $backup 'Handoffs\sample\Repository.bundle') --all
+    if ($LASTEXITCODE -ne 0) { throw 'Restore test bundle setup failed.' }
     [System.IO.File]::WriteAllText((Join-Path $backup 'Recovery\project-recovery.json'), ($manifest | ConvertTo-Json -Depth 5))
     [System.IO.File]::WriteAllText((Join-Path $backup 'Application Data\Projects\sample\data.txt'), 'restored-data')
     [System.IO.File]::WriteAllText((Join-Path $backup 'Product Configuration\cursor\settings.json'), '{"restored":true}')
 
+    Move-Item -LiteralPath $remote -Destination ($remote + '.offline')
     & $restore -BackupRoot $backup -UserRoot $target -SkipQuickAccess
 
     if ((git -C (Join-Path $target 'projects\sample') rev-parse HEAD).Trim() -ne $commit) {

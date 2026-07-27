@@ -1,12 +1,12 @@
 {
     "folders":  [
                     {
-                        "name":  "general-claude",
+                        "name":  "general-ai",
                         "path":  "."
                     },
                     {
                         "name":  "PROJECT_DATA_ROOT",
-                        "path":  "C:/Users/dougl/Data/Projects/general-claude"
+                        "path":  "C:/Users/dougl/Data/Projects/general-ai"
                     }
                 ],
     "settings":  {

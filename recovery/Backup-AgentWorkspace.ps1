@@ -1,6 +1,7 @@
 [CmdletBinding()]
 param(
     [string]$ProjectsRoot = (Join-Path $env:USERPROFILE 'projects'),
+    [string[]]$ProjectExcludes = @('general-claude'),
     [string]$ProjectDataRoot = (Join-Path $env:USERPROFILE 'Data\Projects'),
     [string[]]$ProjectDataExcludes = @(
         'agent-harness',
@@ -120,7 +121,9 @@ New-Item -ItemType Directory -Path $snapshotRoot -Force | Out-Null
 $projectRecords = @()
 
 Get-ChildItem -LiteralPath $ProjectsRoot -Directory | Where-Object {
-    $_.Name -notlike '*incomplete-*' -and (Test-Path -LiteralPath (Join-Path $_.FullName '.git'))
+    $_.Name -notlike '*incomplete-*' -and
+    $_.Name -notin $ProjectExcludes -and
+    (Test-Path -LiteralPath (Join-Path $_.FullName '.git'))
 } | Sort-Object Name | ForEach-Object {
     $projectPath = $_.FullName
     $safePath = $projectPath.Replace('\', '/')
@@ -138,7 +141,8 @@ Get-ChildItem -LiteralPath $ProjectsRoot -Directory | Where-Object {
     New-Item -ItemType Directory -Path $handoffRoot -Force | Out-Null
     $recoveryMode = if ($remote -and $commit) { 'remote' } elseif ($commit) { 'bundle' } else { 'files' }
 
-    if ($recoveryMode -eq 'bundle') {
+    $bundleIncluded = $false
+    if ($commit) {
         if (Get-Command gitleaks -ErrorAction SilentlyContinue) {
             & gitleaks git --no-banner --redact --exit-code 1 $projectPath
             if ($LASTEXITCODE -ne 0) {
@@ -148,6 +152,7 @@ Get-ChildItem -LiteralPath $ProjectsRoot -Directory | Where-Object {
         $bundlePath = Join-Path $handoffRoot 'Repository.bundle'
         git -c "safe.directory=$safePath" -C $projectPath bundle create $bundlePath --all
         if ($LASTEXITCODE -ne 0) { throw "Repository bundle failed for $($_.Name)." }
+        $bundleIncluded = $true
     }
 
     $uncommittedRoot = Join-Path $env:TEMP ("agent-uncommitted-" + [Guid]::NewGuid().ToString('N'))
@@ -203,6 +208,7 @@ Get-ChildItem -LiteralPath $ProjectsRoot -Directory | Where-Object {
         branch = $branch
         commit = $commit
         recoveryMode = $recoveryMode
+        offlineBundle = $bundleIncluded
         dirtyEntries = $status.Count
         uncommittedSnapshot = $snapshotIncluded
     }

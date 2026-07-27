@@ -1,6 +1,6 @@
 # Secret manifest
 
-Project: general-claude
+Project: general-ai
 
 This generated view contains variable names and operating metadata only. Secret values, vault session keys, recovery keys, and access tokens are forbidden.
 
