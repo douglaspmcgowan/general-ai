@@ -117,7 +117,7 @@ Goal: establish a durable operating model for projects, tasks, and files across 
 - [x] Standardize the canonical local repository root on lowercase `C:\Users\dougl\projects`.
 - [x] Remove roughly 7.3 GiB of obsolete OneDrive runtime residue and install exact-path next-sign-in cleanup for the final shell-locked files.
 - [x] Pause Google Drive before its broad configured roots can upload additional local product state.
-- [?] In Google Drive Preferences, verify that the selected computer-folder list contains only `C:\Users\dougl\Documents\Agent Backups`; the stopped client currently has no local profile directory to inspect.
+- [?] In Google Drive Preferences, remove all nine confirmed broad selected folders. Add only curated, value-free backup exports after a restore test.
 - [x] Complete GitHub CLI device authorization, configure the reusable Git HTTPS helper, and push the Docket and harness documentation commits.
 - [?] Create the Docket project, secret, read-only machine account, and access token in Bitwarden Secrets Manager Free using brief 20.
 - [!] Publish the 157 Skills Docket cards after the free Docket secret handoff is complete.
