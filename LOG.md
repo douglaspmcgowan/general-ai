@@ -6,3 +6,4 @@
 2026-07-27 | Repaired Docket loopback authentication with 73 passing tests, imported five setup handoffs, refreshed the human-readable harness, and preserved the IDETC archive in its per-project data folder.
 2026-07-27 | Reauthorized GitHub CLI in the Windows keyring, configured reusable Git HTTPS credentials, pushed Docket and harness updates, and refreshed the remote-verified recovery pointer.
 2026-07-27 | Queried Google Drive's root-preference database read-only and confirmed nine unsafe broad selected folders; kept the client stopped and documented the exact cleanup.
+2026-07-27 | Moved the 168 main repository into lowercase projects, created verified replacement 168 and Berkeley worktrees under Worktrees, and retained ACL-locked old paths as rollback copies.

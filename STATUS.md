@@ -7,7 +7,9 @@
 - The 94-file harness verifier and Gitleaks pass. The value-free recovery pointer is remote-verified.
 - Ten repositories formerly under OneDrive have exact verified copies under `C:\Users\dougl\projects`.
 - The Flight Tracker coordination folder has an exact verified lowercase copy.
-- The 168 Audit and Berkeley House worktrees are actively changing in the old tree and await owner handoff.
+- The 168 main repository is canonical at `C:\Users\dougl\projects\168-audit`; its replacement worktree is verified under `C:\Users\dougl\Worktrees`.
+- Berkeley's published completion commit has a verified replacement worktree under `C:\Users\dougl\Worktrees`.
+- The old worktrees remain registered rollback copies because the active workspace ACL denies directory deletion.
 - Google Drive is installed and stopped. Its root-preference database confirms nine unsafe broad selected folders, including live agent state, data, repositories, worktrees, and old OneDrive Desktop/Documents roots.
 - OneDrive is uninstalled. Its old data tree remains the rollback authority during active-path cutover.
 - Bitwarden Secrets Manager CLI and broker are installed and tested. The web vault needs Douglas's login before the free Docket objects can be created.

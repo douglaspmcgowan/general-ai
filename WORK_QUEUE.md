@@ -126,6 +126,7 @@ Goal: establish a durable operating model for projects, tasks, and files across 
 - [x] Migrate the Flight Tracker coordination folder with an exact tree digest.
 - [x] Replace the incomplete umbrella-copy design with a lean structured `C:\Users\dougl\projects\general-claude` coordination repository.
 - [x] Preserve the IDETC archive in its per-project data folder and verify matching SHA-256 hashes.
-- [?] Receive the active 168 Audit worktree handoff, then move its registered worktree to the lowercase project root.
-- [?] Receive the active Berkeley House auxiliary-worktree handoff, then move or retire that worktree.
-- [!] Retire the old `C:\Users\dougl\OneDrive` data tree after the two active worktrees, Google Drive UI check, and final restore evidence are complete.
+- [x] Preserve the finished 168 Audit state in a verified replacement worktree and move its main repository to the lowercase project root.
+- [x] Preserve the published Berkeley House completion commit in a verified replacement worktree.
+- [!] Remove the old registered worktree rollback copies after this workspace closes and its delete-deny ACL no longer applies.
+- [!] Retire the old `C:\Users\dougl\OneDrive` data tree after the Google Drive UI cleanup, fresh lowercase session, and final restore evidence.

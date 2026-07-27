@@ -41,13 +41,16 @@ Old paths remain rollback sources until the full OneDrive retirement.
 | legal-solutions-website | `C:\Users\dougl\projects\legal-solutions-website` | Existing structured repository |
 | redline-idetc | `C:\Users\dougl\projects\redline-idetc` | Existing structured repository |
 | general-claude | `C:\Users\dougl\projects\general-claude` | Lean coordination repository; current migration authority |
+| 168-audit | `C:\Users\dougl\projects\168-audit` | Main repository moved; additive project baseline and Gitleaks pass |
 
-## Active-path blockers
+## Replacement worktrees and rollback copies
 
-| Project | Active old path | Evidence | Cutover |
+| Project | Replacement path | Old rollback path | Evidence |
 |---|---|---|---|
-| 168 Audit | `C:\Users\dougl\OneDrive\Documents\General Claude\168-audit-redesign` | Files changed during this migration turn; branch is a linked worktree of `C:\Users\dougl\168-audit` | Move the registered worktree after its owner checkpoints and hands off |
-| Berkeley House auxiliary worktree | `C:\Users\dougl\OneDrive\Documents\General Claude\berkeley-house\repo-worktree` | Git worktree file and files changed during this migration turn | Move or remove the auxiliary worktree after its owner checkpoints and hands off |
+| 168 Audit | `C:\Users\dougl\Worktrees\168-audit\codex-168-audit-redesign-relocated` | `C:\Users\dougl\OneDrive\Documents\General Claude\168-audit-redesign` | Exact commit and file mirror; project verifier passes |
+| Berkeley House | `C:\Users\dougl\Worktrees\berkeley-house\agent-property-finance-completion-relocated` | `C:\Users\dougl\OneDrive\Documents\General Claude\berkeley-house\repo-worktree` | Exact published commit `e4e8b53`; cross-agent project verifier passes |
+
+The old rollback paths remain registered because the active workspace ACL denies directory deletion. Remove them with Git's worktree command after this workspace closes.
 
 ## Reversible archive
 
