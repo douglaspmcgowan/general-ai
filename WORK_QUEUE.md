@@ -131,3 +131,15 @@ Goal: establish a durable operating model for projects, tasks, and files across 
 - [!] Remove the old registered worktree rollback copies after this workspace closes and its delete-deny ACL no longer applies.
 - [!] Retire the old `C:\Users\dougl\OneDrive` data tree after the Google Drive UI cleanup, fresh lowercase session, and final restore evidence.
 - [x] Copy missing personal Desktop, non-General-Claude Documents, Pictures, and Attachments files into their normal local Windows folders without overwriting collisions.
+
+## Portable project, app-data, and Explorer recovery — 2026-07-27
+
+- [x] Inventory Git project authorities, approved per-project data, agent application state, and current Drive backup coverage.
+- [x] Implement the approved full-tuple Bitwarden broker policy and its mismatch/environment-isolation tests.
+- [x] Implement a value-free nightly Agent Backups manifest and consistent backup runner.
+- [x] Implement a new-computer restore/bootstrap path for projects, approved app data, Claude/Codex/Cursor context, and Quick Access pins.
+- [x] Generate per-project handoffs and application-data manifests without secret values.
+- [x] Install and run the approved nightly Agent Backups task.
+- [x] Restore-test representative project, application-data, and Quick Access artifacts.
+- [x] Update durable setup documentation, handoff, status, and work log.
+- [x] Run project, harness, Gitleaks, broker, backup, restore, and adversarial verification.

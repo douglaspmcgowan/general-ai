@@ -8,3 +8,4 @@
 2026-07-27 | Queried Google Drive's root-preference database read-only and confirmed nine unsafe broad selected folders; kept the client stopped and documented the exact cleanup.
 2026-07-27 | Moved the 168 main repository into lowercase projects, created verified replacement 168 and Berkeley worktrees under Worktrees, and retained ACL-locked old paths as rollback copies.
 2026-07-27 | Copied missing personal files out of OneDrive without overwriting local collisions, verified no missing-file work remains, and stopped Google Drive after it auto-restarted with the same nine unsafe backup roots.
+2026-07-27 | Installed and live-verified nightly portable Agent Backups, three-mode project restore, approved application-data recovery, full-tuple Bitwarden brokering, local known-folder repair, and deterministic 13-folder Quick Access recovery.
