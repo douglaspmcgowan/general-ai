@@ -21,6 +21,14 @@ Capsule rebuilds Douglas's Claude, Codex, Cursor, shared harness, project reposi
 6. Open `C:\Users\<you>\projects\general-ai\general-ai.code-workspace`.
 7. Run the project and harness verification commands shown in `SYSTEM-MAP.md`.
 
+Bundle-restored repositories keep the offline source as the `capsule` remote and receive the recorded GitHub URL as `origin`. After `gh auth login`, refresh any project's published history with:
+
+```powershell
+git -C "$env:USERPROFILE\projects\<project-name>" fetch origin
+```
+
+A restored `RECOVERY-OMISSIONS.md` marks a clean current-tree bundle that excluded Gitleaks-flagged tracked files. Fetch `origin` before using that project.
+
 The bootstrap refuses to overwrite an existing project or shared-harness folder. Use it on a clean receiving profile.
 
 ## What is inside
