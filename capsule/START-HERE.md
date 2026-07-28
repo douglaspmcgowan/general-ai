@@ -19,6 +19,7 @@ Read `AGENT-START.md` first. It contains the required reading order, safety boun
 
 1. Sign into Windows with the intended Windows account.
 2. Open **Google Drive → My Drive → Capsule**. On the source computer, the verified direct path is `C:\Users\dougl\My Drive\Capsule`.
+   Direct browser link: <https://drive.google.com/drive/folders/197x4O5pCj5cuXETXuv72zeCdvkVSDJSj>
 3. If the My Drive copy has not appeared yet, use <https://drive.google.com/drive/computers>, open this source computer's entry (usually `SEEK_TO_SERVE`), then open `Documents\Capsule`.
 4. If OneDrive is installed, leave it unchanged.
 5. Download the entire folder to a new local staging path outside OneDrive, such as `C:\Users\<you>\Capsule`.

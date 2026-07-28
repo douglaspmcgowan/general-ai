@@ -2,7 +2,7 @@
 
 ## Other computer
 
-1. Open Google Drive and locate `My Drive\Capsule\AGENT-START.md`. If My Drive is mirrored into the user profile, the path is `%USERPROFILE%\My Drive\Capsule\AGENT-START.md`.
+1. Open <https://drive.google.com/drive/folders/197x4O5pCj5cuXETXuv72zeCdvkVSDJSj> or locate `My Drive\Capsule\AGENT-START.md`. If My Drive is mirrored into the user profile, the path is `%USERPROFILE%\My Drive\Capsule\AGENT-START.md`.
 2. Copy Capsule to a separate local staging folder outside OneDrive.
 3. Run `tools\Verify-Capsule.cmd` from the staging copy.
 4. If bootstrap already ran, preserve the created projects and application data. Ask the agent to reconcile the existing installation from `AGENT-START.md`.
