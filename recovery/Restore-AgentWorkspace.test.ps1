@@ -37,6 +37,13 @@ try {
     if ((git -C (Join-Path $target 'projects\sample') rev-parse HEAD).Trim() -ne $commit) {
         throw 'Project was not restored at the recorded commit.'
     }
+    $restoredRepository = Join-Path $target 'projects\sample'
+    if ((git -C $restoredRepository remote get-url origin).Trim() -ne $remote) {
+        throw 'Recorded GitHub-style remote was not restored as origin.'
+    }
+    if (-not (@(git -C $restoredRepository remote) -contains 'capsule')) {
+        throw 'Offline bundle was not retained as the capsule remote.'
+    }
     if (-not (Test-Path -LiteralPath (Join-Path $target 'Data\Projects\sample\data.txt'))) {
         throw 'Application data was not restored.'
     }

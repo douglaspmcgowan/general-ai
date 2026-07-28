@@ -76,6 +76,12 @@ foreach ($project in @($manifest.projects)) {
     elseif ($mode -eq 'bundle') {
         git clone $bundle $target
         if ($LASTEXITCODE -ne 0) { throw "Bundle restore failed for $($project.name)." }
+        if (-not [string]::IsNullOrWhiteSpace([string]$project.remote)) {
+            git -C $target remote rename origin capsule
+            if ($LASTEXITCODE -ne 0) { throw "Capsule remote rename failed for $($project.name)." }
+            git -C $target remote add origin ([string]$project.remote)
+            if ($LASTEXITCODE -ne 0) { throw "Recorded remote restore failed for $($project.name)." }
+        }
     }
     elseif ($mode -eq 'files') {
         New-Item -ItemType Directory -Path $target -Force | Out-Null
