@@ -63,7 +63,7 @@ flowchart TD
 
 ## Verification result
 
-- Capsule payload: snapshot `20260727-capsule5`, 5,731 files, roughly 114 MB scanned by Gitleaks.
+- Capsule payload: the scheduler-selected latest snapshot, roughly 114 MB scanned by Gitleaks, with a passing SHA-256 integrity manifest.
 - Full disposable restore: PASS for all 25 projects, canonical `general-ai`, approved application data, UTF-8 filenames, and portable `.agents`.
 - Offline bundle proof: every captured bundle cloned into an empty temporary repository during backup.
 - Recovery fallbacks: six clean current-tree bundles; three tracked files omitted after redacted Gitleaks reports and recovered from GitHub after login.

@@ -3,10 +3,10 @@
 ## Portable workspace recovery — 2026-07-27
 
 - `Nightly Agent Backups` runs daily at 2:00 AM. Its corrected installed path now scans every repository, proves each offline bundle through a clean clone, and falls back to a Gitleaks-clean current-tree bundle for partial object stores.
-- Snapshot `20260727-capsule5` covers 25 repositories, including canonical `general-ai`, plus approved project data, consistent SQLite backup, product configuration, handoffs, and Quick Access.
+- The scheduler-completed snapshot selected by `Workspace\Recovery\latest.json` covers 25 repositories, including canonical `general-ai`, plus approved project data, consistent SQLite backup, product configuration, handoffs, and Quick Access.
 - The full-tuple Password Manager broker is installed and fail-closed with an empty production policy until the Docket Bitwarden item exists.
 - Desktop, Documents, and Pictures point to local Windows folders. Quick Access has 13 curated valid pins and no retired OneDrive or `G:\My Drive` pins.
-- `C:\Users\dougl\Documents\Capsule` contains 5,731 files from snapshot `20260727-capsule5`; Gitleaks scanned about 114 MB with no findings.
+- `C:\Users\dougl\Documents\Capsule` is built from the scheduler-selected latest snapshot; Gitleaks scanned about 114 MB with no findings and its SHA-256 integrity verifier passes.
 - A disposable assembled Capsule restore recovered all 25 projects, `general-ai`, approved application data, UTF-8 filenames, and the portable shared harness without package installation, account login, or Quick Access mutation.
 - Six repositories use clean current-tree bundles because of partial local object stores or older-history findings. Three still-flagged tracked files were omitted across Berkeley House, Fellowship Tracker, and Legal Solutions Website; GitHub supplies those files after login.
 
