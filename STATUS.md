@@ -9,6 +9,9 @@
 - `C:\Users\dougl\Documents\Capsule` is built from the scheduler-selected latest snapshot; Gitleaks scanned about 114 MB with no findings and its SHA-256 integrity verifier passes.
 - A disposable assembled Capsule restore recovered all 25 projects, `general-ai`, approved application data, UTF-8 filenames, and the portable shared harness without package installation, account login, or Quick Access mutation.
 - Six repositories use clean current-tree bundles because of partial local object stores or older-history findings. Three still-flagged tracked files were omitted across Berkeley House, Fellowship Tracker, and Legal Solutions Website; GitHub supplies those files after login.
+- Capsule now contains an explicit agent entry point, exact Google Drive retrieval instructions, a complete ongoing-sync and excluded-data map, documented retention status, expanded Bitwarden responsibilities, and contextual account prompts.
+- Google Drive's live root-preference database lists `Documents` as an active selected folder. On another computer, Capsule is retrieved through `drive.google.com/drive/computers`, usually under `SEEK_TO_SERVE\Documents\Capsule`.
+- Automatic snapshot deletion remains disabled. The documented retention recommendation is 14 daily, 8 weekly, and 12 month-end snapshots plus labeled milestones and the newest fully restored snapshot.
 
 - The shared harness is installed live and committed locally at `af6dd49` plus the final Capsule recovery changes. Private-GitHub publication waits for refreshed GitHub authorization; Capsule carries the complete local harness meanwhile.
 - Docket's loopback-authentication repair is published on private GitHub at commit `33b00f4`.

@@ -1,5 +1,24 @@
 # Bitwarden setup for project and application secrets
 
+## What this solves
+
+The same Bitwarden account makes credential records available on both computers. Capsule carries value-free instructions and broker policy. Bitwarden carries the secret values in its encrypted vault. A project receives a value for one approved command invocation.
+
+This guide uses Bitwarden Password Manager Free. It supports unlimited personal vault items and cross-device vault sync. Bitwarden Secrets Manager is a separate product and is unnecessary for this desktop workflow.
+
+## Responsibility boundary
+
+| Douglas does | An agent can do |
+|---|---|
+| Create the Bitwarden account and retain the master password | Install or verify the Bitwarden desktop app and CLI |
+| Enable two-step login and retain recovery material separately | Create value-free item naming plans and policy templates |
+| Sign in, approve a new device, and unlock the vault | Resolve exact executable and script paths |
+| Create, rotate, and revoke provider credentials | Add an approved value-free full tuple to the broker policy |
+| Enter credential values into hidden Bitwarden fields | Run broker and regression checks after Douglas unlocks the CLI |
+| Decide which command may use a production credential | Confirm that a child process receives the variable without creating a `.env` file |
+
+The agent must never ask Douglas to paste a secret into chat, inspect vault item JSON, enumerate vault contents, or capture `BW_SESSION`. Douglas completes every screen or prompt that reveals a master password, two-factor code, recovery code, API key, token, or session value.
+
 ## The model
 
 Use Bitwarden Password Manager Free as the credential authority. It supports unlimited vault items and sync across devices. Keep one vault item per project or application. Each secret gets a distinct hidden custom field.
@@ -19,26 +38,41 @@ Examples:
 | `client-portal — production` | `DATABASE_URL` | `DATABASE_URL` |
 | `shared — development` | `OPENAI_API_KEY` | `OPENAI_API_KEY` |
 
+## What belongs in each place
+
+| Place | Store here |
+|---|---|
+| Bitwarden item | Secret value, service username when useful, provider URI |
+| Capsule account manifest | Email or username used to select the correct account |
+| Broker policy | Item ID, field name, destination variable, executable, exact arguments |
+| Project `.env.example` | Variable names and safe placeholders |
+| GitHub Actions settings | Repository or environment secrets used by workflows |
+| Deployment provider | Hosted development, preview, and production environment values |
+
+Local Bitwarden unlock grants access only to the trusted local process. Hosted execution uses the secret store owned by that host.
+
 ## First computer: install and sign in
 
-1. Install the Bitwarden desktop app and browser extension.
-2. Sign into the same Bitwarden account listed in `Capsule\manifests\accounts.json`.
-3. Enable two-step login in the Bitwarden web vault.
-4. Keep the recovery code in a secure physical or separately encrypted recovery location.
-5. Install the command-line client from PowerShell:
+1. Create or open the Bitwarden account whose login email is recorded under `Bitwarden` in `Capsule\manifests\accounts.json`.
+2. Install the Bitwarden desktop app and browser extension from Bitwarden's official download page.
+3. Sign in and allow the initial vault synchronization to finish.
+4. In the Bitwarden web vault, open **Settings → Security → Two-step login** and enable an available method.
+5. Store the recovery code in a secure physical or separately encrypted recovery location outside Capsule and Git.
+6. Install the command-line client from PowerShell:
 
 ```powershell
 npm install -g @bitwarden/cli
 bw login
 ```
 
-6. Unlock the CLI for the current terminal:
+7. Complete `bw login` yourself. This authenticates the computer.
+8. Unlock the CLI for the current terminal:
 
 ```powershell
 $env:BW_SESSION = bw unlock --raw
 ```
 
-The session value lives only in that PowerShell process. Close the terminal to discard it.
+The session value lives only in that PowerShell process. Do not paste it into chat, a file, or a command transcript. Run `bw lock` and close the terminal when finished.
 
 ## Create each project item
 
@@ -49,13 +83,25 @@ In the Bitwarden desktop or web vault:
 3. Add a **Hidden** custom field for every secret.
 4. Use the exact environment-variable name as the field name.
 5. Save and sync.
-6. Copy the item's non-secret ID from the CLI:
+6. Copy the item's non-secret ID from the Bitwarden web vault item URL, or obtain only the ID in your own unlocked PowerShell window:
 
 ```powershell
 bw get item "project-name — environment" | ConvertFrom-Json | Select-Object -ExpandProperty id
 ```
 
-The item ID is safe configuration metadata. Never save the item JSON or a CLI export in the project or Capsule.
+The item ID is value-safe configuration metadata. Share only that ID and the field name with the agent. Never save item JSON or a CLI export in the project or Capsule.
+
+## What Douglas gives the agent
+
+For each approved command, provide value-safe metadata only:
+
+1. project name and environment, such as `flight-finder development`;
+2. Bitwarden item ID;
+3. exact hidden-field name, such as `AMADEUS_API_KEY`;
+4. exact command to authorize;
+5. whether the credential is development, preview, or production.
+
+The agent resolves the executable path, writes the full tuple, runs the value-free regression test, and tells Douglas when to unlock Bitwarden. Douglas keeps the credential value private throughout.
 
 ## Register an exact broker tuple
 
@@ -125,32 +171,36 @@ The broker should pass the value directly to the approved child process. It must
 ## Second computer
 
 1. Run the Capsule bootstrap.
-2. Sign into the same Bitwarden account.
-3. Install the CLI if the bootstrap could not install it:
+2. Open `manifests\accounts.json` and use the recorded Bitwarden email to select the same account.
+3. Sign into Bitwarden and complete two-factor or trusted-device approval.
+4. Wait for the desktop vault to synchronize; verify the expected item names visually.
+5. Install the CLI if the bootstrap could not install it:
 
 ```powershell
 npm install -g @bitwarden/cli
 ```
 
-4. Run `bw login`, then unlock:
+6. Run `bw login`, then unlock:
 
 ```powershell
 $env:BW_SESSION = bw unlock --raw
 ```
 
-5. Sync the vault:
+7. Sync the vault:
 
 ```powershell
 bw sync
 ```
 
-6. Run the broker regression test:
+8. Run the broker regression test:
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\.agents\tools\Invoke-WithBitwardenItem.test.ps1"
 ```
 
-7. Test one development tuple for each project before using a production tuple.
+9. Test one development tuple for each project before using a production tuple.
+
+Bitwarden pulls the current encrypted vault when a new device logs in. The explicit `bw sync` step ensures the CLI has the latest copy before a broker invocation.
 
 ## Rotation and removal
 
@@ -180,4 +230,6 @@ Never put a vault export, master password, session value, API key, access token,
 
 - Bitwarden Password Manager plans: <https://bitwarden.com/help/password-manager-plans/>
 - Bitwarden CLI: <https://bitwarden.com/help/cli/>
+- Bitwarden data storage: <https://bitwarden.com/help/data-storage/>
+- Vault synchronization: <https://bitwarden.com/help/vault-sync/>
 - Two-step login: <https://bitwarden.com/help/setup-two-step-login/>

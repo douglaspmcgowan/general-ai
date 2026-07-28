@@ -15,11 +15,17 @@ if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
 $map = Get-Content -LiteralPath $path -Raw -Encoding UTF8 | ConvertFrom-Json
 foreach ($account in @($map.accounts)) {
     $current = [string]$account.accountIdentifier
+    Write-Host ''
+    Write-Host "$($account.service): $($account.purpose)"
+    if ($account.identifierLabel) { Write-Host "Enter: $($account.identifierLabel)" }
+    if ($account.exampleFormat) { Write-Host "Format example: $($account.exampleFormat)" }
+    if ($account.whereToFind) { Write-Host "Find it: $($account.whereToFind)" }
+    Write-Host 'Never enter a password, token, key, session value, or recovery code.'
     $prompt = if ($current) {
-        "$($account.service) account identifier [$current]"
+        "Account identifier [$current]"
     }
     else {
-        "$($account.service) account identifier"
+        'Account identifier'
     }
     $answer = Read-Host $prompt
     if (-not [string]::IsNullOrWhiteSpace($answer)) {

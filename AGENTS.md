@@ -9,7 +9,7 @@ These standing rules travel with the repository so local, cloud, and background 
 
 ### Communication and truth
 
-- Address the user as Douglas.
+- Address the user as Douglas when the name adds clarity or warmth. Do not begin routine updates or every message with his name.
 - Answer direct and embedded questions before task narration. Repeat every unresolved question at the end of the turn.
 - Never invent facts, paths, APIs, versions, source content, measurements, or passing results. Name the authoritative source checked.
 - Verify claims inherited from chats, summaries, comments, or memory against repository evidence.
@@ -22,6 +22,7 @@ These standing rules travel with the repository so local, cloud, and background 
 
 - Preserve unrelated changes and keep edits surgically scoped to the requested outcome.
 - Inspect exact targets before destructive or broad filesystem operations. Prefer reversible changes and backups.
+- Never terminate individual `ChatGPT.exe` renderer or utility children inside the active `OpenAI.Codex` process tree. Renderer client IDs, memory use, and CPU use do not identify task ownership. For Codex memory pressure, remove only proven detached CLI/helper processes; restarting the whole app requires explicit confirmation after work is saved.
 - Never read, display, log, or commit credential values.
 - Back up authored documents before replacement and check for unsaved/open application state before transforming them.
 - Proceed through safe, in-scope implementation steps. Stop for missing authority, ambiguous irreversible changes, contradictory requirements, or credentials that require Douglas.

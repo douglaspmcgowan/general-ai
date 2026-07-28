@@ -65,7 +65,13 @@ if (Test-Path -LiteralPath $workspaceTarget) {
 New-Item -ItemType Directory -Path $CapsuleRoot, (Join-Path $CapsuleRoot 'manifests'), (Join-Path $CapsuleRoot 'tools') -Force | Out-Null
 Copy-Tree -Source $SnapshotRoot -Destination $workspaceTarget
 
-foreach ($doc in @('START-HERE.md', 'SYSTEM-MAP.md', 'SECRETS-BITWARDEN.md')) {
+foreach ($doc in @(
+    'AGENT-START.md',
+    'START-HERE.md',
+    'SYSTEM-MAP.md',
+    'DATA-SYNC-AND-RETENTION.md',
+    'SECRETS-BITWARDEN.md'
+)) {
     Copy-Item -LiteralPath (Join-Path $PSScriptRoot $doc) -Destination (Join-Path $CapsuleRoot $doc)
 }
 foreach ($tool in @(

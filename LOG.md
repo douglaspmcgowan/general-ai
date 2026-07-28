@@ -10,3 +10,4 @@
 2026-07-27 | Copied missing personal files out of OneDrive without overwriting local collisions, verified no missing-file work remains, and stopped Google Drive after it auto-restarted with the same nine unsafe backup roots.
 2026-07-27 | Installed and live-verified nightly portable Agent Backups, three-mode project restore, approved application-data recovery, full-tuple Bitwarden brokering, local known-folder repair, and deterministic 13-folder Quick Access recovery.
 2026-07-27 | Built the 25-project Capsule, renamed the coordination authority to general-ai, added clean-clone-proven offline bundles and UTF-8-safe restore, and passed a full disposable computer rebuild.
+2026-07-28 | Made Capsule self-explanatory for agents and humans, documented cross-computer updates and retention, expanded Bitwarden/account guidance, confirmed the Google Drive Computers retrieval route, and added Codex renderer process-safety enforcement.

@@ -10,8 +10,10 @@ if (-not $CapsuleRoot) {
 $integrityPath = Join-Path $CapsuleRoot 'manifests\integrity.json'
 $pointerPath = Join-Path $CapsuleRoot 'manifests\capsule.json'
 foreach ($required in @(
+    (Join-Path $CapsuleRoot 'AGENT-START.md'),
     (Join-Path $CapsuleRoot 'START-HERE.md'),
     (Join-Path $CapsuleRoot 'SYSTEM-MAP.md'),
+    (Join-Path $CapsuleRoot 'DATA-SYNC-AND-RETENTION.md'),
     (Join-Path $CapsuleRoot 'SECRETS-BITWARDEN.md'),
     $integrityPath,
     $pointerPath,
