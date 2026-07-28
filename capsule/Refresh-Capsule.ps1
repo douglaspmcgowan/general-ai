@@ -70,7 +70,8 @@ foreach ($doc in @(
     'START-HERE.md',
     'SYSTEM-MAP.md',
     'DATA-SYNC-AND-RETENTION.md',
-    'SECRETS-BITWARDEN.md'
+    'SECRETS-BITWARDEN.md',
+    'NEXT-STEPS.md'
 )) {
     Copy-Item -LiteralPath (Join-Path $PSScriptRoot $doc) -Destination (Join-Path $CapsuleRoot $doc)
 }
@@ -90,7 +91,13 @@ $recoveryRoot = Join-Path (Split-Path -Parent $PSScriptRoot) 'recovery'
 if (-not (Test-Path -LiteralPath $recoveryRoot -PathType Container)) {
     $recoveryRoot = Join-Path (Split-Path -Parent $PSScriptRoot) 'tools'
 }
-foreach ($recoveryTool in @('Restore-AgentWorkspace.ps1', 'Repair-QuickAccess.ps1')) {
+foreach ($recoveryTool in @(
+    'Restore-AgentWorkspace.ps1',
+    'Repair-QuickAccess.ps1',
+    'Clear-StaleAgentProcesses.ps1',
+    'Clear-StaleAgentProcesses.test.ps1',
+    'Install-StaleAgentCleanupTask.ps1'
+)) {
     Copy-Item -LiteralPath (Join-Path $recoveryRoot $recoveryTool) -Destination (Join-Path $CapsuleRoot 'tools')
 }
 Copy-Item -LiteralPath $AccountMapPath -Destination (Join-Path $CapsuleRoot 'manifests\accounts.json')

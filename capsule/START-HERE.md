@@ -18,12 +18,20 @@ Read `AGENT-START.md` first. It contains the required reading order, safety boun
 ## Rebuild a new computer
 
 1. Sign into Windows with the intended Windows account.
-2. Open <https://drive.google.com/drive/computers> with the same Google account.
-3. Open this source computer's entry, usually `SEEK_TO_SERVE`, then open `Documents\Capsule`.
+2. Open **Google Drive → My Drive → Capsule**. On the source computer, the verified direct path is `C:\Users\dougl\My Drive\Capsule`.
+3. If the My Drive copy has not appeared yet, use <https://drive.google.com/drive/computers>, open this source computer's entry (usually `SEEK_TO_SERVE`), then open `Documents\Capsule`.
 4. If OneDrive is installed, leave it unchanged.
 5. Download the entire folder to a new local staging path outside OneDrive, such as `C:\Users\<you>\Capsule`.
 6. Run `tools\Verify-Capsule.cmd`.
 7. Continue only after verification reports `PASS`.
+
+You can point an agent directly at:
+
+```text
+C:\Users\<you>\My Drive\Capsule\AGENT-START.md
+```
+
+Google Drive for desktop can mirror My Drive into `%USERPROFILE%\My Drive` or expose it through a mounted-drive shortcut. Locate the visible **My Drive** folder in File Explorer, then keep the `Capsule\AGENT-START.md` suffix.
 8. Double-click `tools\Bootstrap-Capsule.cmd`.
 9. Sign into each application with the identifiers listed in `manifests\accounts.json`.
 10. Unlock Bitwarden and follow `SECRETS-BITWARDEN.md`.

@@ -12,6 +12,9 @@
 - Capsule now contains an explicit agent entry point, exact Google Drive retrieval instructions, a complete ongoing-sync and excluded-data map, documented retention status, expanded Bitwarden responsibilities, and contextual account prompts.
 - Google Drive's live root-preference database lists `Documents` as an active selected folder. On another computer, Capsule is retrieved through `drive.google.com/drive/computers`, usually under `SEEK_TO_SERVE\Documents\Capsule`.
 - Automatic snapshot deletion remains disabled. The documented retention recommendation is 14 daily, 8 weekly, and 12 month-end snapshots plus labeled milestones and the newest fully restored snapshot.
+- A guarded stale-agent cleanup is installed as a limited-user task at 01:15, 07:15, 13:15, and 19:15. It requires a three-hour minimum age, the reproduced orphaned Node helper pattern, active-agent exclusions, and immediate revalidation.
+- The directly accessible Google Drive copy is `C:\Users\dougl\My Drive\Capsule`; its 5,740-file integrity manifest passes. `My Drive\Capsule\AGENT-START.md` is the receiving agent entry.
+- Four human-gated actions remain: create the Docket Bitwarden item and share value-free tuple metadata; stop Google Drive backup for Desktop/Documents/Downloads after upload confirmation; then approve rollback-worktree and old-OneDrive retirement from a fresh `general-ai` session.
 
 - The shared harness is installed live and published to its private GitHub authority. GitHub CLI authorization is stored in the desktop user's Windows keyring; a failure under `CodexSandboxOnline` does not establish that the desktop login is invalid.
 - Docket's loopback-authentication repair is published on private GitHub at commit `33b00f4`.

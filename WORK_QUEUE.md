@@ -67,7 +67,7 @@ Goal: establish a durable operating model for projects, tasks, and files across 
 - [x] Reconcile project `AGENTS.md` with the portable global rules and wire task, log, backlog, verification, map, design, and memory documents.
 - [x] Verify the Google Drive folder coverage shown in Douglas's screenshot and record remaining backup recommendations.
 - [x] Define the canonical skill, command alias, product adapter, project binding, and provider/model adapter naming convention.
-- [!] Publish the 157-card cross-platform Skills Docket to the cloud board. The value-free outbox and reviewed local Docket client are complete; the Docket review credential is absent.
+- [?] Create the Docket Bitwarden production item with hidden `REVIEW_SECRET`, then give the agent the value-free tuple metadata so it can publish the 157-card outbox.
 - [x] Supersede the Bitwarden Secrets Manager Docket design with Password Manager Free item/field tuples.
 - [x] Diagnose and, when recoverable without overwriting, repair `C:\Users\dougl\Downloads\FOR-DOUGLAS.zip`.
 - [x] Create and live-test a concise cross-platform `skill-audit` skill using the audited skill-writing discipline.
@@ -117,10 +117,10 @@ Goal: establish a durable operating model for projects, tasks, and files across 
 - [x] Standardize the canonical local repository root on lowercase `C:\Users\dougl\projects`.
 - [x] Remove roughly 7.3 GiB of obsolete OneDrive runtime residue and install exact-path next-sign-in cleanup for the final shell-locked files.
 - [x] Pause Google Drive before its broad configured roots can upload additional local product state.
-- [?] In Google Drive Preferences, remove all nine confirmed broad selected folders. Add only curated, value-free backup exports after a restore test.
+- [?] In Google Drive Preferences, stop the three remaining broad computer-backup selections—Desktop, Documents, and Downloads—after `My Drive\Capsule` reports Up to date and local copies are confirmed.
 - [x] Complete GitHub CLI device authorization, configure the reusable Git HTTPS helper, and push the Docket and harness documentation commits.
 - [x] Supersede the three-project Secrets Manager handoff with the Password Manager Free broker procedure.
-- [!] Publish the 157 Skills Docket cards after the free Docket secret handoff is complete.
+- [x] Supersede the duplicate Skills Docket publication item with the single human-gated Bitwarden tuple item above.
 - [x] Migrate nine inactive repositories with exact tree digests, matching Git dirty state, and passing project verifiers.
 - [x] Migrate Flight Finder with matching Git diffs, staged state, untracked-content digest, file inventory, `git fsck`, and project verifier.
 - [x] Migrate the Flight Tracker coordination folder with an exact tree digest.
@@ -128,8 +128,8 @@ Goal: establish a durable operating model for projects, tasks, and files across 
 - [x] Preserve the IDETC archive in its per-project data folder and verify matching SHA-256 hashes.
 - [x] Preserve the finished 168 Audit state in a verified replacement worktree and move its main repository to the lowercase project root.
 - [x] Preserve the published Berkeley House completion commit in a verified replacement worktree.
-- [!] Remove the old registered worktree rollback copies after this workspace closes and its delete-deny ACL no longer applies.
-- [!] Retire the old `C:\Users\dougl\OneDrive` data tree after the Google Drive UI cleanup, fresh lowercase session, and final restore evidence.
+- [?] From a fresh `general-ai` session, reverify and approve removal of the old registered worktree rollback copies after this active rollback workspace closes.
+- [?] From that fresh session, reverify and approve retirement of `C:\Users\dougl\OneDrive` after the three Google Drive backup selections are removed.
 - [x] Copy missing personal Desktop, non-General-Claude Documents, Pictures, and Attachments files into their normal local Windows folders without overwriting collisions.
 
 ## Portable project, app-data, and Explorer recovery — 2026-07-27
@@ -170,3 +170,14 @@ Goal: establish a durable operating model for projects, tasks, and files across 
 - [x] Push and remote-verify the safe harness changes with the existing GitHub authorization.
 - [x] Preserve OneDrive on a receiving computer and require inventory/staging before any migration or known-folder changes.
 - [x] Audit Windows memory accounting and distinguish safe stale helpers from the active Codex process tree.
+
+## Reliable cleanup, remaining setup, and direct Drive Capsule — 2026-07-28
+
+- [x] Inventory stale-agent-process behavior, existing cleanup mechanisms, open queue items, Bitwarden state, and the Google Drive target.
+- [x] Build and test a guarded dry-run-first stale-agent-process cleanup tool.
+- [x] Install and verify a recurring cleanup task.
+- [x] Reconcile every remaining queue item into completed, externally blocked, or human-only action.
+- [x] Produce the exact remaining Bitwarden and computer-setup checklist.
+- [x] Refresh Capsule and publish a directly accessible `My Drive\Capsule` copy.
+- [x] Update durable harness documentation, changelog, integrity stamp, project state, and work log.
+- [x] Run Capsule, harness, project, Gitleaks, task, Git, and remote verification.

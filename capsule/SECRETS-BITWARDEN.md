@@ -15,6 +15,23 @@ This guide uses Bitwarden Password Manager Free. It supports unlimited personal 
 | Sign in, approve a new device, and unlock the vault | Resolve exact executable and script paths |
 | Create, rotate, and revoke provider credentials | Add an approved value-free full tuple to the broker policy |
 | Enter credential values into hidden Bitwarden fields | Run broker and regression checks after Douglas unlocks the CLI |
+
+## Current remaining setup
+
+The Bitwarden CLI, Password Manager broker, fail-closed tuple policy, and regression test are installed. The production tuple policy remains empty until the required Bitwarden items exist.
+
+Douglas completes these human-only steps:
+
+1. Sign into the Bitwarden desktop app and web vault with the intended account.
+2. Enable two-step login and store the recovery material separately.
+3. Complete the safe account identifiers in `manifests\accounts.json`; enter login email addresses or SSO labels only.
+4. Create one Bitwarden Login item per project/environment that needs a credential.
+5. Add each credential as a hidden custom field whose name matches the required environment-variable name.
+6. For Docket publication, create the planned production item and hidden `REVIEW_SECRET` field.
+7. Give the agent only the non-secret item identifier, item label, field name, destination environment-variable name, executable path, and exact argument list.
+8. Run `bw login` once on the receiving computer and unlock the CLI when a brokered command is ready.
+
+The agent then registers the exact value-free tuple, runs `Invoke-WithBitwardenItem.test.ps1`, and exercises the approved command after the vault is unlocked. Passwords, tokens, recovery codes, and field values never enter Capsule, Git, chat, or the broker policy.
 | Decide which command may use a production credential | Confirm that a child process receives the variable without creating a `.env` file |
 
 The agent must never ask Douglas to paste a secret into chat, inspect vault item JSON, enumerate vault contents, or capture `BW_SESSION`. Douglas completes every screen or prompt that reveals a master password, two-factor code, recovery code, API key, token, or session value.

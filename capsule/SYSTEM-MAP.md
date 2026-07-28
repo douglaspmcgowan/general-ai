@@ -19,7 +19,7 @@ flowchart TD
     B --> K["Dated Capsule payload + integrity manifest"]
     K --> N["New Windows computer"]
     BW["Bitwarden account"] -->|"encrypted vault sync"| N
-    GD["Google Drive account"] -->|"Drive sync"| N
+    GD["Google Drive My Drive\\Capsule"] -->|"direct Drive sync"| N
     PA["OpenAI, Anthropic, Cursor accounts"] -->|"provider-supported account sync"| N
     N -->|"verified restore"| P2["Restored projects and project data"]
     N -->|"verified restore"| H2["Restored shared harness"]
@@ -41,6 +41,7 @@ flowchart TD
 | File Explorer pins | Portable path manifest | `Recovery\quick-access.json` |
 | Google Drive documents | Google Drive account | Resynced from Google after login |
 | Machine rebuild | Capsule | Bootstrap script plus SHA-256 integrity manifest |
+| Old agent helper memory | Guarded stale-process cleanup task | Dry-run inspection, active-tree exclusions, immediate revalidation, JSONL audit log |
 
 ## Update routes after installation
 
@@ -70,6 +71,8 @@ See `DATA-SYNC-AND-RETENTION.md` for exclusions, the current retention state, an
 ## Folder reading order
 
 An agent starts at `AGENT-START.md`. A human starts at `START-HERE.md`. Both paths converge on this map, `DATA-SYNC-AND-RETENTION.md`, and `SECRETS-BITWARDEN.md` before bootstrap or secret use.
+
+The preferred cross-computer entry is `Google Drive\My Drive\Capsule\AGENT-START.md`. The verified source-computer path is `C:\Users\dougl\My Drive\Capsule\AGENT-START.md`; receiving computers may mirror `%USERPROFILE%\My Drive` or expose My Drive through a mounted-drive shortcut.
 
 ## Verification on the receiving computer
 

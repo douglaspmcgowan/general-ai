@@ -15,6 +15,7 @@ foreach ($required in @(
     (Join-Path $CapsuleRoot 'SYSTEM-MAP.md'),
     (Join-Path $CapsuleRoot 'DATA-SYNC-AND-RETENTION.md'),
     (Join-Path $CapsuleRoot 'SECRETS-BITWARDEN.md'),
+    (Join-Path $CapsuleRoot 'NEXT-STEPS.md'),
     $integrityPath,
     $pointerPath,
     (Join-Path $CapsuleRoot 'tools\Bootstrap-Capsule.ps1'),
