@@ -3,10 +3,13 @@ param(
     [string]$CapsuleRoot = (Join-Path $env:USERPROFILE 'Documents\Capsule'),
     [string]$SnapshotRoot,
     [string]$HarnessRepository = (Join-Path $env:USERPROFILE 'projects\agent-harness'),
-    [string]$AccountMapPath = (Join-Path $PSScriptRoot 'templates\accounts.template.json')
+    [string]$AccountMapPath
 )
 
 $ErrorActionPreference = 'Stop'
+if (-not $AccountMapPath) {
+    $AccountMapPath = Join-Path $PSScriptRoot 'templates\accounts.template.json'
+}
 
 function Copy-Tree {
     param([string]$Source, [string]$Destination)
@@ -24,6 +27,13 @@ function Copy-Tree {
 function Assert-SafeFileName {
     param([string]$Path)
     $leaf = Split-Path -Leaf $Path
+    if ($leaf -in @(
+        'credential-command-allowlist.json',
+        'credential-command-policy.json',
+        'bws-command-allowlist.json'
+    )) {
+        return
+    }
     if ($leaf -match '^(?i)\.env($|\.)|credential|token|password|passcode|recovery.?key|cookies?$') {
         throw "A forbidden secret-like filename was found: $Path"
     }
@@ -34,7 +44,7 @@ if (-not $SnapshotRoot) {
     if (-not (Test-Path -LiteralPath $latestPath -PathType Leaf)) {
         throw "Latest Agent Backups pointer is unavailable: $latestPath"
     }
-    $SnapshotRoot = [string]((Get-Content -LiteralPath $latestPath -Raw | ConvertFrom-Json).snapshotRoot)
+    $SnapshotRoot = [string]((Get-Content -LiteralPath $latestPath -Raw -Encoding UTF8 | ConvertFrom-Json).snapshotRoot)
 }
 
 $snapshotManifest = Join-Path $SnapshotRoot 'Recovery\project-recovery.json'

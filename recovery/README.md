@@ -13,7 +13,7 @@ Run `Backup-AgentWorkspace.cmd` nightly through the `Nightly Agent Backups` sche
 C:\Users\dougl\Documents\Agent Backups\Tools\Restore-AgentWorkspace.cmd -BackupRoot "C:\Users\dougl\Documents\Agent Backups\Workspace"
 ```
 
-The restore prefers each captured offline bundle, reapplies any reviewed uncommitted snapshot, restores project application data and selected value-safe product configuration, and repairs Quick Access folder pins. Product sessions, caches, authentication stores, `.env` files, credential exports, and restricted data remain excluded.
+The restore prefers each captured offline bundle, reapplies any reviewed uncommitted snapshot, restores project application data and selected value-safe product configuration, and repairs Quick Access folder pins. Every history bundle must clone successfully into an empty temporary repository during backup. An incomplete object store or older-history Gitleaks finding triggers a clean current-tree bundle. Current-tree files still flagged by that scan are excluded, the omission count is recorded, and the reduced bundle must pass Gitleaks again. Published history and omitted tracked material remain available from GitHub. Product sessions, caches, authentication stores, `.env` files, credential exports, and restricted data remain excluded.
 
 `C:\Users\dougl\Documents\Capsule` packages one verified snapshot with the portable harness, application list, safe account identifiers, Bitwarden procedure, setup map, restore tools, and SHA-256 integrity records. Run its `tools\Bootstrap-Capsule.cmd` on a clean receiving Windows profile.
 

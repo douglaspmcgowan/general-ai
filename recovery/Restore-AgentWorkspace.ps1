@@ -49,12 +49,12 @@ if (-not (Test-Path -LiteralPath $directManifest)) {
     if (-not (Test-Path -LiteralPath $latestPath)) {
         throw 'The backup root contains no recovery manifest.'
     }
-    $latest = Get-Content -LiteralPath $latestPath -Raw | ConvertFrom-Json
+    $latest = Get-Content -LiteralPath $latestPath -Raw -Encoding UTF8 | ConvertFrom-Json
     $snapshotRoot = [string]$latest.snapshotRoot
     $directManifest = Join-Path $snapshotRoot 'Recovery\project-recovery.json'
 }
 
-$manifest = Get-Content -LiteralPath $directManifest -Raw | ConvertFrom-Json
+$manifest = Get-Content -LiteralPath $directManifest -Raw -Encoding UTF8 | ConvertFrom-Json
 $projectsRoot = Join-Path $UserRoot 'projects'
 New-Item -ItemType Directory -Path $projectsRoot -Force | Out-Null
 
@@ -92,7 +92,12 @@ foreach ($project in @($manifest.projects)) {
         [string](git -c "safe.directory=$safeTarget" -C $target rev-parse --verify HEAD)
     }
     if ($null -eq $head) { $head = '' } else { $head = $head.Trim() }
-    if ([string]$project.commit -and $head -ne [string]$project.commit) {
+    $offlineBundleMode = if ($project.PSObject.Properties.Name -contains 'offlineBundleMode') {
+        [string]$project.offlineBundleMode
+    } else { 'history' }
+    if ([string]$project.commit -and
+        $head -ne [string]$project.commit -and
+        $offlineBundleMode -ne 'sanitized-tip') {
         git -c "safe.directory=$safeTarget" -C $target checkout ([string]$project.commit)
         if ($LASTEXITCODE -ne 0) { throw "Recorded commit could not be restored for $($project.name)." }
     }
@@ -140,7 +145,7 @@ if (-not $SkipQuickAccess -and [string]::Equals(
             $_.InvokeVerb('unpinfromhome')
         }
 
-        $quickAccessManifest = Get-Content -LiteralPath $quickAccessPath -Raw | ConvertFrom-Json
+        $quickAccessManifest = Get-Content -LiteralPath $quickAccessPath -Raw -Encoding UTF8 | ConvertFrom-Json
         foreach ($portablePath in @($quickAccessManifest.pinnedFolders)) {
             $path = Expand-RecoveryPath -Path ([string]$portablePath)
             if (Test-Path -LiteralPath $path -PathType Container) {

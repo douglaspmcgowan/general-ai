@@ -21,7 +21,7 @@ function Expand-PortablePath {
     return $expanded
 }
 
-$manifest = Get-Content -LiteralPath $ManifestPath -Raw | ConvertFrom-Json
+$manifest = Get-Content -LiteralPath $ManifestPath -Raw -Encoding UTF8 | ConvertFrom-Json
 $allTargets = @($manifest.pinnedFolders | ForEach-Object {
     Expand-PortablePath -Path ([string]$_)
 })

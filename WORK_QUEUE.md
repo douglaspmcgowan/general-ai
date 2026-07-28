@@ -152,6 +152,6 @@ Goal: establish a durable operating model for projects, tasks, and files across 
 - [x] Build Capsule bootstrap, refresh, verification, manifests, instructions, and system map.
 - [x] Include local-only repositories, application data, handoffs, and the private harness recovery path.
 - [x] Rename the project identity from general-claude to general-ai.
-- [ ] Create and verify `C:\Users\dougl\projects\general-ai`; retain the current folder as a session-owned rollback copy.
-- [~] Update shared harness documentation and recovery pointers; local private-harness commit complete and remote publication requires refreshed GitHub authorization.
-- [ ] Run assembled Capsule restore, Gitleaks, project, harness, and adversarial verification.
+- [x] Create and verify `C:\Users\dougl\projects\general-ai`; retain the current folder as a session-owned rollback copy.
+- [!] Publish the final shared-harness commit after Douglas refreshes GitHub authorization; live installation, local commit, and offline Capsule payload are complete.
+- [x] Run assembled Capsule restore, Gitleaks, project, harness, UTF-8, bundle-clone, and adversarial verification.

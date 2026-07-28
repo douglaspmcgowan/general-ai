@@ -41,6 +41,15 @@ try {
         (Join-Path $projectDataRoot 'sample-project\portable.txt'),
         "portable application data`n"
     )
+    [System.IO.File]::WriteAllText(
+        (Join-Path $projectDataRoot 'sample-project\Screenshot 4.32.21 PM.txt'),
+        "unicode path`n"
+    )
+    New-Item -ItemType Directory -Path (Join-Path $project '.agents\tools') -Force | Out-Null
+    [System.IO.File]::WriteAllText(
+        (Join-Path $project '.agents\tools\credential-command-policy.json'),
+        "{`"schemaVersion`":2,`"commands`":[]}`n"
+    )
 
     & $backup `
         -ProjectsRoot $projectsRoot `
@@ -80,8 +89,17 @@ try {
     if (-not (Test-Path -LiteralPath (Join-Path $restoreRoot 'Data\Projects\sample-project\portable.txt') -PathType Leaf)) {
         throw 'Bootstrap did not restore portable project application data.'
     }
+    if (-not (Test-Path -LiteralPath (Join-Path $restoreRoot 'Data\Projects\sample-project\Screenshot 4.32.21 PM.txt') -PathType Leaf)) {
+        throw 'Bootstrap did not restore a UTF-8 project-data filename.'
+    }
 
+    $approvedMetadataFiles = @(
+        'credential-command-allowlist.json',
+        'credential-command-policy.json',
+        'bws-command-allowlist.json'
+    )
     $secretLikeFiles = @(Get-ChildItem -LiteralPath $capsuleRoot -File -Recurse -Force | Where-Object {
+        $_.Name -notin $approvedMetadataFiles -and
         $_.Name -match '^(?i)\.env($|\.)|credential|token|password|passcode|recovery.?key|cookies?$'
     })
     if ($secretLikeFiles.Count) {

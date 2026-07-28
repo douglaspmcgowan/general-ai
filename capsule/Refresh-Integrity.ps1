@@ -1,9 +1,12 @@
 [CmdletBinding()]
 param(
-    [string]$CapsuleRoot = (Split-Path -Parent $PSScriptRoot)
+    [string]$CapsuleRoot
 )
 
 $ErrorActionPreference = 'Stop'
+if (-not $CapsuleRoot) {
+    $CapsuleRoot = Split-Path -Parent $PSScriptRoot
+}
 $integrityPath = Join-Path $CapsuleRoot 'manifests\integrity.json'
 $files = @(Get-ChildItem -LiteralPath $CapsuleRoot -File -Recurse -Force | Where-Object {
     $_.FullName -ne $integrityPath

@@ -89,6 +89,107 @@ function Copy-ApprovedTree {
     }
 }
 
+function New-SanitizedTipBundle {
+    param(
+        [string]$Repository,
+        [string]$SafeRepository,
+        [string]$BundlePath,
+        [string]$ProjectName
+    )
+
+    $root = Join-Path $env:TEMP ("agent-tip-bundle-" + [Guid]::NewGuid().ToString('N'))
+    $archive = Join-Path $root 'tip.zip'
+    $tree = Join-Path $root 'tree'
+    $report = Join-Path $root 'gitleaks-redacted.json'
+    $omissionCount = 0
+    try {
+        New-Item -ItemType Directory -Path $tree -Force | Out-Null
+        git -c "safe.directory=$SafeRepository" -C $Repository archive --format=zip --output=$archive HEAD
+        if ($LASTEXITCODE -ne 0) { throw "Current-tree archive failed for $ProjectName." }
+        Expand-Archive -LiteralPath $archive -DestinationPath $tree
+
+        if (Get-Command gitleaks -ErrorAction SilentlyContinue) {
+            & gitleaks dir --no-banner --redact --exit-code 1 --report-format json --report-path $report $tree
+            if ($LASTEXITCODE -ne 0) {
+                if (-not (Test-Path -LiteralPath $report -PathType Leaf)) {
+                    throw "Gitleaks blocked the current-tree recovery bundle for $ProjectName without a redacted report."
+                }
+                $findings = @(Get-Content -LiteralPath $report -Raw | ConvertFrom-Json)
+                $flaggedFiles = @($findings | ForEach-Object { [string]$_.File } | Where-Object {
+                    -not [string]::IsNullOrWhiteSpace($_)
+                } | Sort-Object -Unique)
+                if (-not $flaggedFiles.Count) {
+                    throw "Gitleaks blocked the current-tree recovery bundle for $ProjectName without a removable file boundary."
+                }
+                foreach ($flagged in $flaggedFiles) {
+                    $candidate = if ([System.IO.Path]::IsPathRooted($flagged)) {
+                        [System.IO.Path]::GetFullPath($flagged)
+                    }
+                    else {
+                        [System.IO.Path]::GetFullPath((Join-Path $tree $flagged))
+                    }
+                    $treePrefix = [System.IO.Path]::GetFullPath($tree).TrimEnd('\') + '\'
+                    if (-not $candidate.StartsWith($treePrefix, [StringComparison]::OrdinalIgnoreCase)) {
+                        throw "Gitleaks returned an unsafe recovery omission path for $ProjectName."
+                    }
+                    if (Test-Path -LiteralPath $candidate -PathType Leaf) {
+                        Remove-Item -LiteralPath $candidate -Force
+                        $omissionCount += 1
+                    }
+                }
+                [System.IO.File]::WriteAllText(
+                    (Join-Path $tree 'RECOVERY-OMISSIONS.md'),
+                    "# Recovery omissions`n`n$omissionCount tracked file(s) were excluded from this offline current-tree bundle by the Gitleaks gate. Restore published tracked material from the recorded GitHub remote after authentication.`n",
+                    [System.Text.UTF8Encoding]::new($false)
+                )
+                & gitleaks dir --no-banner --redact --exit-code 1 $tree
+                if ($LASTEXITCODE -ne 0) {
+                    throw "Gitleaks blocked the reduced current-tree recovery bundle for $ProjectName."
+                }
+            }
+        }
+
+        git -C $tree init | Out-Null
+        git -C $tree config user.name 'Agent Backups'
+        git -C $tree config user.email 'agent-backups@example.invalid'
+        git -C $tree add -A
+        git -c core.hooksPath= -C $tree commit -m 'Portable recovery snapshot' | Out-Null
+        if ($LASTEXITCODE -ne 0) { throw "Current-tree recovery commit failed for $ProjectName." }
+        git -C $tree bundle create $BundlePath --all
+        if ($LASTEXITCODE -ne 0) { throw "Current-tree recovery bundle failed for $ProjectName." }
+        return $omissionCount
+    }
+    finally {
+        if (Test-Path -LiteralPath $root) {
+            $resolved = (Resolve-Path -LiteralPath $root).Path
+            if ($resolved.StartsWith([System.IO.Path]::GetTempPath(), [StringComparison]::OrdinalIgnoreCase)) {
+                Remove-Item -LiteralPath $resolved -Recurse -Force
+            }
+        }
+    }
+}
+
+function Test-OfflineBundleClone {
+    param(
+        [string]$BundlePath,
+        [string]$ProjectName
+    )
+
+    $root = Join-Path $env:TEMP ("agent-bundle-clone-" + [Guid]::NewGuid().ToString('N'))
+    try {
+        git clone $BundlePath (Join-Path $root 'clone') | Out-Null
+        return ($LASTEXITCODE -eq 0)
+    }
+    finally {
+        if (Test-Path -LiteralPath $root) {
+            $resolved = (Resolve-Path -LiteralPath $root).Path
+            if ($resolved.StartsWith([System.IO.Path]::GetTempPath(), [StringComparison]::OrdinalIgnoreCase)) {
+                Remove-Item -LiteralPath $resolved -Recurse -Force
+            }
+        }
+    }
+}
+
 function Get-NormalizedQuickAccessPath {
     param([string]$Path)
     $profile = [Environment]::GetFolderPath('UserProfile').TrimEnd('\')
@@ -142,16 +243,49 @@ Get-ChildItem -LiteralPath $ProjectsRoot -Directory | Where-Object {
     $recoveryMode = if ($remote -and $commit) { 'remote' } elseif ($commit) { 'bundle' } else { 'files' }
 
     $bundleIncluded = $false
+    $offlineBundleMode = 'none'
+    $offlineOmittedFiles = 0
+    $offlineBundleCloneVerified = $false
     if ($commit) {
+        $historyClean = $true
         if (Get-Command gitleaks -ErrorAction SilentlyContinue) {
             & gitleaks git --no-banner --redact --exit-code 1 $projectPath
             if ($LASTEXITCODE -ne 0) {
-                throw "Gitleaks blocked the repository bundle for $($_.Name)."
+                $historyClean = $false
             }
         }
         $bundlePath = Join-Path $handoffRoot 'Repository.bundle'
-        git -c "safe.directory=$safePath" -C $projectPath bundle create $bundlePath --all
-        if ($LASTEXITCODE -ne 0) { throw "Repository bundle failed for $($_.Name)." }
+        if ($historyClean) {
+            git -c "safe.directory=$safePath" -C $projectPath bundle create $bundlePath --all
+            if ($LASTEXITCODE -ne 0) { throw "Repository bundle failed for $($_.Name)." }
+            $offlineBundleCloneVerified = Test-OfflineBundleClone -BundlePath $bundlePath -ProjectName $_.Name
+            if ($offlineBundleCloneVerified) {
+                $offlineBundleMode = 'history'
+            }
+            else {
+                Remove-Item -LiteralPath $bundlePath -Force
+                $offlineOmittedFiles = New-SanitizedTipBundle `
+                    -Repository $projectPath `
+                    -SafeRepository $safePath `
+                    -BundlePath $bundlePath `
+                    -ProjectName $_.Name
+                $offlineBundleMode = 'sanitized-tip'
+            }
+        }
+        else {
+            $offlineOmittedFiles = New-SanitizedTipBundle `
+                -Repository $projectPath `
+                -SafeRepository $safePath `
+                -BundlePath $bundlePath `
+                -ProjectName $_.Name
+            $offlineBundleMode = 'sanitized-tip'
+        }
+        if (-not $offlineBundleCloneVerified) {
+            $offlineBundleCloneVerified = Test-OfflineBundleClone -BundlePath $bundlePath -ProjectName $_.Name
+        }
+        if (-not $offlineBundleCloneVerified) {
+            throw "Offline recovery bundle failed a clean clone for $($_.Name)."
+        }
         $bundleIncluded = $true
     }
 
@@ -209,6 +343,9 @@ Get-ChildItem -LiteralPath $ProjectsRoot -Directory | Where-Object {
         commit = $commit
         recoveryMode = $recoveryMode
         offlineBundle = $bundleIncluded
+        offlineBundleMode = $offlineBundleMode
+        offlineOmittedFiles = $offlineOmittedFiles
+        offlineBundleCloneVerified = $offlineBundleCloneVerified
         dirtyEntries = $status.Count
         uncommittedSnapshot = $snapshotIncluded
     }
@@ -222,6 +359,8 @@ Generated: $((Get-Date).ToUniversalTime().ToString('o'))
 - Branch: `$branch`
 - Commit: `$commit`
 - Recovery mode: `$recoveryMode`
+- Offline bundle mode: `$offlineBundleMode`
+- Offline omitted files: `$offlineOmittedFiles`
 - Dirty entries: $($status.Count)
 - Uncommitted snapshot included: $snapshotIncluded
 

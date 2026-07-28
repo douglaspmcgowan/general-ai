@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [string]$CapsuleRoot = (Split-Path -Parent $PSScriptRoot),
+    [string]$CapsuleRoot,
     [string]$UserRoot = $env:USERPROFILE,
     [switch]$SkipPackageInstall,
     [switch]$SkipAccountLogin,
@@ -8,6 +8,9 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+if (-not $CapsuleRoot) {
+    $CapsuleRoot = Split-Path -Parent $PSScriptRoot
+}
 
 & (Join-Path $CapsuleRoot 'tools\Verify-Capsule.ps1') -CapsuleRoot $CapsuleRoot | Out-Null
 
@@ -16,7 +19,7 @@ if (-not $SkipPackageInstall) {
     if (-not $winget) {
         throw 'Windows Package Manager is required. Install App Installer from Microsoft Store, then rerun.'
     }
-    $software = Get-Content -LiteralPath (Join-Path $CapsuleRoot 'manifests\software.json') -Raw | ConvertFrom-Json
+    $software = Get-Content -LiteralPath (Join-Path $CapsuleRoot 'manifests\software.json') -Raw -Encoding UTF8 | ConvertFrom-Json
     foreach ($package in @($software.packages | Where-Object { $_.wingetId })) {
         & $winget.Source install --id ([string]$package.wingetId) --exact --accept-package-agreements --accept-source-agreements
         if ($LASTEXITCODE -ne 0) { throw "Package installation failed: $($package.name)" }
@@ -34,7 +37,7 @@ if (-not $SkipAccountLogin) {
     Read-Host 'Press Enter after the account sign-ins are complete'
 }
 
-$pointer = Get-Content -LiteralPath (Join-Path $CapsuleRoot 'manifests\capsule.json') -Raw | ConvertFrom-Json
+$pointer = Get-Content -LiteralPath (Join-Path $CapsuleRoot 'manifests\capsule.json') -Raw -Encoding UTF8 | ConvertFrom-Json
 $snapshotRoot = Join-Path $CapsuleRoot ([string]$pointer.workspaceRelativePath)
 & (Join-Path $CapsuleRoot 'tools\Restore-AgentWorkspace.ps1') `
     -BackupRoot $snapshotRoot `

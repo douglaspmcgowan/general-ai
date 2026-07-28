@@ -1,15 +1,18 @@
 [CmdletBinding()]
 param(
-    [string]$CapsuleRoot = (Split-Path -Parent $PSScriptRoot)
+    [string]$CapsuleRoot
 )
 
 $ErrorActionPreference = 'Stop'
+if (-not $CapsuleRoot) {
+    $CapsuleRoot = Split-Path -Parent $PSScriptRoot
+}
 $path = Join-Path $CapsuleRoot 'manifests\accounts.json'
 if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
     throw "Account map is unavailable: $path"
 }
 
-$map = Get-Content -LiteralPath $path -Raw | ConvertFrom-Json
+$map = Get-Content -LiteralPath $path -Raw -Encoding UTF8 | ConvertFrom-Json
 foreach ($account in @($map.accounts)) {
     $current = [string]$account.accountIdentifier
     $prompt = if ($current) {

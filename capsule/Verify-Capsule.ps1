@@ -1,9 +1,12 @@
 [CmdletBinding()]
 param(
-    [string]$CapsuleRoot = (Split-Path -Parent $PSScriptRoot)
+    [string]$CapsuleRoot
 )
 
 $ErrorActionPreference = 'Stop'
+if (-not $CapsuleRoot) {
+    $CapsuleRoot = Split-Path -Parent $PSScriptRoot
+}
 $integrityPath = Join-Path $CapsuleRoot 'manifests\integrity.json'
 $pointerPath = Join-Path $CapsuleRoot 'manifests\capsule.json'
 foreach ($required in @(
@@ -20,7 +23,7 @@ foreach ($required in @(
     }
 }
 
-$integrity = Get-Content -LiteralPath $integrityPath -Raw | ConvertFrom-Json
+$integrity = Get-Content -LiteralPath $integrityPath -Raw -Encoding UTF8 | ConvertFrom-Json
 foreach ($record in @($integrity.files)) {
     $path = Join-Path $CapsuleRoot ([string]$record.path)
     if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
@@ -36,7 +39,7 @@ foreach ($record in @($integrity.files)) {
     }
 }
 
-$pointer = Get-Content -LiteralPath $pointerPath -Raw | ConvertFrom-Json
+$pointer = Get-Content -LiteralPath $pointerPath -Raw -Encoding UTF8 | ConvertFrom-Json
 $snapshot = Join-Path $CapsuleRoot ([string]$pointer.workspaceRelativePath)
 if (-not (Test-Path -LiteralPath (Join-Path $snapshot 'Recovery\project-recovery.json') -PathType Leaf)) {
     throw 'Capsule workspace recovery manifest is unavailable.'
