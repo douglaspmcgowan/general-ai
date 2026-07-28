@@ -153,5 +153,20 @@ Goal: establish a durable operating model for projects, tasks, and files across 
 - [x] Include local-only repositories, application data, handoffs, and the private harness recovery path.
 - [x] Rename the project identity from general-claude to general-ai.
 - [x] Create and verify `C:\Users\dougl\projects\general-ai`; retain the current folder as a session-owned rollback copy.
-- [!] Publish the final shared-harness commit after Douglas refreshes GitHub authorization; live installation, local commit, and offline Capsule payload are complete.
+- [x] Publish the final shared-harness commit using the existing GitHub keyring authorization after verifying it under the desktop Windows identity.
 - [x] Run assembled Capsule restore, Gitleaks, project, harness, UTF-8, bundle-clone, and adversarial verification.
+# Capsule clarification and publication — 2026-07-28
+
+- [x] Read the Codex-sync and deep-search skill instructions.
+- [x] Verify the existing GitHub CLI keyring authorization under the desktop Windows identity; suppress duplicate browser-login requests caused by the sandbox identity.
+- [x] Add an explicit agent entry point inside Capsule.
+- [x] Explain ongoing project, harness, app-data, excluded-data, and secret synchronization.
+- [x] Define snapshot retention and distinguish the recommendation from active deletion behavior.
+- [x] Clarify every account value Douglas enters.
+- [x] Complete the Bitwarden responsibility and end-to-end usage guide.
+- [x] Add the full system map to the human-readable harness brief.
+- [x] Refresh live/private harness sources and rebuild Capsule.
+- [x] Run integrity, Gitleaks, project, and harness verification.
+- [x] Push and remote-verify the safe harness changes with the existing GitHub authorization.
+- [x] Preserve OneDrive on a receiving computer and require inventory/staging before any migration or known-folder changes.
+- [x] Audit Windows memory accounting and distinguish safe stale helpers from the active Codex process tree.

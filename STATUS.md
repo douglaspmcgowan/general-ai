@@ -13,9 +13,9 @@
 - Google Drive's live root-preference database lists `Documents` as an active selected folder. On another computer, Capsule is retrieved through `drive.google.com/drive/computers`, usually under `SEEK_TO_SERVE\Documents\Capsule`.
 - Automatic snapshot deletion remains disabled. The documented retention recommendation is 14 daily, 8 weekly, and 12 month-end snapshots plus labeled milestones and the newest fully restored snapshot.
 
-- The shared harness is installed live and committed locally at `af6dd49` plus the final Capsule recovery changes. Private-GitHub publication waits for refreshed GitHub authorization; Capsule carries the complete local harness meanwhile.
+- The shared harness is installed live and published to its private GitHub authority. GitHub CLI authorization is stored in the desktop user's Windows keyring; a failure under `CodexSandboxOnline` does not establish that the desktop login is invalid.
 - Docket's loopback-authentication repair is published on private GitHub at commit `33b00f4`.
-- The GitHub app connector works for existing repositories. GitHub CLI returned HTTP 401 during the Capsule audit and needs a fresh `gh auth login`; offline Git bundles cover recovery before that login.
+- The GitHub app connector and GitHub CLI work for existing repositories. Authentication must be checked under the Windows identity that owns the keyring before any browser-login flow is started.
 - Docket starts through the limited-privilege `DocketDaemon` task. The repaired local API passes loopback integration tests without a persistent passcode.
 - The 94-file harness verifier and Gitleaks pass. The value-free recovery pointer is remote-verified.
 - Ten repositories formerly under OneDrive have exact verified copies under `C:\Users\dougl\projects`.
@@ -26,6 +26,7 @@
 - The old worktrees remain registered rollback copies because the active workspace ACL denies directory deletion.
 - Google Drive reports up to date after Douglas updated its folder selection. Capsule and Agent Backups remain independently verifiable local folders.
 - OneDrive is uninstalled. Its old data tree remains the rollback authority during active-path cutover.
+- A receiving computer that already has OneDrive keeps it installed and unchanged during Capsule staging. The agent inventories known-folder mappings, unique files, collisions, and Quick Access before proposing any migration.
 - Missing personal Desktop, non-General-Claude Documents, Pictures, and Attachments files have additive copies in the normal local Windows folders; existing destination files were preserved.
 - Bitwarden Password Manager CLI and the full-tuple broker are installed and tested. Production tuples remain empty until Douglas creates the named Password Manager items and hidden fields.
 - The local Docket contains 162 cards: 157 Skills Docket cards and five setup handoffs. Cloud publication remains pending the Docket secret handoff.

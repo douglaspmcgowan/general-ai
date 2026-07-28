@@ -17,6 +17,8 @@ If you are an agent opening this Capsule on a receiving Windows computer, read a
 - Restore only into a clean receiving profile. The bootstrap refuses existing project and shared-harness destinations.
 - Treat GitHub, Google Drive, and Bitwarden as ongoing authorities after installation. Treat the Capsule payload as a dated recovery snapshot.
 - Preserve `capsule` as the offline Git remote and use `origin` for the recorded GitHub remote.
+- If OneDrive exists on the receiving computer, leave it installed and unchanged. Inventory its selected folders, Windows known-folder mappings, unique files, and Quick Access targets before proposing any migration.
+- Never uninstall, disconnect, reset, delete, move, or reconfigure OneDrive during Capsule bootstrap.
 - Stop when an integrity check, Gitleaks scan, repository verifier, or harness verifier fails.
 
 ## First commands

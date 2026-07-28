@@ -42,10 +42,25 @@ This computer currently syncs `C:\Users\dougl\Documents`, which contains `C:\Use
 2. Sign into the Google account recorded in `manifests\accounts.json`.
 3. Open the source computer entry, usually `SEEK_TO_SERVE`.
 4. Open `Documents\Capsule`.
-5. Download the complete folder to `C:\Users\<receiving-user>\Documents\Capsule`.
-6. Run `tools\Verify-Capsule.cmd` locally before bootstrap.
+5. If OneDrive is installed, leave it unchanged.
+6. Download the complete folder to a new local staging path outside OneDrive, such as `C:\Users\<receiving-user>\Capsule`.
+7. Run `tools\Verify-Capsule.cmd` locally before bootstrap.
 
 Google Drive stores folders selected under **Folders from your computer** in its **Computers/Other computers** area. The web Computers view is the reliable cross-computer retrieval path. A future dedicated copy under **My Drive** would also appear directly in each computer's streamed or mirrored My Drive.
+
+## OneDrive on the receiving computer
+
+Leave OneDrive installed, connected, and unchanged during Capsule restore. Before any later migration:
+
+1. inventory OneDrive's selected folders and sync status;
+2. resolve the physical paths for Windows Desktop, Documents, Pictures, and other known folders;
+3. identify unique files and filename collisions;
+4. record Quick Access targets;
+5. copy additively into approved destinations without overwriting collisions;
+6. compare source and destination;
+7. verify every application and shortcut that relied on an old path.
+
+Uninstalling, disconnecting, moving, deleting, or changing OneDrive folder protection belongs to a separate reviewed task.
 
 ## Routine update cycle
 

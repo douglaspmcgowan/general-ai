@@ -23,6 +23,7 @@ These standing rules travel with the repository so local, cloud, and background 
 - Preserve unrelated changes and keep edits surgically scoped to the requested outcome.
 - Inspect exact targets before destructive or broad filesystem operations. Prefer reversible changes and backups.
 - Never terminate individual `ChatGPT.exe` renderer or utility children inside the active `OpenAI.Codex` process tree. Renderer client IDs, memory use, and CPU use do not identify task ownership. For Codex memory pressure, remove only proven detached CLI/helper processes; restarting the whole app requires explicit confirmation after work is saved.
+- Before asking for GitHub reauthentication, verify `gh auth status` under the interactive Windows user's security context. A sandbox/AppContainer credential failure does not prove the user's Windows keyring login is invalid. Never start overlapping device-login flows.
 - Never read, display, log, or commit credential values.
 - Back up authored documents before replacement and check for unsaved/open application state before transforming them.
 - Proceed through safe, in-scope implementation steps. Stop for missing authority, ambiguous irreversible changes, contradictory requirements, or credentials that require Douglas.

@@ -20,14 +20,19 @@ Read `AGENT-START.md` first. It contains the required reading order, safety boun
 1. Sign into Windows with the intended Windows account.
 2. Open <https://drive.google.com/drive/computers> with the same Google account.
 3. Open this source computer's entry, usually `SEEK_TO_SERVE`, then open `Documents\Capsule`.
-4. Download the entire folder into `C:\Users\<you>\Documents\Capsule`.
-5. Run `tools\Verify-Capsule.cmd`.
-6. Continue only after verification reports `PASS`.
-7. Double-click `tools\Bootstrap-Capsule.cmd`.
-8. Sign into each application with the identifiers listed in `manifests\accounts.json`.
-9. Unlock Bitwarden and follow `SECRETS-BITWARDEN.md`.
-10. Open `C:\Users\<you>\projects\general-ai\general-ai.code-workspace`.
-11. Run the project and harness verification commands shown in `SYSTEM-MAP.md`.
+4. If OneDrive is installed, leave it unchanged.
+5. Download the entire folder to a new local staging path outside OneDrive, such as `C:\Users\<you>\Capsule`.
+6. Run `tools\Verify-Capsule.cmd`.
+7. Continue only after verification reports `PASS`.
+8. Double-click `tools\Bootstrap-Capsule.cmd`.
+9. Sign into each application with the identifiers listed in `manifests\accounts.json`.
+10. Unlock Bitwarden and follow `SECRETS-BITWARDEN.md`.
+11. Open `C:\Users\<you>\projects\general-ai\general-ai.code-workspace`.
+12. Run the project and harness verification commands shown in `SYSTEM-MAP.md`.
+
+### OneDrive on the receiving computer
+
+Capsule bootstrap leaves OneDrive alone. The receiving agent must inventory OneDrive's folder selection, Windows Desktop/Documents/Pictures mappings, unique files, and Quick Access targets before any migration proposal. OneDrive removal or reconfiguration requires a separate reviewed task after additive copies and comparisons prove that no unique data will be lost.
 
 Bundle-restored repositories keep the offline source as the `capsule` remote and receive the recorded GitHub URL as `origin`. After `gh auth login`, refresh any project's published history with:
 
