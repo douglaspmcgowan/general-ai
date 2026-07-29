@@ -19,6 +19,17 @@ The restore prefers each captured offline bundle, reapplies any reviewed uncommi
 
 The default backup excludes the retained `general-claude` rollback repository after the canonical rename to `general-ai`.
 
+## Retained `general-claude` Git history
+
+`general-claude-history.bundle` preserves every committed ref from `C:\Users\dougl\projects\general-claude` at source `master` commit `f8c1f39ed369d8694eb9f82c50f622883bf29a7e`. It was created with `git bundle create --all`, verified as complete, cloned into an empty temporary directory, checked with `git fsck --full`, and matched back to the source `master` SHA. The original repository remains the authority for its current uncommitted working-tree state.
+
+Verify or restore it with:
+
+```powershell
+git bundle verify "C:\Users\dougl\projects\general-ai\recovery\general-claude-history.bundle"
+git clone "C:\Users\dougl\projects\general-ai\recovery\general-claude-history.bundle" "C:\Users\dougl\projects\general-claude-restored"
+```
+
 To repair File Explorer pins on the current computer without restoring projects, run `Repair-QuickAccess.cmd` with the latest snapshot's `Recovery\quick-access.json`.
 
 Harness test-output data roots are excluded because their authoritative content already lives in the private harness repository. The backup includes material project data under `Data\Projects`, with consistent SQLite snapshots handled separately.

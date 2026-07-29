@@ -19,6 +19,7 @@ Implement the approved harness-only Capsule and per-project synchronization arch
 - [x] Complete the corrected interactive Bitwarden run, create all 8 scaffold receipt items, and leave the CLI locked.
 - [x] Push Docket README commit `e89150e`.
 - [x] Push harness commits `c67792d`, `64bd8cd`, and `64aea3d`; install the resulting global harness; pass `VerifyGlobal`; and preserve the active Codex rules hash.
+- [x] Preserve every committed `general-claude` ref in `recovery\general-claude-history.bundle` at source `master` commit `f8c1f39ed369d8694eb9f82c50f622883bf29a7e`; verify the bundle as complete, clone it into an empty temporary directory, pass `git fsck --full`, and match the restored HEAD to the source SHA.
 - [~] Change active retention documentation from 14/8/12 to 3 daily, 4 weekly, and 3 month-end snapshots; retain milestones, latest disposable-restore evidence, dry-run review, and failure pauses.
 - [~] Redefine Capsule as the shared global harness/bootstrap/repository-inventory package and remove its current per-project workspace payload.
 - [ ] Implement and verify the project-sync manager using GitHub CLI account-and-topic discovery plus local path conventions. Avoid a static `repositories.json`; add an exception mechanism only when repository evidence requires one.

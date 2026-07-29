@@ -49,6 +49,7 @@
 | `C:\Users\dougl\projects\agent-harness` | Private Git authority for the shared harness | No | Yes |
 | `C:\Users\dougl\projects\docket` | Docket source authority | No | Yes |
 | `C:\Users\dougl\projects\general-ai` | This coordination repository | No | Yes |
+| `C:\Users\dougl\projects\general-ai\recovery\general-claude-history.bundle` | Complete committed-ref recovery for the retained `general-claude` repository | No | Yes |
 | `C:\Users\dougl\Data\Projects\general-ai` | Local coordination data | Mixed | No |
 | `C:\Users\dougl\Documents\Agent Backups` | Curated value-free recovery artifacts | Yes | No |
 | `C:\Users\dougl\My Drive\Capsule` | Primary transferable computer-rebuild package | Yes | No |
@@ -61,10 +62,11 @@
 3. Each discovered GitHub repository carries its project source, portable rules, handoffs, and small versionable data into `C:\Users\dougl\projects`.
 4. The manager uses each project data manifest to restore excluded and live mutable databases, records, inputs, outputs, and other declared data. Twenty-five of 27 repositories already have this extension point.
 5. GitHub receives versioned source and safe documentation.
-6. SQLite-safe exports and value-free recovery pointers enter `Documents\Agent Backups`.
-7. Capsule tooling from `C:\Users\dougl\projects\agent-harness\.agents\capsule` packages the shared global harness, bootstrap tools, repository-discovery configuration, account identifiers, and integrity hashes. The current workspace payload is scheduled for removal and remains frozen until the replacement transport passes.
-8. Google Drive syncs the generated `My Drive\Capsule` bootstrap artifact; Agent Backups remain the dated local recovery authority.
-9. Secret values reach approved child processes through exact Bitwarden Password Manager broker tuples.
+6. The committed `general-claude` refs remain recoverable from `recovery\general-claude-history.bundle`; its original folder retains the current uncommitted working-tree state.
+7. SQLite-safe exports and value-free recovery pointers enter `Documents\Agent Backups`.
+8. Capsule tooling from `C:\Users\dougl\projects\agent-harness\.agents\capsule` packages the shared global harness, bootstrap tools, repository-discovery configuration, account identifiers, and integrity hashes. The current workspace payload is scheduled for removal and remains frozen until the replacement transport passes.
+9. Google Drive syncs the generated `My Drive\Capsule` bootstrap artifact; Agent Backups remain the dated local recovery authority.
+10. Secret values reach approved child processes through exact Bitwarden Password Manager broker tuples.
 
 ## Integrations
 
