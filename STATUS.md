@@ -9,9 +9,10 @@
 - Private harness pull request #3 merged at `0435bb8c38e09d5d9a18c46c11d7d9a1bbdf6a63`.
 - Private harness pull request #4 merged at `03c0f0d8c2692dbbaa13411d1c5ff7379f9aa589`.
 - Private harness pull request #5 merged at `727662d4881eeadcef605f15cb268d1791774ad3`.
+- Private harness pull request #6 merged at `0d19eeca14bc0313705cf57390e18c0f822e75a5`.
 - Docket pull request #1 merged at `2489f7a32617eec287cf36d9a521636cc38b01f9`. The source authority remains `C:\Users\dougl\projects\docket`.
 - GitHub CLI is authenticated as `douglaspmcgowan` through the interactive Windows keyring.
-- The canonical receiving-computer package is `C:\Users\dougl\My Drive\Capsule`. Its manifest selects snapshot `20260729-065807`, and `AGENT-START.md` is the agent entry.
+- The canonical receiving-computer package is `C:\Users\dougl\My Drive\Capsule`. Its manifest selects snapshot `20260729-071541`; the package contains 28,462 files, including the self-excluded integrity manifest; and `AGENT-START.md` is the agent entry.
 - Google Drive is launched. The direct local Capsule path and selected-snapshot manifest are accessible.
 - Nightly Agent Backups remains the ongoing route for repositories, approved project data, application configuration, handoffs, and Quick Access recovery.
 - The guarded stale-agent cleanup and portable `declog` skill remain installed for Windows resource-pressure diagnosis.

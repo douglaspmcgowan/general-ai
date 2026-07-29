@@ -24,11 +24,11 @@ No unattended agent work remains.
 
 - [x] Installed the canonical shared harness at `C:\Users\dougl\.agents` with global `AGENTS.md`, `MAP.md`, `DESIGN.md`, `MEMORY.md`, product adapters, baseline skills, and one manager.
 - [x] Consolidated live hook wiring into `security-dispatch.js`, `task-state-dispatch.js`, and `continue-dispatch.js`; the installed hook verifier passes.
-- [x] Merged private harness pull requests #2, #3, #4, and #5 into `master` and fast-forwarded `C:\Users\dougl\projects\agent-harness`.
+- [x] Merged private harness pull requests #2 through #6 into `master`; PR #6 merged at `0d19eeca14bc0313705cf57390e18c0f822e75a5`; and fast-forwarded `C:\Users\dougl\projects\agent-harness`.
 - [x] Merged Docket pull request #1 at `2489f7a32617eec287cf36d9a521636cc38b01f9`; personal cards now use the authenticated cloud-sync policy.
 - [x] Verified GitHub CLI authentication through the interactive Windows keyring and completed the authorized repository publication.
 - [x] Consolidated the human guide at `C:\Users\dougl\.agents\human-readable\README.md` with its matching HTML mirror.
-- [x] Refreshed the canonical Capsule at `C:\Users\dougl\My Drive\Capsule` to snapshot `20260729-065807` and retained `AGENT-START.md` as the receiving-computer entry.
+- [x] Refreshed the canonical Capsule at `C:\Users\dougl\My Drive\Capsule` to snapshot `20260729-071541` with 28,462 packaged files and retained `AGENT-START.md` as the receiving-computer entry.
 - [x] Launched Google Drive and verified the direct local Capsule path and selected-snapshot manifest.
 - [x] Migrated canonical `C:\Users\dougl\projects\general-ai` to the v3 project contract and one `TASK.md`; verified legacy sources remain recoverable under `.agents\archive`.
 
