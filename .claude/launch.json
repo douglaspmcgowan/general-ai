@@ -10,7 +10,7 @@
     {
       "name": "redline",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "8766", "--directory", "C:\\Users\\dougl\\OneDrive\\Documents\\General Claude\\idetc-writing-ide"],
+      "runtimeArgs": ["-m", "http.server", "8766", "--directory", "C:\\Users\\dougl\\projects\\idetc-writing-ide"],
       "port": 8766
     }
   ,
@@ -29,7 +29,7 @@
     {
       "name": "drive-organizer",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "8778", "--directory", "C:\\Users\\dougl\\OneDrive\\Documents\\General Claude\\drive-organizer"],
+      "runtimeArgs": ["-m", "http.server", "8778", "--directory", "C:\\Users\\dougl\\projects\\drive-organizer"],
       "port": 8778
     }
   ,
@@ -75,7 +75,7 @@
     {
       "name": "contact-form-caller",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "8799", "--directory", "C:\\Users\\dougl\\OneDrive\\Documents\\General Claude\\contact-form-caller"],
+      "runtimeArgs": ["-m", "http.server", "8799", "--directory", "C:\\Users\\dougl\\projects\\contact-form-caller"],
       "port": 8799
     }
   ]
