@@ -6,7 +6,7 @@ Before claiming this coordination project or migration complete:
 2. Run `C:\Users\dougl\.agents\tools\Test-HarnessSetup.cmd`.
 3. Run `git diff --check`.
 4. Run `C:\Users\dougl\Tools\gitleaks\gitleaks.exe dir C:\Users\dougl\projects\general-ai --no-banner --redact`.
-5. Run `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Users\dougl\projects\general-ai\capsule\Capsule.Tests.ps1`.
+5. Run `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Users\dougl\projects\agent-harness\.agents\capsule\Capsule-Portability.Tests.ps1 -AgentHarnessSource C:\Users\dougl\projects\agent-harness`.
 6. Confirm every canonical repository in `MIGRATION.md` exists and passes its project verifier.
 7. For a copied dirty repository, compare the source and destination Git status, tracked diff, staged diff, and untracked-content digest before cutover.
 8. Confirm the Docket scheduled task is running and `http://127.0.0.1:8471` returns HTTP 200.
