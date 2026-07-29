@@ -11,7 +11,7 @@
 | `STATUS.md` | Agents and humans | Start, resume, milestone | Durable setup and migration state |
 | `LOG.md` | Agents and humans | Recent history, handoff | Append-only work record |
 | `BACKBURNER.md` | Humans and agents | Planning | Parked cross-project backlog |
-| `MIGRATION.md` | Humans and agents | Path changes and OneDrive retirement | Repository cutover ledger and rollback rules |
+| `MIGRATION.md` | Humans and agents | Path changes and legacy recovery review | Repository cutover ledger, retirement evidence, and preserved-data decisions |
 | `DESIGN.md` | Agents and humans | Interface work | Universal and project-specific interface rules |
 | `PRODUCT.md` | Agents and humans | Product work, when present | Optional product intent |
 | `MEMORY.md` | Agents | Recall | Lean links to durable topic notes |
@@ -31,13 +31,14 @@
 | Declog | Diagnose memory pressure and classify stale agent, browser, Node, Python, and WebView2 helpers before guarded cleanup | `C:\Users\dougl\.agents\skills\declog\SKILL.md` | Shared harness |
 | Bitwarden scaffold plan | Create empty project Login items with exact Hidden field names | `C:\Users\dougl\.agents\tools\bitwarden-project-scaffolds.json` | Shared harness |
 | Product adapters | Load shared rules into Claude, Codex, and Cursor | `C:\Users\dougl\.claude\CLAUDE.md`, `C:\Users\dougl\.codex\AGENTS.md`, `C:\Users\dougl\.cursor\rules` | Each product |
-| Local project fleet | Hold one versioned working copy per project | `C:\Users\dougl\projects` | Each project repository |
-| Project data fleet | Hold valuable mutable data outside Git | `C:\Users\dougl\Data\Projects` and `C:\Users\dougl\Data\Restricted` | Each project manifest |
+| Local project fleet | Sync source, project rules, handoffs, and small versionable data through one GitHub repository per project | `C:\Users\dougl\projects` | Each project repository |
+| Project data fleet | Restore excluded and live mutable data through project-specific data-manifest adapters | `C:\Users\dougl\Data\Projects` and `C:\Users\dougl\Data\Restricted` | Each project manifest |
+| Project-sync manager | Discover tagged repositories through GitHub CLI, recreate them under local conventions, and route excluded/live data through each declared adapter | Pending shared-harness implementation | GitHub account/topic, shared harness, and each project manifest |
 | Worktree fleet | Isolate concurrent source changes | `C:\Users\dougl\Worktrees` | Task owner |
 | Docket | Present review cards from local SQLite and optional cloud sync | `C:\Users\dougl\projects\docket` | Docket repository |
 | Coordination state | Track the cross-project migration and remaining human boundaries | `TASK.md`, durable state files, and `MIGRATION.md` | This repository |
 | Historical research | Preserve the research that informed the current architecture | `research\` | This repository |
-| Capsule | Rebuild the project fleet, harness, approved app data, and Quick Access on another Windows computer | `C:\Users\dougl\My Drive\Capsule\AGENT-START.md` | `agent-harness` repository and Nightly Agent Backups |
+| Capsule | Carry the shared global harness, bootstrap tools, and repository inventory to another Windows computer | `C:\Users\dougl\My Drive\Capsule\AGENT-START.md` | `agent-harness` repository |
 
 ## Important paths
 
@@ -51,18 +52,19 @@
 | `C:\Users\dougl\Data\Projects\general-ai` | Local coordination data | Mixed | No |
 | `C:\Users\dougl\Documents\Agent Backups` | Curated value-free recovery artifacts | Yes | No |
 | `C:\Users\dougl\My Drive\Capsule` | Primary transferable computer-rebuild package | Yes | No |
-| `C:\Users\dougl\OneDrive` | Retired source and temporary rollback tree | No | No |
+| `C:\Users\dougl\OneDrive` | Preserved retired data and legacy-worktree root pending an exact retention decision; no application dependency | No | No |
 
 ## Data flow
 
 1. Product adapters load the shared harness and the nearest project contract.
-2. Repository source and portable project instructions live under `C:\Users\dougl\projects`.
-3. Mutable databases, private records, inputs, outputs, and caches resolve through each project's data manifest.
-4. GitHub receives versioned source and safe documentation.
-5. SQLite-safe exports and value-free recovery pointers enter `Documents\Agent Backups`.
-6. Capsule tooling from `C:\Users\dougl\projects\agent-harness\.agents\capsule` packages a selected verified snapshot, portable harness, restore tools, account identifiers, and integrity hashes.
-7. Google Drive syncs the generated `My Drive\Capsule` deployment artifact; Agent Backups sync only when their selected Drive route remains enabled.
-8. Secret values reach approved child processes through exact Bitwarden Password Manager broker tuples.
+2. The project-sync manager asks GitHub CLI for repositories under the configured account and topic, then applies local path conventions. Static repository inventory is unnecessary; exceptions require repository evidence.
+3. Each discovered GitHub repository carries its project source, portable rules, handoffs, and small versionable data into `C:\Users\dougl\projects`.
+4. The manager uses each project data manifest to restore excluded and live mutable databases, records, inputs, outputs, and other declared data. Twenty-five of 27 repositories already have this extension point.
+5. GitHub receives versioned source and safe documentation.
+6. SQLite-safe exports and value-free recovery pointers enter `Documents\Agent Backups`.
+7. Capsule tooling from `C:\Users\dougl\projects\agent-harness\.agents\capsule` packages the shared global harness, bootstrap tools, repository-discovery configuration, account identifiers, and integrity hashes. The current workspace payload is scheduled for removal and remains frozen until the replacement transport passes.
+8. Google Drive syncs the generated `My Drive\Capsule` bootstrap artifact; Agent Backups remain the dated local recovery authority.
+9. Secret values reach approved child processes through exact Bitwarden Password Manager broker tuples.
 
 ## Integrations
 
@@ -80,7 +82,7 @@
 - A writable task gets one branch, one worktree, and one owner.
 - Active worktrees remain at their current paths until their owning session reaches a handoff point.
 - Shared runtime data uses project-specific paths and task-specific test stores.
-- `MIGRATION.md` records every cutover, rollback source, verification result, and remaining active-path blocker.
+- `MIGRATION.md` records every cutover, preserved recovery source, verification result, and remaining data-retention decision.
 
 ## Update rule
 

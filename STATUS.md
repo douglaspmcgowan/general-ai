@@ -2,29 +2,33 @@
 
 ## Current harness state — 2026-07-29
 
-- `C:\Users\dougl\projects\general-ai` is the canonical coordination repository. It uses the v3 portable project contract and one `TASK.md`; verified migration sources remain under `.agents\archive`.
-- The live shared authority is `C:\Users\dougl\.agents`. Its global rules, map, design rules, memory index, manager, adapters, baseline skills, and three consolidated hook dispatchers are installed.
-- The human guide is `C:\Users\dougl\.agents\human-readable\README.md`; `README.html` is its source-hash-matched browser-readable mirror. Both describe the verified `20260729-081324` Capsule and the remaining credential/RAMMap gates.
-- Private harness pull request #2 merged at `5245929e362fddf912f6f43dd2efc3b141241fb4`.
-- Private harness pull request #3 merged at `0435bb8c38e09d5d9a18c46c11d7d9a1bbdf6a63`.
-- Private harness pull request #4 merged at `03c0f0d8c2692dbbaa13411d1c5ff7379f9aa589`.
-- Private harness pull request #5 merged at `727662d4881eeadcef605f15cb268d1791774ad3`.
-- Private harness pull request #6 merged at `0d19eeca14bc0313705cf57390e18c0f822e75a5`.
-- Docket pull request #1 merged at `2489f7a32617eec287cf36d9a521636cc38b01f9`; pull request #2 merged at `32d2346`, followed by status commit `9aa727a`. The source authority remains `C:\Users\dougl\projects\docket`.
-- The Docket store contains 162 items. `setup-handoff--general-claude-github` and `setup-handoff--google-drive-preferences` are archived locally; the pre-archive backup is `C:\Users\dougl\.docket-local\_backups\before-stale-archive-20260729`; 160 unresolved items remain eligible for outbound publication.
-- Claude launch configuration commit `52a7fd1` points redline, drive-organizer, and contact-form-caller at their canonical project roots. The configuration parsed and three PID-scoped HTTP smoke tests returned 200.
-- GitHub CLI is authenticated as `douglaspmcgowan` through the interactive Windows keyring.
-- Harness lifecycle fix commit `6840e6a` packages `tools\Refresh-Capsule.ps1`, resolves deployed root assets, and preserves same-path account/software maps and tools. The assembled source-to-Capsule-to-second-snapshot regression passes.
-- The corrected shared harness is installed globally and `VerifyGlobal` passes. The active Codex `AGENTS.md` SHA-256 remains `F26ABEA21241FC2BEC069D0EC99E933EAE0BC04F2BBDB4C0354C22B137996E37`.
-- The canonical receiving-computer package is `C:\Users\dougl\My Drive\Capsule`. Its manifest selects snapshot `20260729-081324` with 34,062 integrity records. The packaged refresh tool is present and recorded, and the account map is preserved across same-path sync. `README.md` is the current human and agent entry; `AGENT-START.md` remains a compatibility pointer.
-- The final Capsule Gitleaks scan covered roughly 743.55 MB and found no leaks.
-- Google Drive is running. The direct local Capsule path and selected-snapshot manifest are accessible.
-- Nightly Agent Backups remains the ongoing route for repositories, approved project data, application configuration, handoffs, and Quick Access recovery.
-- The guarded stale-agent cleanup and portable `declog` skill remain installed for Windows resource-pressure diagnosis.
-- Bitwarden Password Manager CLI, the value-safe scaffold, and the full-tuple broker are installed and tested. Interactive login/unlock, emailed-device verification, and value entry remain.
-- Signed Microsoft RAMMap v1.63 is installed at `C:\Users\dougl\Tools\Sysinternals\RAMMap\RAMMap64.exe`. The captured pressure sample showed 95% physical-memory use and 4.02 GiB combined paged/nonpaged pools. An elevated snapshot attempt produced no file, so another UAC capture and a controlled WSAIFabric A/B test remain optional.
+- `C:\Users\dougl\projects\general-ai` is the coordination repository. It uses one `TASK.md`; migration sources remain recoverable under `.agents\archive`.
+- `C:\Users\dougl\projects\agent-harness\.agents` is the committed shared authority. `C:\Users\dougl\.agents` is its installed projection for Claude, Codex, and Cursor.
+- The active human guide is `C:\Users\dougl\.agents\human-readable\README.md`; `README.html` is its source-hash-matched browser mirror.
+- Live hook wiring has three entrypoints: `security-dispatch.js`, `task-state-dispatch.js`, and `continue-dispatch.js`.
+- The active Codex `AGENTS.md` is preserved at SHA-256 `F26ABEA21241FC2BEC069D0EC99E933EAE0BC04F2BBDB4C0354C22B137996E37`.
+- Harness PR #7 merged at `ac88a9a`. Follow-up commits add source-first Capsule tool resolution (`f80f919`), the current Docket protocol (`ece6121`), the consolidated `TASK.md` verifier (`8fe2b96`), bounded cleanup retry (`6dc0e6d`), and the Bitwarden creator regression (`16ef4dd`).
+- Harness commits `c67792d`, `64bd8cd`, and `64aea3d` are pushed and installed globally. `VerifyGlobal` passes and the active Codex `AGENTS.md` hash remains preserved.
+- `agent-harness\.agents\capsule` is the sole Capsule source. `C:\Users\dougl\My Drive\Capsule` is the generated cross-computer artifact, and `C:\Users\dougl\Documents\Agent Backups\Workspace` is dated snapshot authority.
+- The target Capsule scope is the shared global harness, bootstrap tools, and repository inventory. Per-project source, rules, handoffs, and small versionable data travel through each GitHub repository; excluded and live mutable data travel through project data-manifest adapters.
+- The Drive Capsule verifier and `manifests\capsule.json` are the authorities for its selected snapshot and file count. The current manifest selects `20260729-124626` with 6,043 integrity records and still contains one per-project workspace payload, so it is a transition package. Do not refresh it until the harness-only package and project-sync/data-transport implementation pass end-to-end verification.
+- GitHub CLI can enumerate repositories dynamically by account and topic. The selected design uses GitHub topic discovery plus the account ID and local path conventions; a static `repositories.json` is unnecessary, and exception metadata will be added only for proven cases.
+- The local inventory contains 27 Git repositories: 16 have origins and 11 are dirty without origins. Three additional project-root entries are outside Git: `.obsidian` configuration, the `flight-tracker` container, and the `general-claude-incomplete` archive. Existing `data-manifest.yaml` files in 25 of 27 repositories provide the extension point for excluded and live mutable-data transport.
+- Automatic Agent Backups pruning remains disabled. Active documentation is being revised to the 3-daily/4-weekly/3-month-end policy while retaining labeled milestones and the newest disposable-restore proof.
+- Google Drive is running and the direct My Drive Capsule is accessible.
+- OneDrive application retirement is verified. The official `C:\Windows\System32\OneDriveSetup.exe /uninstall` exited `0`; follow-up checks found zero running processes, uninstall registrations, startup entry, scheduled tasks, and Winget packages. The Windows system setup stub remains present.
+- `C:\Users\dougl\OneDrive` remains as a preserved local reparse-point data tree with 141,008 files and 5,796,741,017 logical bytes. Git still registers the legacy 168 Audit and Berkeley House worktrees there alongside their relocated replacements. Metadata-only comparisons reported Desktop with 1 candidate file, Documents with 140,440 candidate files and 5,413,453,487 bytes, Pictures fully skipped, and Attachments with no `C:\Users\dougl\Attachments` counterpart. The exact data-retention boundary remains open.
+- Docket README commit `e89150e` is pushed. Its local store has 162 items, two archived decisions, and 160 unresolved publication candidates. Authenticated card publication remains pending.
+- The corrected interactive Bitwarden run succeeded and created the 8 planned scaffold receipt items. The CLI is locked. Hidden-value entry and the Docket/Vercel binding remain.
+- The guarded stale-agent cleanup and portable `declog` skill remain installed.
+- Signed Microsoft RAMMap v1.63 is installed at `C:\Users\dougl\Tools\Sysinternals\RAMMap\RAMMap64.exe`. The measured pressure sample showed 95% physical-memory use and 4.02 GiB combined paged/nonpaged pools.
 
 ## Remaining boundaries
 
-1. Complete Bitwarden authentication and Hidden-field setup, bind the non-secret Docket item ID, configure the matching Vercel credentials, publish the 160 eligible cards, and verify returned IDs without exposing credential values.
-2. Decide whether another elevated RAMMap capture and a controlled WSAIFabric A/B test are useful.
+1. Approve the topic/account/local-convention selector and any evidence-backed exception cases.
+2. Publish or connect the 11 dirty no-origin repositories while preserving their exact working state; define handling for the three non-repository entries.
+3. Implement the project-sync manager, add the two missing data manifests, verify all data-manifest adapters, and remove the Capsule workspace payload.
+4. Fill the 8 Bitwarden Login scaffolds, bind the Docket item ID, configure matching Vercel variables, publish the 160 eligible cards, and verify returned IDs without exposing values.
+5. Finish the 3/4/3 and OneDrive-removal documentation, then refresh the harness-only Capsule after the new transport path passes.
+6. Decide the exact retention or removal boundary for the preserved `C:\Users\dougl\OneDrive` data tree, registered legacy worktrees, comparison candidates, and unmatched Attachments folder.
+7. Optional: run an elevated RAMMap capture and controlled WSAIFabric stop/restart comparison if deeper kernel-pool attribution remains useful.
