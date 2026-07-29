@@ -1,5 +1,7 @@
 # Capsule and general-ai recovery handoff
 
+> Superseded on 2026-07-29. Current Capsule source lives at `C:\Users\dougl\projects\agent-harness\.agents\capsule`; the generated receiving-computer artifact lives at `C:\Users\dougl\My Drive\Capsule`. Follow `MAP.md` and the shared harness human guide for current paths and procedures.
+
 Date: 2026-07-27
 
 ## Decision

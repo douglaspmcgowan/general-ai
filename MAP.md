@@ -37,7 +37,7 @@
 | Docket | Present review cards from local SQLite and optional cloud sync | `C:\Users\dougl\projects\docket` | Docket repository |
 | Coordination state | Track the cross-project migration and remaining human boundaries | `TASK.md`, durable state files, and `MIGRATION.md` | This repository |
 | Historical research | Preserve the research that informed the current architecture | `research\` | This repository |
-| Capsule | Rebuild the project fleet, harness, approved app data, and Quick Access on another Windows computer | `C:\Users\dougl\My Drive\Capsule\AGENT-START.md` | This repository and Nightly Agent Backups |
+| Capsule | Rebuild the project fleet, harness, approved app data, and Quick Access on another Windows computer | `C:\Users\dougl\My Drive\Capsule\AGENT-START.md` | `agent-harness` repository and Nightly Agent Backups |
 
 ## Important paths
 
@@ -51,7 +51,6 @@
 | `C:\Users\dougl\Data\Projects\general-ai` | Local coordination data | Mixed | No |
 | `C:\Users\dougl\Documents\Agent Backups` | Curated value-free recovery artifacts | Yes | No |
 | `C:\Users\dougl\My Drive\Capsule` | Primary transferable computer-rebuild package | Yes | No |
-| `C:\Users\dougl\Documents\Capsule` | Local Capsule build/staging copy | Yes | No |
 | `C:\Users\dougl\OneDrive` | Retired source and temporary rollback tree | No | No |
 
 ## Data flow
@@ -61,8 +60,8 @@
 3. Mutable databases, private records, inputs, outputs, and caches resolve through each project's data manifest.
 4. GitHub receives versioned source and safe documentation.
 5. SQLite-safe exports and value-free recovery pointers enter `Documents\Agent Backups`.
-6. Capsule captures a selected verified snapshot, portable harness, restore tools, account identifiers, and integrity hashes.
-7. Google Drive syncs `My Drive\Capsule`; Agent Backups sync only when their selected Drive route remains enabled.
+6. Capsule tooling from `C:\Users\dougl\projects\agent-harness\.agents\capsule` packages a selected verified snapshot, portable harness, restore tools, account identifiers, and integrity hashes.
+7. Google Drive syncs the generated `My Drive\Capsule` deployment artifact; Agent Backups sync only when their selected Drive route remains enabled.
 8. Secret values reach approved child processes through exact Bitwarden Password Manager broker tuples.
 
 ## Integrations
