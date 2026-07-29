@@ -25,3 +25,5 @@
 2026-07-29 | Merged harness PR #6 at `0d19eeca14bc0313705cf57390e18c0f822e75a5` and refreshed `C:\Users\dougl\My Drive\Capsule` to snapshot `20260729-071541` with 28,462 packaged files.
 2026-07-29 | Reconciled the human guide, HTML mirror, and Capsule onboarding with the verified final rollout; replaced stale snapshot, hook, task-migration, Docket-patch, and Documents-Capsule claims; and passed the harness, Capsule lifecycle, and portability suites.
 2026-07-29 | Repointed the redline, drive-organizer, and contact-form-caller Claude launch entries from OneDrive rollback copies to their canonical project roots; parsed the configuration and passed three PID-scoped HTTP smoke tests.
+2026-07-29 | Merged Docket PR #2 (`32d2346`) and status commit `9aa727a`; backed up the local store, archived the two stale setup handoffs by exact ID, and reconciled 162 local items to 160 unresolved outbound cards.
+2026-07-29 | Verified signed RAMMap v1.63 at its canonical executable, recorded a 95%-physical/4.02-GiB-pools pressure sample, and preserved the failed-to-write elevated snapshot plus optional RAMMap/WSAIFabric follow-up as an explicit decision.
