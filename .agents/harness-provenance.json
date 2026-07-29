@@ -1,10 +1,10 @@
 {
     "schemaVersion":  1,
-    "authority":  "C:\\Users\\dougl\\projects\\general-claude\\harness-updates\\global-contract",
+    "authority":  "C:\\Users\\dougl\\.agents",
     "files":  [
                   {
                       "path":  "AGENTS.md",
-                      "sha256":  "99c2d8340b1983570e2dc684e4487b1468011eefceff09b0da462b7d5698cbba"
+                      "sha256":  "7fcb9b325c98313585c5aefd0ed4faf417fc26bd1a5bf73b0b468c1e507e40d7"
                   },
                   {
                       "path":  "CLAUDE.md",
@@ -16,7 +16,7 @@
                   },
                   {
                       "path":  "DESIGN.md",
-                      "sha256":  "093612141f2a5620126289ac86dd952ac33b7679f4adbe84ae80fe1c949f4b04"
+                      "sha256":  "3905df52e87f0cbe966228edc0115bba6fb4839359db19fd25a5ad4aae6f17e0"
                   },
                   {
                       "path":  "MAP.md",
@@ -24,15 +24,15 @@
                   },
                   {
                       "path":  "TASK.md",
-                      "sha256":  "e4806a2a9324026c55cebd9f41649931df13cac45f12a7f86bc502913058cd7b"
+                      "sha256":  "30979842f44840012822755aa60d2e041de3438e4454a9b3899059f778ef4d5e"
                   },
                   {
                       "path":  "STATUS.md",
-                      "sha256":  "3b26c8fd0fba04acdae4950f9069f4836d7a43da3798c778033423f71105a681"
+                      "sha256":  "f28ef225efab6be49e713ce7dd1745f2888e2b3d05f500639e89b0926bb8188c"
                   },
                   {
                       "path":  "LOG.md",
-                      "sha256":  "d3bd0208db6ba269200864e46e9ffb33c08cba2ed3ce5b0e3385c609cefca991"
+                      "sha256":  "e6da5e22b688d1026e56ab5b7faef36d2f5f92a066a0b7722ebfed0004053f9a"
                   },
                   {
                       "path":  "BACKBURNER.md",
