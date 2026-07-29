@@ -13,3 +13,7 @@ Before claiming this coordination project or migration complete:
 9. Confirm GitHub remotes match the recorded local commits.
 10. Confirm Google Drive's selected folders include only intentional sync roots.
 11. Retire a rollback source only after its destination is verified and no active session owns the old path.
+12. Run the `declog` fixture tests, then run a read-only live report and confirm the active Codex/ChatGPT owner tree is protected.
+13. Run the Bitwarden scaffold tests and inspect the value-free creation plan; never require live vault contents for project verification.
+14. Confirm `Nightly Agent Backups` is Ready, starts at 02:00, runs on battery, starts when available, and advances `Recovery\latest.json` after a successful assembled run.
+15. Before a whole-task completion handoff, reconcile `CURRENT-TASK.md` Remaining against every `[ ]` and `[~]` entry in the resolved `WORK_QUEUE*`. When actionable entries remain, continue or report the exact active owners; when only `[!]` and `[?]` remain, report each external dependency and owner.

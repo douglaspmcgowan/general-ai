@@ -7,33 +7,37 @@
 | `AGENTS.md` | Agents and humans | Every repository session | Portable project contract |
 | `CLAUDE.md` | Claude adapter | Every Claude repository session | Imports `AGENTS.md` |
 | `.cursor/rules/00-project-contract.mdc` | Cursor adapter | Every Cursor repository session | Requires `AGENTS.md` |
-| `CURRENT-TASK.md` | Agents and humans | Start, resume, handoff | Active goal, progress, exact next verifier |
-| `WORK_QUEUE.md` | Agents and harness | Multi-step work | Actionable checkbox state |
+| `TASK.md` | Agents and humans | Start, resume, handoff | Active goal, actionable queue, blockers, completed evidence, and exact next verifier |
 | `STATUS.md` | Agents and humans | Start, resume, milestone | Durable setup and migration state |
 | `LOG.md` | Agents and humans | Recent history, handoff | Append-only work record |
 | `BACKBURNER.md` | Humans and agents | Planning | Parked cross-project backlog |
-| `VERIFY.md` | Agents and CI | Before completion | Required evidence and commands |
 | `MIGRATION.md` | Humans and agents | Path changes and OneDrive retirement | Repository cutover ledger and rollback rules |
-| `DESIGN.md` | Agents and humans | Harness or storage decisions | Goals, constraints, and durable decisions |
+| `DESIGN.md` | Agents and humans | Interface work | Universal and project-specific interface rules |
+| `PRODUCT.md` | Agents and humans | Product work, when present | Optional product intent |
 | `MEMORY.md` | Agents | Recall | Lean links to durable topic notes |
 | `data-manifest.yaml` | Agents | Data access | Value-free external-data policy |
 | `secret-manifest.json` | Agents and automation | Credential-dependent setup | Value-free environment-variable inventory |
 | `skills-manifest.json` | Agents and cloud setup | Skill selection and export | Project skill bindings |
+| `.agents/harness-provenance.json` | Agents and verifiers | Harness drift checks | Installed project-contract hashes and authority |
+| `.agents/skill-pathways.json` | Agents | Named compound skill workflows | Ordered portable skill chains |
+| `.agents/archive/task-state-migration/` | Humans and agents | Historical recovery only | Verified legacy task and verification sources |
 
 ## Architecture
 
 | Component | Purpose | Entry point | Owner |
 |---|---|---|---|
 | Human harness documentation | Explain the system, decisions, and operating procedures | `C:\Users\dougl\.agents\human-readable\README.md` | Shared harness |
-| Live agent harness | Supply contracts, tools, templates, skills, and deterministic guards | `C:\Users\dougl\.agents\HARNESS-MAP.md` | Shared harness |
+| Live agent harness | Supply contracts, tools, templates, skills, and deterministic guards | `C:\Users\dougl\.agents\AGENTS.md` and `C:\Users\dougl\.agents\MAP.md` | Shared harness |
+| Declog | Diagnose memory pressure and classify stale agent, browser, Node, Python, and WebView2 helpers before guarded cleanup | `C:\Users\dougl\.agents\skills\declog\SKILL.md` | Shared harness |
+| Bitwarden scaffold plan | Create empty project Login items with exact Hidden field names | `C:\Users\dougl\.agents\tools\bitwarden-project-scaffolds.json` | Shared harness |
 | Product adapters | Load shared rules into Claude, Codex, and Cursor | `C:\Users\dougl\.claude\CLAUDE.md`, `C:\Users\dougl\.codex\AGENTS.md`, `C:\Users\dougl\.cursor\rules` | Each product |
 | Local project fleet | Hold one versioned working copy per project | `C:\Users\dougl\projects` | Each project repository |
 | Project data fleet | Hold valuable mutable data outside Git | `C:\Users\dougl\Data\Projects` and `C:\Users\dougl\Data\Restricted` | Each project manifest |
 | Worktree fleet | Isolate concurrent source changes | `C:\Users\dougl\Worktrees` | Task owner |
 | Docket | Present review cards from local SQLite and optional cloud sync | `C:\Users\dougl\projects\docket` | Docket repository |
-| Coordination state | Track the cross-project migration and remaining human boundaries | Repository root task files and `MIGRATION.md` | This repository |
+| Coordination state | Track the cross-project migration and remaining human boundaries | `TASK.md`, durable state files, and `MIGRATION.md` | This repository |
 | Historical research | Preserve the research that informed the current architecture | `research\` | This repository |
-| Capsule | Rebuild the project fleet, harness, approved app data, and Quick Access on another Windows computer | `C:\Users\dougl\Documents\Capsule\START-HERE.md` | This repository and Nightly Agent Backups |
+| Capsule | Rebuild the project fleet, harness, approved app data, and Quick Access on another Windows computer | `C:\Users\dougl\My Drive\Capsule\AGENT-START.md` | This repository and Nightly Agent Backups |
 
 ## Important paths
 
@@ -46,7 +50,8 @@
 | `C:\Users\dougl\projects\general-ai` | This coordination repository | No | Yes |
 | `C:\Users\dougl\Data\Projects\general-ai` | Local coordination data | Mixed | No |
 | `C:\Users\dougl\Documents\Agent Backups` | Curated value-free recovery artifacts | Yes | No |
-| `C:\Users\dougl\Documents\Capsule` | Transferable computer-rebuild package | Yes | No |
+| `C:\Users\dougl\My Drive\Capsule` | Primary transferable computer-rebuild package | Yes | No |
+| `C:\Users\dougl\Documents\Capsule` | Local Capsule build/staging copy | Yes | No |
 | `C:\Users\dougl\OneDrive` | Retired source and temporary rollback tree | No | No |
 
 ## Data flow
@@ -57,7 +62,7 @@
 4. GitHub receives versioned source and safe documentation.
 5. SQLite-safe exports and value-free recovery pointers enter `Documents\Agent Backups`.
 6. Capsule captures a selected verified snapshot, portable harness, restore tools, account identifiers, and integrity hashes.
-7. Google Drive syncs the curated backup and Capsule folders.
+7. Google Drive syncs `My Drive\Capsule`; Agent Backups sync only when their selected Drive route remains enabled.
 8. Secret values reach approved child processes through exact Bitwarden Password Manager broker tuples.
 
 ## Integrations

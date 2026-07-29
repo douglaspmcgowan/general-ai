@@ -14,7 +14,7 @@
 - Automatic snapshot deletion remains disabled. The documented retention recommendation is 14 daily, 8 weekly, and 12 month-end snapshots plus labeled milestones and the newest fully restored snapshot.
 - A guarded stale-agent cleanup is installed as a limited-user task at 01:15, 07:15, 13:15, and 19:15. It requires a three-hour minimum age, the reproduced orphaned Node helper pattern, active-agent exclusions, and immediate revalidation.
 - The directly accessible Google Drive copy is `C:\Users\dougl\My Drive\Capsule`; its 5,740-file integrity manifest passes. `My Drive\Capsule\AGENT-START.md` is the receiving agent entry.
-- Human-gated work includes completing Bitwarden new-device verification and populating value-safe scaffold fields, approving any RAMMap elevation capture, and reviewing proposed Codex rule edits.
+- Four human-gated actions remain: create the Docket Bitwarden item and share value-free tuple metadata; stop Google Drive backup for Desktop/Documents/Downloads after upload confirmation; then approve rollback-worktree and old-OneDrive retirement from a fresh `general-ai` session.
 
 - The shared harness is installed live and published to its private GitHub authority. GitHub CLI authorization is stored in the desktop user's Windows keyring; a failure under `CodexSandboxOnline` does not establish that the desktop login is invalid.
 - Docket's loopback-authentication repair is published on private GitHub at commit `33b00f4`.
@@ -22,7 +22,7 @@
 - Docket starts through the limited-privilege `DocketDaemon` task. The repaired local API passes loopback integration tests without a persistent passcode.
 - The 94-file harness verifier and Gitleaks pass. The value-free recovery pointer is remote-verified.
 - Ten repositories formerly under OneDrive have exact verified copies under `C:\Users\dougl\projects`.
-- `C:\Users\dougl\projects\general-ai` is the canonical coordination repository. It now uses the v3 portable project contract and consolidated `TASK.md`; the reconciled legacy task sources and pre-reconciliation target state are preserved under `.agents\archive`. `general-claude` remains the session-owned rollback copy.
+- `C:\Users\dougl\projects\general-ai` is the clean canonical coordination repository. `general-claude` remains the session-owned rollback copy.
 - The Flight Tracker coordination folder has an exact verified lowercase copy.
 - The 168 main repository is canonical at `C:\Users\dougl\projects\168-audit`; its replacement worktree is verified under `C:\Users\dougl\Worktrees`.
 - Berkeley's published completion commit has a verified replacement worktree under `C:\Users\dougl\Worktrees`.
@@ -37,15 +37,14 @@
 - The portable `declog` skill is deployed live and in the private harness source. Its fixture suite and assembled harness verifier pass; ambiguous process trees remain decision-required.
 - A live latency audit identified broad Google Drive synchronization as the dominant measured pressure. Stopping Google Drive reduced sampled average CPU from about 60% to about 18% and disk transfers from about 1,729/s to about 450/s. Drive remains stopped pending a narrow Preferences configuration.
 - The human-readable harness set is consolidated into topical guides with archived superseded briefs. Live and private setup stamps match across 118 files.
-- Value-safe Bitwarden Login scaffolds and an empty-Hidden-field creator are tested. Vault creation remains blocked because the interactive wrapper did not complete Bitwarden's emailed new-device verification flow.
+- Value-safe Bitwarden Login scaffolds and an empty-Hidden-field creator are tested. Vault creation remains blocked on a same-shell CLI login/unlock by Douglas.
 - Core task-state, keep-going, and concurrency tests pass. Six task-state reminder tests and six hook-governance tests remain open, so task management is operational with unresolved governance drift.
 - The live Codex `AGENTS.md` remains under Douglas's edit authority. Its current references to four `C:\Users\dougl\.Codex\...` topic files are stale, and its task-state path conflicts with the shared resolver.
 - Nightly snapshot `20260729-002722` completed successfully. Both `C:\Users\dougl\Documents\Capsule` and `C:\Users\dougl\My Drive\Capsule` were refreshed from it and passed SHA-256 integrity verification; Google Drive must be restarted after its Preferences are narrowed before the My Drive copy uploads.
 - Codex currently wires 39 hook command invocations across 29 unique programs. A four-dispatcher design can reduce this to 10 commands across 9 executables while preserving separate security and lifecycle failure boundaries. Two Impeccable entries are exact duplicates and `block-ai-reference.js` is subsumed by `protect-ai-reference.js`.
-- Google Drive remains stopped. Its configuration still registers Desktop, Documents, and Downloads as active mirrored roots; Douglas wants to retain coverage for all three while reducing file churn, memory, CPU, and disk pressure.
-- Private harness pull request 2 was merged into `master` at merge commit `5245929e362fddf912f6f43dd2efc3b141241fb4`, and the local harness authority was fast-forwarded to the merged state.
+- Google Drive remains stopped. Its configuration still registers Desktop, Documents, and Downloads as active mirrored roots; those roots must be removed in Preferences before sync resumes.
+- Private harness commit `8309800` is remote-verified on branch `codex/consolidate-portable-harness`; draft pull request 2 targets private `ai-consulting-1/doug-harness` master.
 - Microsoft RAMMap v1.63 is installed at `C:\Users\dougl\Tools\Sysinternals\RAMMap`; all executables have valid Microsoft Authenticode signatures. Its elevated launch was canceled before evidence capture.
 - A 30-second trace kept paged pool near 2.11 GB and nonpaged pool near 1.91 GB with no growth. The level warrants pool-tag attribution, while the short trace does not establish a leak.
 - Chrome's active 23-process tree used about 1.93 GB working set and 3.43 GB private bytes while nearly CPU-idle. PIDs 15020 and 6120 held about 773 MB resident combined and require identification through Chrome Task Manager before any close action.
 - Shared feedback record `premature-completion-under-parallelization-20260729` is appended and projected to the private harness. Project verification now requires actionable queue reconciliation before a whole-task completion handoff.
-- Current research supports replacing independently edited checkbox state with an append-only intent ledger, a structured task graph, and generated `CURRENT-TASK.md`/`WORK_QUEUE.md` projections. The design includes automatic prompt reconciliation, governed agent-created subtasks, dependency IDs, evidence-gated completion, and cross-product parity fixtures; implementation remains open.

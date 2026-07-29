@@ -1,0 +1,54 @@
+{
+    "schemaVersion":  1,
+    "authority":  "C:\\Users\\dougl\\projects\\general-claude\\harness-updates\\global-contract",
+    "files":  [
+                  {
+                      "path":  "AGENTS.md",
+                      "sha256":  "99c2d8340b1983570e2dc684e4487b1468011eefceff09b0da462b7d5698cbba"
+                  },
+                  {
+                      "path":  "CLAUDE.md",
+                      "sha256":  "d631d88045f74623d568adfb4783b72e3d1b732330d749bc6c72e6648d4581d3"
+                  },
+                  {
+                      "path":  ".cursor\\rules\\00-project-contract.mdc",
+                      "sha256":  "4459122f01d10046f37e7a3bdd174eb0a3042d948c21188509d55f8fc567d299"
+                  },
+                  {
+                      "path":  "DESIGN.md",
+                      "sha256":  "093612141f2a5620126289ac86dd952ac33b7679f4adbe84ae80fe1c949f4b04"
+                  },
+                  {
+                      "path":  "MAP.md",
+                      "sha256":  "cf30417d53b8ed4a2fea31eba26d19c81a7dcb8cf2a462ab1347c079e98225d2"
+                  },
+                  {
+                      "path":  "TASK.md",
+                      "sha256":  "e4806a2a9324026c55cebd9f41649931df13cac45f12a7f86bc502913058cd7b"
+                  },
+                  {
+                      "path":  "STATUS.md",
+                      "sha256":  "3b26c8fd0fba04acdae4950f9069f4836d7a43da3798c778033423f71105a681"
+                  },
+                  {
+                      "path":  "LOG.md",
+                      "sha256":  "d3bd0208db6ba269200864e46e9ffb33c08cba2ed3ce5b0e3385c609cefca991"
+                  },
+                  {
+                      "path":  "BACKBURNER.md",
+                      "sha256":  "62358b8940fa6cce2db1d46f43f72fdf5ff327c9880787d1077c9b6820455f9a"
+                  },
+                  {
+                      "path":  "MEMORY.md",
+                      "sha256":  "154f98dc2015fea095297cbc6c28ad7a125890ec28acbc7fad93d5b5dfe90eef"
+                  },
+                  {
+                      "path":  "skills-manifest.json",
+                      "sha256":  "ba18414f86ddba1609029dcc16f31f5b2a23db5f8bb53fcebcae9a628cc64d49"
+                  },
+                  {
+                      "path":  ".agents\\skill-pathways.json",
+                      "sha256":  "33d529030f3723bc185f94090cf9fcd1007646f9c7d15a76f962104aa78a3b9b"
+                  }
+              ]
+}

@@ -2,56 +2,24 @@
 
 This file is the portable project contract for local and cloud agents.
 
-<!-- agent-harness:portable-principles:v2:start -->
-## Portable operating principles
+<!-- agent-harness:portable:v3:start -->
+## Portable operating rules
 
-These standing rules travel with the repository so local, cloud, and background agents receive the same core judgment.
-
-### Communication and truth
-
-- Address the user as Douglas when the name adds clarity or warmth. Do not begin routine updates or every message with his name.
-- Answer direct and embedded questions before task narration. Repeat every unresolved question at the end of the turn.
-- Never invent facts, paths, APIs, versions, source content, measurements, or passing results. Name the authoritative source checked.
-- Verify claims inherited from chats, summaries, comments, or memory against repository evidence.
-- For current or version-sensitive facts, consult current primary sources. Use practitioner evidence alongside primary sources for subjective workflow judgments.
-- Match commands and paths to the shell and environment Douglas will actually use.
-- Avoid the rhetorical â€œit is X, not Yâ€ construction in prose.
-- Before drafting publishable prose, use the project voice guide when one exists.
-
-### Safety, scope, and autonomy
-
-- Preserve unrelated changes and keep edits surgically scoped to the requested outcome.
-- Inspect exact targets before destructive or broad filesystem operations. Prefer reversible changes and backups.
-- Never terminate individual `ChatGPT.exe` renderer or utility children inside the active `OpenAI.Codex` process tree. Renderer client IDs, memory use, and CPU use do not identify task ownership. For Codex memory pressure, remove only proven detached CLI/helper processes; restarting the whole app requires explicit confirmation after work is saved.
-- Before asking for GitHub reauthentication, verify `gh auth status` under the interactive Windows user's security context. A sandbox/AppContainer credential failure does not prove the user's Windows keyring login is invalid. Never start overlapping device-login flows.
-- Never read, display, log, or commit credential values.
-- Back up authored documents before replacement and check for unsaved/open application state before transforming them.
-- Proceed through safe, in-scope implementation steps. Stop for missing authority, ambiguous irreversible changes, contradictory requirements, or credentials that require Douglas.
-- Treat a request for a plan as plan-only work until Douglas gives an implementation instruction.
-
-### Engineering judgment
-
-- State key assumptions, surface materially different interpretations, and choose the simplest sufficient design.
-- Convert work into verifiable goals. Reproduce bugs before fixing them and add a regression test when practical.
-- Exercise the assembled system under the condition that exposed the bug; isolated mocks and unit tests are supporting evidence.
-- Reproduce a claimed root cause before writing it to durable memory. Preserve unresolved causes as hypotheses.
-- Use comments for non-obvious rationale and public interfaces; remove comments that merely restate code.
-- Use code-graph or symbol navigation when available before loading large files.
-- Keep bulk research and large file content out of the main conversation when targeted reads or isolated analysis can answer the question.
-- Use matching repository skills when their trigger applies. Keep task workflows in skills and standing cross-tool invariants in this file.
-- Douglas grants standing approval to use sub-agents. Default to delegation for eligible non-trivial work with independent streams, context-heavy investigation, or a skill that requires isolated assessment; do not pause for another approval prompt.
-- Keep delegated work independently verifiable, with one writer per file or an isolated worktree. Handle tightly coupled or trivial work in the primary context.
-- For browser-visible changes, run the repositoryâ€™s browser/end-to-end verifier.
-
-### Completion and durable learning
-
-- Run `VERIFY.md`, relevant tests, and an adversarial pass before claiming non-trivial work is complete.
-- A recurring-error fix requires a durable artifact that reaches future sessions: one or more rules, skills, memories, verifiers, hooks, permissions, tests, briefs, or backlog records.
-- Route corrections by evidence and scope. Use the narrowest proven scope and several enforcement mechanisms when they address different failure modes.
-- Append value-free correction records to `.agents/feedback/FEEDBACK-LOG.md`; preserve history through superseding entries.
-- Record failures, blockers, remaining uncertainty, created/updated file paths, and open questions plainly.
-- When a turn ends or work blocks with action required from Douglas, finish with a numbered `Next steps for Douglas` checklist. Each step must name the exact location, action, setting or field, safe value format, and confirmation Douglas should send back.
-<!-- agent-harness:portable-principles:v2:end -->
+- Answer questions before task narration. Keep routine updates concise.
+- Never invent facts, paths, APIs, versions, source content, measurements, credential state, or passing results. Name the source checked.
+- Verify inherited claims against repository, Git, runtime, or current primary evidence.
+- Match commands and paths to the user's actual shell and device.
+- Avoid the rhetorical "it is X, not Y" construction.
+- Preserve unrelated changes. Inspect exact targets before destructive or broad operations and prefer recoverable changes.
+- Before creating, replacing, renaming, or removing an artifact, search the repository and available shared harness for its existing owner, equivalents, consumers, wiring, tests, and documentation. Extend or consolidate the closest adequate owner. Record search evidence and the reason for a truly new owner in `TASK.md`.
+- Extract every discrete obligation from a multi-step prompt into `TASK.md`. Add required agent-discovered work as nested checkboxes with provenance. Use parallel execution when eligible work is independent and file-disjoint.
+- Read a named or clearly matching skill in full. Keep canonical workflows under `.agents\skills` and product adapters thin.
+- Reproduce bugs before fixing them and add a regression test when practical. Exercise the assembled system under the condition that exposed the failure.
+- For browser-visible changes, run the repository browser or end-to-end verifier.
+- When a correction requests permanent prevention, use the `correct` skill and implement a durable, narrowly scoped artifact.
+- Treat `MEMORY.md` as a lean index. Keep behavior in instructions, skills, hooks, permissions, tests, or verifiers.
+- Before claiming non-trivial work complete, run the verification recorded in `TASK.md`, relevant tests, and an adversarial pass.
+<!-- agent-harness:portable:v3:end -->
 
 ## Project identity
 
@@ -63,19 +31,19 @@ These standing rules travel with the repository so local, cloud, and background 
 ## Start and resume
 
 1. Read this file.
-2. Read `CURRENT-TASK.md`, `STATUS.md`, and the last 5ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“10 entries in `LOG.md`.
-3. Read `WORK_QUEUE.md` for multi-step work.
-4. Run `git status --short --branch` and `git worktree list --porcelain`.
-5. Reconcile stale chat claims against files and Git before editing.
-6. Run the repository state verifier when the local shared harness is available.
+2. Read `TASK.md`, `STATUS.md`, and recent entries in `LOG.md`.
+3. Run `git status --short --branch` and `git worktree list --porcelain`.
+4. Read `MAP.md` for architecture, data, ownership, integrations, or important paths.
+5. Read `DESIGN.md` for interface work and `PRODUCT.md` when present.
+6. Reconcile inherited claims against files and Git before editing.
 
 ## Commands
 
-- Setup: `C:\Users\dougl\.agents\tools\Ensure-AgentProject.cmd -Repository .`
-- Test: `C:\Users\dougl\.agents\tools\Test-AgentProjectState.cmd -Repository .`
+- Setup: `powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\.agents\tools\Manage-Harness.ps1" -Action EnsureProject -Repository .`
+- Test: `powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\.agents\tools\Manage-Harness.ps1" -Action VerifyProject -Repository .`
 - Lint: `git diff --check`
 - Build: `N/A — coordination and documentation repository`
-- End-to-end verification: `C:\Users\dougl\.agents\tools\Test-HarnessSetup.cmd`
+- End-to-end verification: the project verifier plus the relevant harness, hook, link, HTML, credential-safety, backup, and restore suites recorded in `TASK.md`.
 
 ## Safety and evidence
 
@@ -108,34 +76,30 @@ These standing rules travel with the repository so local, cloud, and background 
 
 ## Task and knowledge files
 
-- `CURRENT-TASK.md`: active goal, completed steps, remaining steps, next verifier.
-- `WORK_QUEUE.md`: actionable multi-step queue.
+- `TASK.md`: active goal, actionable queue, blockers, completed evidence, and next verifier.
 - `STATUS.md`: durable project state.
 - `LOG.md`: append-only work log.
 - `BACKBURNER.md`: parked backlog.
-- `VERIFY.md`: required proof before completion.
 - `MAP.md`: architecture, data, ownership, and file navigation.
-- `DESIGN.md`: current design decisions and constraints.
+- `DESIGN.md`: universal interface rules plus project-specific design rules.
+- `PRODUCT.md`: optional product intent.
 - `MEMORY.md`: lean index to durable reference files.
-
-Use session-keyed active task files when concurrent sessions share one folder. Shared files remain `STATUS.md`, `LOG.md`, and `BACKBURNER.md`.
+- `skills-manifest.json`: canonical baseline and project skill bindings.
 
 ### Update triggers
 
-- Start or resume: read `CURRENT-TASK.md`, `STATUS.md`, recent `LOG.md`, and `WORK_QUEUE.md` when the work has multiple steps.
-- Multi-step request: seed `WORK_QUEUE.md` before implementation and update checkboxes as evidence lands.
-- Active goal, completed step, next command, or verifier changes: update `CURRENT-TASK.md`.
+- Start or resume: read `TASK.md`, `STATUS.md`, and recent `LOG.md`.
+- Multi-step request: extract every discrete obligation into `TASK.md` before implementation.
+- Active goal, queue, blockers, completed evidence, next command, or verifier changes: update `TASK.md`.
 - Durable capability or project-state change: update `STATUS.md`.
 - Meaningful completed work: append one dated line to `LOG.md`.
 - Parked idea or deferred task: update `BACKBURNER.md`.
 - Architecture, data flow, ownership, integration, or important path changes: update `MAP.md`.
-- Product or architecture decision changes: update `DESIGN.md`.
-- Verification command or required evidence changes: update `VERIFY.md`.
+- Universal or project-specific interface rules change: update `DESIGN.md`.
+- Product intent changes: update `PRODUCT.md` when present.
 - Reusable fact gains a durable reference: add one linked line to `MEMORY.md`.
 - Douglas corrects recurring behavior: record evidence, choose path/project/shared/platform/provider scope, implement the narrowest reliable rule or enforcement artifact, and add verification.
-- Before handoff or stopping: reconcile the queue, task narrative, durable status, log, and Git state.
-
-`CURRENT-TASK.md` explains the active goal and exact next verifier. `WORK_QUEUE.md` supplies machine-readable action state for loops, hooks, and concurrent work. Keep queue entries short and link to the current-task narrative instead of duplicating it.
+- Before handoff or stopping: reconcile `TASK.md`, durable status, log, and Git state.
 
 ## Secret handling
 
@@ -165,9 +129,9 @@ Use session-keyed active task files when concurrent sessions share one folder. S
 
 When present, read:
 
-- `C:\Users\dougl\.agents\HARNESS-MAP.md`
-- `C:\Users\dougl\.agents\CROSS-AGENT-CONTRACT.md`
-- `C:\Users\dougl\.agents\FEEDBACK-ROUTER.md` when Douglas corrects behavior or asks for a durable prevention
+- `C:\Users\dougl\.agents\AGENTS.md`
+- `C:\Users\dougl\.agents\MAP.md`
+- `C:\Users\dougl\.agents\DESIGN.md`
 - `C:\Users\dougl\.agents\WORKTREE-PROTOCOL.md` for parallel or isolated work
 
 Cloud sessions continue with this repository contract when those machine-local files are absent.
