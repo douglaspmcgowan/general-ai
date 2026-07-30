@@ -27,3 +27,9 @@
 - Bitwarden Password Manager CLI and the full-tuple broker are installed and tested. Production tuples remain empty until Douglas creates the named Password Manager items and hidden fields.
 - The local Docket contains 162 cards: 157 Skills Docket cards and five setup handoffs. Cloud publication remains pending the Docket secret handoff.
 - The IDETC archive is preserved under `C:\Users\dougl\Data\Projects\idetc-writing-ide\inputs` with a matching SHA-256 copy check.
+
+## Harness v3 onboarding — 2026-07-30
+
+- Prepared the harness v3 onboarding in isolated worktree `C:\tmp\onboard-general-ai-v3` from stable `master` commit `9d3313e8a7bad7b90c810ddfd6e15814df6d58c6`; the stable checkout was not mutated.
+- Reconciled the legacy `WORK_QUEUE.md` and `VERIFY.md` losslessly under `.agents/archive/pre-harness-v3/`, promoted unresolved work into `TASK.md`, and migrated the data and skill manifests to current schemas.
+- Canonical harness sync and verify, the installed project verifier, `git diff --check`, redacted Gitleaks history and directory scans, and the disposable local Capsule test suite passed before commit.

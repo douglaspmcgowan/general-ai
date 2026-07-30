@@ -7,18 +7,20 @@
 | `AGENTS.md` | Agents and humans | Every repository session | Portable project contract |
 | `CLAUDE.md` | Claude adapter | Every Claude repository session | Imports `AGENTS.md` |
 | `.cursor/rules/00-project-contract.mdc` | Cursor adapter | Every Cursor repository session | Requires `AGENTS.md` |
-| `CURRENT-TASK.md` | Agents and humans | Start, resume, handoff | Active goal, progress, exact next verifier |
-| `WORK_QUEUE.md` | Agents and harness | Multi-step work | Actionable checkbox state |
+| `TASK.md` | Agents and humans | Start, resume, handoff | Goal, actionable queue, blockers, decisions, completed evidence, and verification |
 | `STATUS.md` | Agents and humans | Start, resume, milestone | Durable setup and migration state |
 | `LOG.md` | Agents and humans | Recent history, handoff | Append-only work record |
 | `BACKBURNER.md` | Humans and agents | Planning | Parked cross-project backlog |
-| `VERIFY.md` | Agents and CI | Before completion | Required evidence and commands |
 | `MIGRATION.md` | Humans and agents | Path changes and OneDrive retirement | Repository cutover ledger and rollback rules |
 | `DESIGN.md` | Agents and humans | Harness or storage decisions | Goals, constraints, and durable decisions |
 | `MEMORY.md` | Agents | Recall | Lean links to durable topic notes |
 | `data-manifest.yaml` | Agents | Data access | Value-free external-data policy |
 | `secret-manifest.json` | Agents and automation | Credential-dependent setup | Value-free environment-variable inventory |
 | `skills-manifest.json` | Agents and cloud setup | Skill selection and export | Project skill bindings |
+| `secret-manifest.md` | Humans and agents | Credential setup | Generated value-free credential brief |
+| `.agents/skill-pathways.json` | Agents and automation | Skill routing | Generated pathway selection |
+| `.agents/harness-provenance.json` | Agents and verification | Harness verification | Generated managed-file hashes |
+| `.agents/archive/pre-harness-v3/` | Humans and agents | Historical audit | Verbatim superseded task and verification state |
 
 ## Architecture
 
@@ -31,7 +33,7 @@
 | Project data fleet | Hold valuable mutable data outside Git | `C:\Users\dougl\Data\Projects` and `C:\Users\dougl\Data\Restricted` | Each project manifest |
 | Worktree fleet | Isolate concurrent source changes | `C:\Users\dougl\Worktrees` | Task owner |
 | Docket | Present review cards from local SQLite and optional cloud sync | `C:\Users\dougl\projects\docket` | Docket repository |
-| Coordination state | Track the cross-project migration and remaining human boundaries | Repository root task files and `MIGRATION.md` | This repository |
+| Coordination state | Track the cross-project migration and remaining human boundaries | `TASK.md`, durable coordination files, and `MIGRATION.md` | This repository |
 | Historical research | Preserve the research that informed the current architecture | `research\` | This repository |
 | Capsule | Rebuild the project fleet, harness, approved app data, and Quick Access on another Windows computer | `C:\Users\dougl\Documents\Capsule\START-HERE.md` | This repository and Nightly Agent Backups |
 
