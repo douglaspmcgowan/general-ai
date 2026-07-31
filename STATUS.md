@@ -18,6 +18,7 @@
 - Private Agent Brain `main` at `fd584d1` contains portable Claude/Codex loaders, map/spec/schema/state, fixtures, constrained `proposals/` and `agent-notes/` write zones, and the reviewed cross-device index refresh proposal from PR 3; mirrored human notes remain read-only.
 - The live Obsidian bundle has Web Viewer enabled and `html-page-viewer@0.1.1` installed. Harness `master` at `ae3899a` still carries the older bundle and lacks the pinned community-plugin installation path.
 - Harness `master` also lacks the exact two-path mutable-runtime verifier allowance and still runs prerequisite discovery after dependent Obsidian and Project Data stages. These three harness blockers remain with the active harness owner and gate the real receiving-computer proof.
+- [Harness issue 18](https://github.com/pyrgos-ai/doug-harness/issues/18) is the consolidated implementation and release owner for those receiving-device blockers and the final receipt.
 
 ## Remaining boundaries
 
