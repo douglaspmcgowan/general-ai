@@ -20,16 +20,17 @@
       "repository": "douglaspmcgowan/general-ai",
       "visibility": "public",
       "defaultBranch": "master",
-      "portabilityInventoryCommit": "340a05fde53f1f1c6a08bf8c73698a2449956273",
+      "portabilityInventoryCommit": "582daf5519812d46c0950c625887fb51de1f4661",
       "entrypoint": "CROSS-DEVICE-ACCESS.md",
       "portabilityInventory": "PORTABILITY-INVENTORY.yaml",
-      "handoff": "handoffs/HANDOFF-CROSS-DEVICE-HARNESS-2026-07-31.md"
+      "handoff": "handoffs/HANDOFF-CROSS-DEVICE-HARNESS-2026-07-31.md",
+      "hookMigrationIssue": "https://github.com/pyrgos-ai/doug-harness/issues/17"
     },
     "agentBrain": {
       "repository": "douglaspmcgowan/obsidian-vault-mirror",
       "visibility": "private",
       "defaultBranch": "main",
-      "auditedCommit": "337d615895b2dd42884cf868a90534a61f661da8",
+      "auditedCommit": "fd584d121438ef3bb448962bd1e88fbabdab2f00",
       "contract": "AGENTS.md",
       "agentWritablePrefixes": [
         "proposals/",
@@ -157,7 +158,7 @@
     "Harness master must move prerequisite discovery before dependent Obsidian and Project Data stages and pass a blank-profile regression.",
     "The consolidated task-state hook suite has six failing chain and PROMPT_LOG regressions.",
     "The merged harness release must complete one real receiving-computer onboarding run.",
-    "Nine project actions require attention: eight retained roots lack origins, while boundaries-reader has a remote and needs its topic and portable baseline.",
+    "Five project actions require attention: private remotes exist, while their reviewed initial branches remain gated by the backup-preserving Gitleaks hook migration in harness issue 17.",
     "Nineteen project data manifests remain placeholders; Docket has the sole operational cloud-data adapter.",
     "The two OneDrive worktrees must be checkpointed or relocated before any OneDrive-root removal.",
     "The 14-repository cloud rollout remains plan-only until issue 16 is explicitly promoted."

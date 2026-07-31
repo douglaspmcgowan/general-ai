@@ -40,7 +40,7 @@ GitHub authentication is required for the private harness and private vault mirr
 - The official `obsidian-headless@0.0.14` package runs under the installed Node runtime in a disposable invocation.
 - The Windows `ob` command currently resolves to a separate unsigned third-party client; official bridge automation must use an explicit pinned launcher.
 - Every current Engineer brief has a body-complete Docket card.
-- General AI PR 6 is merged at `188e12b`, including the reconciled phone and machine pickup state.
+- General AI PR 7 is merged at `582daf5`, including the current project-transport inventory and pickup state.
 - Private mirror PR 3 is merged at `fd584d1`, including the constrained cross-device index refresh proposal.
 - Boundaries Reader PR 1 is merged at `53df3f7`, including its portable baseline; the repository now participates in `agent-project` discovery.
 - All 12 current Engineer documents in scope have Git-backed copies.
@@ -51,7 +51,7 @@ GitHub authentication is required for the private harness and private vault mirr
 2. **Approved Obsidian bundle:** the committed onboarding snapshot predates today's plugin installation. It records Web Viewer as disabled and lacks the HTML Page Viewer ID.
 3. **Community-plugin installation:** the current Obsidian export/restore path carries plugin IDs without carrying or installing the pinned plugin package.
 4. **Blank-computer ordering:** Obsidian restoration and Google Drive data-root setup currently run before prerequisite discovery, so a blank profile can fail before receiving a complete `ATTENTION` inventory.
-5. **Project hook composition:** five new private project remotes remain branchless because their existing fixed-path Gitleaks hooks and the portable PATH-resolved hook need one explicitly approved, backup-preserving replacement.
+5. **Project hook composition:** five new private project remotes remain branchless because their existing fixed-path Gitleaks hooks and the portable PATH-resolved hook need one explicitly approved, backup-preserving replacement. The fail-closed implementation owner is [harness issue 17](https://github.com/pyrgos-ai/doug-harness/issues/17).
 6. **Real receiving-device proof:** the final claim requires one actual receiving computer to complete the merged clone/ZIP flow and verify installed harness, Obsidian configuration, project discovery, data adapters, and current context.
 
 ## Fastest completion order
@@ -61,7 +61,7 @@ GitHub authentication is required for the private harness and private vault mirr
 3. Capture the live approved Obsidian configuration through the existing onboarding owner.
 4. Add a pinned HTML Page Viewer installation declaration with source, version, expected files, checksum, and verifier.
 5. Refresh the harness setup stamp and onboarding manifest once.
-6. Approve and apply the exact backup-preserving Gitleaks hook replacement in the five branchless project remotes, then finish their reviewed initial baselines.
+6. Approve and apply the exact backup-preserving Gitleaks hook replacement in the five branchless project remotes through [harness issue 17](https://github.com/pyrgos-ai/doug-harness/issues/17), then finish their reviewed initial baselines.
 7. Run focused tests during each change, followed by one integrated suite, Gitleaks, and whitespace validation.
 8. Merge, install from reviewed `master`, and prove one real receiving-computer pickup.
 9. Begin the repository cloud-readiness rollout from [harness issue 16](https://github.com/pyrgos-ai/doug-harness/issues/16): shared template first, then Docket, General AI, Flight Tracker, and Kelly Uniforms, followed by parallel project batches.
