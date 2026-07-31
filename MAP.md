@@ -2,90 +2,101 @@
 
 ## Core documents
 
-| File | Audience | Loaded or read when | Owns |
-|---|---|---|---|
-| `AGENTS.md` | Agents and humans | Every repository session | Portable project contract |
-| `CLAUDE.md` | Claude adapter | Every Claude repository session | Imports `AGENTS.md` |
-| `.cursor/rules/00-project-contract.mdc` | Cursor adapter | Every Cursor repository session | Requires `AGENTS.md` |
-| `TASK.md` | Agents and humans | Start, resume, handoff | Active goal, actionable queue, blockers, completed evidence, and exact next verifier |
-| `STATUS.md` | Agents and humans | Start, resume, milestone | Durable setup and migration state |
-| `LOG.md` | Agents and humans | Recent history, handoff | Append-only work record |
-| `BACKBURNER.md` | Humans and agents | Planning | Parked cross-project backlog |
-| `MIGRATION.md` | Humans and agents | Path changes and legacy recovery review | Repository cutover ledger, retirement evidence, and preserved-data decisions |
-| `DESIGN.md` | Agents and humans | Interface work | Universal and project-specific interface rules |
-| `PRODUCT.md` | Agents and humans | Product work, when present | Optional product intent |
-| `MEMORY.md` | Agents | Recall | Lean links to durable topic notes |
-| `data-manifest.yaml` | Agents | Data access | Value-free external-data policy |
-| `secret-manifest.json` | Agents and automation | Credential-dependent setup | Value-free environment-variable inventory |
-| `skills-manifest.json` | Agents and cloud setup | Skill selection and export | Project skill bindings |
-| `.agents/harness-provenance.json` | Agents and verifiers | Harness drift checks | Installed project-contract hashes and authority |
-| `.agents/skill-pathways.json` | Agents | Named compound skill workflows | Ordered portable skill chains |
-| `.agents/archive/task-state-migration/` | Humans and agents | Historical recovery only | Verified legacy task and verification sources |
+| File | Loaded or read when | Owns |
+|---|---|---|
+| `AGENTS.md` | Every repository session | Portable project contract |
+| `CLAUDE.md` | Every Claude repository session | Claude import of `AGENTS.md` |
+| `.cursor\rules\00-project-contract.mdc` | Every Cursor repository session | Cursor pointer to `AGENTS.md` |
+| `TASK.md` | Start, resume, handoff | Active goal, queue, constraints, completion evidence, and next verifier |
+| `STATUS.md` | Start, resume, milestone | Durable current capability and boundaries |
+| `LOG.md` | Recent history and handoff | Append-only completed-work record |
+| `BACKBURNER.md` | Planning | Parked work |
+| `MAP.md` | Architecture or path work | Architecture, data flow, owners, integrations, and navigation |
+| `MIGRATION.md` | Legacy recovery review | Cutover ledger and preserved-data evidence |
+| `MEMORY.md` | Recall | Lean links to durable references |
+| `research\` | Research review | Historical recons, briefs, and specifications |
+| `data-manifest.yaml` | External-data access | Value-free local-data policy |
+| `secret-manifest.json` | Credential-dependent setup | Value-free runtime-variable inventory |
+| `skills-manifest.json` | Skill selection and export | Project skill bindings |
+| `CROSS-DEVICE-ACCESS.md` | Phone, computer, or cloud-agent pickup | Current human entrypoint and ordered links |
+| `PORTABILITY-INVENTORY.yaml` | Receiving-device project discovery | Machine-readable action and transport state for 27 retained roots |
+| `handoffs\CROSS-DEVICE-CONTEXT-2026-07-31-v2.json` | Agent pickup | Machine-readable commits, paths, blockers, and boundaries |
 
-## Architecture
+## System map
 
-| Component | Purpose | Entry point | Owner |
-|---|---|---|---|
-| Human harness documentation | Explain the system, decisions, and operating procedures | `C:\Users\dougl\.agents\human-readable\README.md` | Shared harness |
-| Live agent harness | Supply contracts, tools, templates, skills, and deterministic guards | `C:\Users\dougl\.agents\AGENTS.md` and `C:\Users\dougl\.agents\MAP.md` | Shared harness |
-| Declog | Diagnose memory pressure and classify stale agent, browser, Node, Python, and WebView2 helpers before guarded cleanup | `C:\Users\dougl\.agents\skills\declog\SKILL.md` | Shared harness |
-| Bitwarden scaffold plan | Create empty project Login items with exact Hidden field names | `C:\Users\dougl\.agents\tools\bitwarden-project-scaffolds.json` | Shared harness |
-| Product adapters | Load shared rules into Claude, Codex, and Cursor | `C:\Users\dougl\.claude\CLAUDE.md`, `C:\Users\dougl\.codex\AGENTS.md`, `C:\Users\dougl\.cursor\rules` | Each product |
-| Local project fleet | Sync source, project rules, handoffs, and small versionable data through one GitHub repository per project | `C:\Users\dougl\projects` | Each project repository |
-| Project data fleet | Restore excluded and live mutable data through project-specific data-manifest adapters | `C:\Users\dougl\Data\Projects` and `C:\Users\dougl\Data\Restricted` | Each project manifest |
-| Project-sync manager | Discover tagged repositories through GitHub CLI, recreate them under local conventions, and route excluded/live data through each declared adapter | Pending shared-harness implementation | GitHub account/topic, shared harness, and each project manifest |
-| Worktree fleet | Isolate concurrent source changes | `C:\Users\dougl\Worktrees` | Task owner |
-| Docket | Present review cards from local SQLite and optional cloud sync | `C:\Users\dougl\projects\docket` | Docket repository |
-| Coordination state | Track the cross-project migration and remaining human boundaries | `TASK.md`, durable state files, and `MIGRATION.md` | This repository |
-| Historical research | Preserve the research that informed the current architecture | `research\` | This repository |
-| Capsule | Carry the shared global harness, bootstrap tools, and repository inventory to another Windows computer | `C:\Users\dougl\My Drive\Capsule\AGENT-START.md` | `agent-harness` repository |
+```mermaid
+flowchart LR
+    H["Private GitHub repository<br/>pyrgos-ai/doug-harness"] --> O["Root ONBOARDING folder"]
+    H --> I["Installed global harness<br/>C:\Users\dougl\.agents"]
+    I --> C["Claude, Codex, and Cursor"]
+    O --> G["GitHub agent-project discovery"]
+    G --> R["Project repositories<br/>C:\Users\dougl\projects"]
+    R --> M["Per-project data-manifest.yaml"]
+    M --> P["Local runtime data<br/>PROJECT_DATA_ROOT"]
+    M --> S["External artifacts<br/>My Drive\Project Data"]
+    B["Bitwarden Secrets Manager"] --> C
+    C --> D["Docket HTTPS/Vercel Blob<br/>phone-accessible cards"]
+    GA["general-ai"] --> H
+    GA --> D
+    GA --> V["Active Obsidian vault"]
+    GA --> A["Private Agent Brain mirror"]
+```
 
-## Important paths
+## Authorities and important paths
 
-| Path | Purpose | Generated | Committed |
-|---|---|---:|---:|
-| `C:\Users\dougl\.agents` | Live shared harness | Mixed | Private harness repository mirror |
-| `C:\Users\dougl\.agents\human-readable` | Human explanations and setup changelog | No | Yes, in the harness repository |
-| `C:\Users\dougl\projects\agent-harness` | Private Git authority for the shared harness | No | Yes |
-| `C:\Users\dougl\projects\docket` | Docket source authority | No | Yes |
-| `C:\Users\dougl\projects\general-ai` | This coordination repository | No | Yes |
-| `C:\Users\dougl\projects\general-ai\recovery\general-claude-history.bundle` | Complete committed-ref recovery for the retained `general-claude` repository | No | Yes |
-| `C:\Users\dougl\Data\Projects\general-ai` | Local coordination data | Mixed | No |
-| `C:\Users\dougl\Documents\Agent Backups` | Curated value-free recovery artifacts | Yes | No |
-| `C:\Users\dougl\My Drive\Capsule` | Primary transferable computer-rebuild package | Yes | No |
-| `C:\Users\dougl\OneDrive` | Preserved retired data and legacy-worktree root pending an exact retention decision; no application dependency | No | No |
+| Authority | Path or endpoint | Role |
+|---|---|---|
+| Shared harness source | `C:\Users\dougl\projects\agent-harness` | Local checkout of `pyrgos-ai/doug-harness` |
+| Installed harness | `C:\Users\dougl\.agents` | Live shared rules, skills, tools, hooks, and human guide |
+| Receiving workflow | `agent-harness\ONBOARDING\START-HERE.md` | ZIP/clone bootstrap entry point |
+| Project coordination | `C:\Users\dougl\projects\general-ai` | This repository |
+| Project source fleet | `C:\Users\dougl\projects` | Canonical local repository roots |
+| External project artifacts | `C:\Users\dougl\My Drive\Project Data` | DVC objects, verified SQLite snapshots, and declared assets |
+| Docket source | `C:\Users\dougl\projects\docket` | Phone-accessible review-card application |
+| Historical recovery | `recovery\general-claude-history.bundle` | Complete committed-ref bundle for retained `general-claude` history |
+| Shared research | `research\` | Committed architecture, task, second-brain, and graph-planning research |
+| Cross-device entrypoint | `CROSS-DEVICE-ACCESS.md` | Ordered phone-safe links and current reconstruction blockers |
+| Fleet inventory | `PORTABILITY-INVENTORY.yaml` | Guarded clone, attention, skip, and fixture-exclusion actions |
+| Agent Brain | `https://github.com/douglaspmcgowan/obsidian-vault-mirror` | Curated cloud context and constrained proposal/agent-note branches |
 
-## Data flow
+The Drive Capsule has no active authority. Its former folder was removed recoverably after repository onboarding passed. `My Drive\Project Data` remains an intentional external data path.
 
-1. Product adapters load the shared harness and the nearest project contract.
-2. The project-sync manager asks GitHub CLI for repositories under the configured account and topic, then applies local path conventions. Static repository inventory is unnecessary; exceptions require repository evidence.
-3. Each discovered GitHub repository carries its project source, portable rules, handoffs, and small versionable data into `C:\Users\dougl\projects`.
-4. The manager uses each project data manifest to restore excluded and live mutable databases, records, inputs, outputs, and other declared data. Twenty-five of 27 repositories already have this extension point.
-5. GitHub receives versioned source and safe documentation.
-6. The committed `general-claude` refs remain recoverable from `recovery\general-claude-history.bundle`; its original folder retains the current uncommitted working-tree state.
-7. SQLite-safe exports and value-free recovery pointers enter `Documents\Agent Backups`.
-8. Capsule tooling from `C:\Users\dougl\projects\agent-harness\.agents\capsule` packages the shared global harness, bootstrap tools, repository-discovery configuration, account identifiers, and integrity hashes. The current workspace payload is scheduled for removal and remains frozen until the replacement transport passes.
-9. Google Drive syncs the generated `My Drive\Capsule` bootstrap artifact; Agent Backups remain the dated local recovery authority.
-10. Secret values reach approved child processes through exact Bitwarden Password Manager broker tuples.
+## Data and onboarding flow
+
+1. A receiving computer downloads an authenticated repository ZIP or clones `pyrgos-ai/doug-harness`.
+2. `ONBOARDING\START-HERE.md` routes the reviewed Windows bootstrap, harness installation and verification, approved Obsidian configuration restore, executable discovery, and project-data environment setup. The current released commit still requires the three harness blockers listed in `TASK.md` before final receiving-computer proof.
+3. GitHub topic `agent-project` discovers the project fleet. Missing repositories clone under local conventions; clean existing repositories may pull safely.
+4. Git carries source, instructions, manifests, portable fixtures, and value-safe documentation.
+5. Each repository's `data-manifest.yaml` declares excluded runtime data and its adapter. `PROJECT_DATA_ROOT` holds local runtime state; `PROJECT_DATA_SYNC_ROOT` resolves to `C:\Users\dougl\My Drive\Project Data` on this computer.
+6. DVC carries versioned content pointers in Git and immutable content-addressed bytes through the declared external artifact root. SQLite adapters create verified recovery snapshots under the 2/2/1 policy.
+7. Bitwarden Secrets Manager supplies approved runtime credentials through the exact-command broker. Git receives names and safe placeholders only.
+8. Docket makes briefs and decisions available on phone and other devices through its authenticated HTTPS/Vercel Blob path.
+9. The private Agent Brain mirror supplies curated context to cloud agents. Agent-authored changes use reviewed branches under `proposals/` and `agent-notes/`; a future trusted bridge owns reviewed import into the personal vault.
+10. The future cloud rollout follows `agent-harness\ONBOARDING\CLOUD-AGENTS.md` and issue #16. Planning does not grant cloud-ready status.
 
 ## Integrations
 
-| System | Direction | Authentication name | Failure behavior |
+| System | Direction | Authentication boundary | Failure behavior |
 |---|---|---|---|
-| GitHub | Both | GitHub Windows keyring | Stop publication; offline Git bundles remain available |
-| Bitwarden Password Manager | Inbound | Interactive `BW_SESSION` plus item/field tuple metadata | Broker fails closed; secret values stay out of files |
-| Google Drive | Outbound backup | Google account owned by Douglas | Capsule and Agent Backups remain locally usable |
-| Docket cloud sync | Both | `REVIEW_SECRET` | Local SQLite and outbox remain authoritative |
-| Claude, Codex, Cursor | Inbound rules and local writes | Product-owned login/session | Project contract remains portable through Git |
+| GitHub | Both | GitHub credential store or hosted-agent credential | Stop clone, pull, or publication; preserve local Git state |
+| Bitwarden Secrets Manager | Inbound | Existing machine-account token through exact-command broker | Fail closed without writing values to files or logs |
+| Google Drive Project Data | Both through declared adapters | Google Drive Desktop session | Report adapter attention; preserve local data and last verified recovery point |
+| Docket | Both | Existing `REVIEW_SECRET` and committed non-secret endpoint | Preserve local/outbox state and reject unauthorized or invalid writes |
+| Obsidian | Outbound publication | Active vault selected from Obsidian configuration | Back up before replacement and avoid prohibited paths |
+| Claude, Codex, Cursor | Inbound rules and project writes | Product-owned sessions | Continue from repository contract when local shared files are unavailable |
+
+## Current research
+
+- `research\obsidian-second-brain-recon-2026-07-30.md`
+- `research\obsidian-second-brain-spec-2026-07-30.md`
+- `research\graph-engineering-agent-planning-recon-2026-07-30.md`
+- `research\graph-aware-agent-planning-spec-2026-07-30.md`
+- `research\task-management-recon-2026-07-29.md`
 
 ## Ownership and concurrency
 
-- A repository gets one canonical local path under `C:\Users\dougl\projects`.
-- A writable task gets one branch, one worktree, and one owner.
-- Active worktrees remain at their current paths until their owning session reaches a handoff point.
-- Shared runtime data uses project-specific paths and task-specific test stores.
-- `MIGRATION.md` records every cutover, preserved recovery source, verification result, and remaining data-retention decision.
-
-## Update rule
-
-Update this file whenever a core document, source-of-truth path, data flow, owner, integration, or concurrency boundary changes.
+- One repository has one canonical local path.
+- One writable task has one branch, one isolated worktree, and one owner.
+- `TASK.md` is the task authority. UI task boards mirror its actionable slice.
+- Shared runtime data remains read-only unless a task explicitly owns its mutation.
+- Architecture changes update this map; durable capability changes update `STATUS.md`; meaningful completion appends to `LOG.md`.

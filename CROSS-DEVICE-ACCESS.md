@@ -14,8 +14,9 @@ Use this page as the current phone, computer, and cloud-agent entrypoint for the
 6. [Existing cross-device handoff](https://github.com/douglaspmcgowan/general-ai/blob/master/handoffs/HANDOFF-CROSS-DEVICE-HARNESS-2026-07-31.md)
 7. [Machine-readable pickup context](https://github.com/douglaspmcgowan/general-ai/blob/master/handoffs/CROSS-DEVICE-CONTEXT-2026-07-31-v2.json)
 8. [Current portability completion audit](https://github.com/douglaspmcgowan/general-ai/blob/master/research/cross-device-portability-completion-audit-2026-07-31.md)
-9. [Docket](https://vault-review-mobile.vercel.app)
-10. [Private Obsidian vault mirror](https://github.com/douglaspmcgowan/obsidian-vault-mirror)
+9. [Machine-readable fleet portability inventory](https://github.com/douglaspmcgowan/general-ai/blob/master/PORTABILITY-INVENTORY.yaml)
+10. [Docket](https://vault-review-mobile.vercel.app)
+11. [Private Obsidian vault mirror](https://github.com/douglaspmcgowan/obsidian-vault-mirror)
 
 GitHub authentication is required for the private harness and private vault mirror. Docket uses its existing authenticated access.
 
@@ -24,7 +25,7 @@ GitHub authentication is required for the private harness and private vault mirr
 - `pyrgos-ai/doug-harness` is the canonical shared-harness and Windows-onboarding source.
 - `douglaspmcgowan/general-ai` carries coordination, research, recovery context, and cross-device handoffs.
 - The active personal vault remains the human-authoring source and uses Obsidian Sync for desktop and phone.
-- The private `obsidian-vault-mirror` is the curated Git surface for cloud-agent context.
+- The private `obsidian-vault-mirror` is the curated Agent Brain surface for cloud-agent context. Its portable contract permits agent-authored branches only under `proposals/` and `agent-notes/`; mirrored human notes remain read-only.
 - Docket is the phone review surface. The local store currently has 174 cards: 172 unresolved and 2 resolved.
 - Bitwarden Secrets Manager uses the existing `Agents` organization, `Agent Runtime` project, and connected machine account. The one-time bootstrap variable name is `BITWARDEN_SECRETS_MANAGER_ACCESS_TOKEN`.
 - `C:\Users\dougl\My Drive\Project Data` remains the external transport for declared DVC objects, verified SQLite snapshots, and other project artifacts.
@@ -39,11 +40,13 @@ GitHub authentication is required for the private harness and private vault mirr
 - The official `obsidian-headless@0.0.14` package runs under the installed Node runtime in a disposable invocation.
 - The Windows `ob` command currently resolves to a separate unsigned third-party client; official bridge automation must use an explicit pinned launcher.
 - Every current Engineer brief has a body-complete Docket card.
-- This publication branch carries the two new cross-device documents plus the previously missing Headless brief; after merge, all 12 current Engineer documents in scope have Git-backed copies.
+- General AI PR 4 is merged at `340a05f`, including the 27-root portability inventory.
+- Private mirror PR 2 is merged at `337d615`, including the portable Agent Brain contract, schema, policy, state, fixtures, and constrained write zones.
+- All 12 current Engineer documents in scope have Git-backed copies.
 
 ## Current blockers to complete receiving-computer reconstruction
 
-1. **Installed harness verification:** the live verifier rejects two legitimate harness-owned mutable files. A narrow existing fix allows exactly `logs/stale-agent-process-cleanup.jsonl` and `state/permissions-snapshot.json` while preserving rejection of undeclared siblings.
+1. **Installed harness verification:** harness `master` at `ae3899a` still rejects two legitimate harness-owned mutable files. No published commit or pull request contains the required narrow allowance for exactly `logs/stale-agent-process-cleanup.jsonl` and `state/permissions-snapshot.json`.
 2. **Approved Obsidian bundle:** the committed onboarding snapshot predates today's plugin installation. It records Web Viewer as disabled and lacks the HTML Page Viewer ID.
 3. **Community-plugin installation:** the current Obsidian export/restore path carries plugin IDs without carrying or installing the pinned plugin package.
 4. **Blank-computer ordering:** Obsidian restoration and Google Drive data-root setup currently run before prerequisite discovery, so a blank profile can fail before receiving a complete `ATTENTION` inventory.
@@ -68,7 +71,7 @@ GitHub authentication is required for the private harness and private vault mirr
 - Four topic repositories have the full portable baseline on their remote default branch: Docket, Flight Tracker, General AI, and Kelly Uniforms.
 - Docket has the only operational cloud data adapter.
 - Nineteen local data manifests remain template placeholders.
-- The current full inventory and remediation groups are in the [portability completion audit](https://github.com/douglaspmcgowan/general-ai/blob/master/research/cross-device-portability-completion-audit-2026-07-31.md).
+- The current full inventory is in [`PORTABILITY-INVENTORY.yaml`](https://github.com/douglaspmcgowan/general-ai/blob/master/PORTABILITY-INVENTORY.yaml); remediation groups and supporting evidence are in the [portability completion audit](https://github.com/douglaspmcgowan/general-ai/blob/master/research/cross-device-portability-completion-audit-2026-07-31.md).
 
 ## Second Brain and Headless boundary
 
@@ -86,4 +89,4 @@ The current Windows desktop should not run continuous Headless Sync while deskto
 
 ## Resume prompt
 
-> Open `CROSS-DEVICE-ACCESS.md` in `douglaspmcgowan/general-ai`, then read the linked completion audit and the canonical harness `ONBOARDING/START-HERE.md`. Inspect current GitHub, installed harness, Obsidian, Docket, Bitwarden metadata, project inventory, and worktree state before acting. Preserve Project Data, credential values, protected vault paths, and active worktree ownership.
+> Open `CROSS-DEVICE-ACCESS.md` in `douglaspmcgowan/general-ai`, then read `PORTABILITY-INVENTORY.yaml`, the linked completion audit, and the canonical harness `ONBOARDING/START-HERE.md`. Inspect current GitHub, installed harness, Obsidian, Docket, Bitwarden metadata, project inventory, and worktree state before acting. Preserve Project Data, credential values, protected vault paths, and active worktree ownership.

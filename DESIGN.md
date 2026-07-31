@@ -15,41 +15,32 @@
 - Verify browser-visible work with browser or end-to-end tests across responsive, keyboard, loading, empty, and error behavior.
 <!-- agent-harness:universal-design:v1:end -->
 
-# Design record
+# Cross-device architecture decisions
 
 ## Goals
 
-- Give every project one stable lowercase path under `C:\Users\dougl\projects`.
-- Keep shared agent behavior consistent across Claude, Codex, Cursor, local worktrees, and cloud sessions.
-- Separate versioned source, valuable mutable data, credentials, worktrees, product state, and recovery artifacts.
-- Preserve recovery evidence until exact data-retention decisions and replacement-path verification are recorded.
-
-## Constraints
-
-- Several repositories began with uncommitted user and agent changes.
-- The project inventory contains 27 Git repositories: 16 with origins and 11 dirty repositories without origins. Remote publication must preserve exact working state.
-- `.obsidian` configuration, the `flight-tracker` container, and the `general-claude-incomplete` archive require explicit non-repository handling.
-- The OneDrive application is removed. Its local data tree and two registered legacy worktrees remain preserved pending an exact retention decision.
-- Credential values cannot enter Git, Markdown, chat, logs, manifests, or agent-visible command output.
-- Google Drive desktop folder coverage requires human verification in its Preferences UI.
-- Docket cloud publication requires a populated Bitwarden Password Manager Login item and value-free full-tuple broker metadata.
+- Reconstruct the shared harness and project fleet from reviewed GitHub authorities on another computer.
+- Keep project source, portable configuration, runtime data, credentials, human knowledge, and review state in explicit authorities.
+- Preserve exact recovery evidence until its replacement path is verified.
 
 ## Decisions
 
-- `.agents` is the live shared harness; `.agents\human-readable` is the canonical explanatory layer.
-- The private harness repository and per-project Git remotes supply versioned recovery.
-- `C:\Users\dougl\projects` is the canonical source root.
-- `C:\Users\dougl\Data\Projects` and `Data\Restricted` hold mutable and restricted data.
-- `C:\Users\dougl\Worktrees` holds disposable concurrent Git state.
-- `Documents\Agent Backups` holds curated value-free recovery artifacts for optional Google Drive backup.
-- `My Drive\Capsule` carries only the shared global harness, bootstrap tools, and repository inventory for a receiving computer.
-- Each GitHub repository carries its own source, portable rules, handoffs, and small versionable data.
-- GitHub CLI discovers the managed repository set dynamically from the configured account and topic, then applies local path conventions. A static `repositories.json` is unnecessary; evidence-backed exceptions stay narrow.
-- Project data-manifest adapters carry excluded and live mutable data; the shared project-sync manager orchestrates repository recreation and adapter execution.
-- The existing `data-manifest.yaml` in 25 of 27 repositories is the standard transport extension point; the remaining two repositories need manifests before full-fleet verification.
-- The current Capsule workspace payload is transitional and will be removed after the project-sync manager passes end-to-end restore verification.
-- Current workflows have no OneDrive application dependency; the preserved local tree is recovery evidence until its explicit retention boundary is approved.
-- Password Manager Login items with exact Hidden custom-field names are the default project-secret container; the broker fails closed on empty, missing, or ambiguous fields.
-- Process cleanup begins with a read-only ownership and memory report. Active owner trees stay protected, and ambiguous candidates require a human decision.
-- Dirty repositories migrate through additive copies and exact state verification before old paths are retired.
-- Active worktrees cut over only at a recorded handoff point.
+- `pyrgos-ai/doug-harness` and its root `ONBOARDING` folder own shared-harness installation and Windows reconstruction.
+- `douglaspmcgowan/general-ai` owns current coordination, the phone-safe access index, fleet inventory, research, and machine pickup context.
+- Each retained project uses one GitHub remote or an explicit consolidation, retirement, upstream, or fixture-exclusion mapping.
+- Git carries source, portable contracts, safe fixtures, documentation, and value-free manifests.
+- `data-manifest.yaml` declares excluded runtime data. `PROJECT_DATA_ROOT` is local runtime state; `PROJECT_DATA_SYNC_ROOT` resolves to `C:\Users\dougl\My Drive\Project Data` for declared DVC objects, verified SQLite snapshots, and other approved artifacts.
+- SQLite snapshot retention defaults to 2 daily, 2 weekly, and 1 monthly bucket, always preserving the newest verified snapshot and no more than five distinct snapshots.
+- Bitwarden Secrets Manager supplies runtime credentials through the exact-command broker. Credential values stay outside Git, Markdown, logs, and chat.
+- The active personal Obsidian vault remains the human-authoring authority. The private Agent Brain mirror supplies curated cloud-agent context; agents write only reviewed branches under `proposals/` and `agent-notes/`.
+- Docket is the authenticated phone review surface for briefs and decisions.
+- Drive Capsule and Password Manager scaffolds have no active architecture role. Older files mentioning them are historical recovery evidence.
+- The preserved OneDrive tree and registered legacy worktrees remain a separate retirement decision with no application or onboarding dependency.
+
+## Current boundaries
+
+- The inventory contains 27 roots: 14 guarded clones, 9 attention actions, 3 explicit skips, and 1 excluded fixture.
+- Eight retained roots lack origins. `boundaries-reader` has an origin and still needs the discovery topic and portable baseline.
+- Nineteen project data manifests remain placeholders; Docket has the sole operational cloud-data adapter.
+- Harness `master` must still publish the current Obsidian bundle, exact mutable-runtime verifier repair, and blank-profile prerequisite-order repair before the real receiving-computer proof.
+- Cloud-ready repository rollout remains plan-only under `pyrgos-ai/doug-harness` issue #16.

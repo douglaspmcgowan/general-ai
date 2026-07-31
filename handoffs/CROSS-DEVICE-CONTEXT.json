@@ -20,9 +20,21 @@
       "repository": "douglaspmcgowan/general-ai",
       "visibility": "public",
       "defaultBranch": "master",
-      "artifactBaselineCommit": "7db0271650ea836520c4b51af49f1eaeea1b0c8e",
-      "entrypoint": "START-HERE.md",
+      "portabilityInventoryCommit": "340a05fde53f1f1c6a08bf8c73698a2449956273",
+      "entrypoint": "CROSS-DEVICE-ACCESS.md",
+      "portabilityInventory": "PORTABILITY-INVENTORY.yaml",
       "handoff": "handoffs/HANDOFF-CROSS-DEVICE-HARNESS-2026-07-31.md"
+    },
+    "agentBrain": {
+      "repository": "douglaspmcgowan/obsidian-vault-mirror",
+      "visibility": "private",
+      "defaultBranch": "main",
+      "auditedCommit": "337d615895b2dd42884cf868a90534a61f661da8",
+      "contract": "AGENTS.md",
+      "agentWritablePrefixes": [
+        "proposals/",
+        "agent-notes/"
+      ]
     },
     "retiredPublicHarnessSnapshot": {
       "repository": "douglaspmcgowan/agent-harness",
@@ -42,7 +54,8 @@
       "gitBlob": "ef062b6420aa1d9dc7357706c6c6ea4e7d23b139",
       "sha256Bytes": "d97e8e9d9bd033ab474243cb723f675df8f877568b4775169784a72139b90acb",
       "applyBase": "pyrgos-ai/doug-harness@4bbb2fdb617a0e4749aaa7e4aa72474cc9864bb3",
-      "applyCheck": "passed"
+      "applyCheck": "historical-only",
+      "status": "superseded_recovery_evidence_do_not_apply"
     },
     {
       "path": "handoffs/patches/general-ai-state-reconciliation-2026-07-31.patch.zip",
@@ -54,7 +67,8 @@
       "postApplyVerification": [
         "VerifyProject",
         "git diff --check"
-      ]
+      ],
+      "status": "superseded recovery evidence; current state lives in TASK.md, STATUS.md, and MAP.md after this refresh merges"
     },
     {
       "path": "research/graph-aware-agent-planning-spec-2026-07-30.md",
@@ -85,7 +99,10 @@
     "url": "https://vault-review-mobile.vercel.app",
     "stableIds": [
       "agent-harness--cloud-ready-repository-plan",
+      "agent-brain--obsidian-headless-scoping-run-2026-07-31",
+      "agent-harness--cross-device-access-index-2026-07-31",
       "agent-harness--cross-device-handoff-2026-07-31",
+      "agent-harness--cross-device-portability-completion-audit-2026-07-31",
       "agent-harness--graph-aware-agent-planning-spec",
       "agent-harness--graph-engineering-agent-planning-recon",
       "agent-harness--last-day-execution-retrospective-2026-07-30",
@@ -93,7 +110,7 @@
       "agent-harness--obsidian-second-brain-spec"
     ],
     "lastSyncEvidence": {
-      "pushed": 167,
+      "pushed": 172,
       "unsafeOrInvalidRefused": 0,
       "decisionsPulled": 0,
       "unknownLegacyDecisionsRefused": 25
@@ -109,13 +126,16 @@
       "Graph-Aware Agent Planning SPEC.md",
       "Graph Engineering and Agent Planning Recon.md",
       "Obsidian Second Brain Recon.md",
-      "Obsidian Second Brain SPEC.md"
+      "Obsidian Second Brain SPEC.md",
+      "Cross-Device Access Index.md",
+      "Cross-Device Portability Completion Audit.md",
+      "Obsidian Headless Scoping Run.md"
     ],
-    "phoneSyncStateVerifiedHere": false
+    "obsidianSyncReportedSynced": true,
+    "phoneOpenVerifiedHere": false
   },
   "sourceComputerBoundaries": {
     "preserveProjectData": "C:\\Users\\dougl\\My Drive\\Project Data",
-    "googleDriveDesktopRunning": false,
     "preservedOneDriveWorktrees": [
       "C:\\Users\\dougl\\OneDrive\\Documents\\General Claude\\168-audit-redesign",
       "C:\\Users\\dougl\\OneDrive\\Documents\\General Claude\\berkeley-house\\repo-worktree"
@@ -132,11 +152,14 @@
     "mainHarnessEditsOwnedByAnotherAgent": true
   },
   "pending": [
-    "The separate main-harness owner must finish and verify canonical harness work.",
-    "The paused harness patch must be reconciled hunk by hunk against newer harness work.",
-    "The general-ai state patch must land through a separately owned review branch before TASK.md, STATUS.md, and MAP.md become current.",
+    "Harness master must publish the current approved Obsidian bundle with pinned html-page-viewer installation and receiving-side restore proof.",
+    "Harness master must publish and install the exact two-path mutable-runtime verifier allowance.",
+    "Harness master must move prerequisite discovery before dependent Obsidian and Project Data stages and pass a blank-profile regression.",
+    "The consolidated task-state hook suite has six failing chain and PROMPT_LOG regressions.",
+    "The merged harness release must complete one real receiving-computer onboarding run.",
+    "Nine project actions require attention: eight retained roots lack origins, while boundaries-reader has a remote and needs its topic and portable baseline.",
+    "Nineteen project data manifests remain placeholders; Docket has the sole operational cloud-data adapter.",
     "The two OneDrive worktrees must be checkpointed or relocated before any OneDrive-root removal.",
-    "A narrower Project Data synchronization method must replace the resource-heavy Google Drive desktop scan.",
     "The 14-repository cloud rollout remains plan-only until issue 16 is explicitly promoted."
   ]
 }
