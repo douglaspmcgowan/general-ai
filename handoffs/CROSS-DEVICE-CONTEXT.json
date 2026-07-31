@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 1,
+  "lastVerified": "2026-07-31",
+  "purpose": "Machine-readable pickup context for reconstructing the cross-agent harness and continuing its open work from another computer.",
+  "canonicalSources": {
+    "harness": {
+      "repository": "pyrgos-ai/doug-harness",
+      "visibility": "private",
+      "defaultBranch": "master",
+      "onboardingEntry": "ONBOARDING/START-HERE.md",
+      "cloudPlan": {
+        "branch": "codex/cloud-ready-repositories",
+        "commit": "4bbb2fdb617a0e4749aaa7e4aa72474cc9864bb3",
+        "issue": "https://github.com/pyrgos-ai/doug-harness/issues/16",
+        "implementedRepositoryCount": 0,
+        "plannedRepositoryCount": 14
+      }
+    },
+    "coordination": {
+      "repository": "douglaspmcgowan/general-ai",
+      "visibility": "public",
+      "defaultBranch": "master",
+      "artifactBaselineCommit": "7db0271650ea836520c4b51af49f1eaeea1b0c8e",
+      "entrypoint": "START-HERE.md",
+      "handoff": "handoffs/HANDOFF-CROSS-DEVICE-HARNESS-2026-07-31.md"
+    },
+    "retiredPublicHarnessSnapshot": {
+      "repository": "douglaspmcgowan/agent-harness",
+      "onboardingAuthority": false
+    }
+  },
+  "artifacts": [
+    {
+      "path": "handoffs/HANDOFF-CROSS-DEVICE-HARNESS-2026-07-31.md",
+      "kind": "handoff",
+      "gitBlob": "f8902c696baed17f17c115829354c9094fb33733",
+      "sha256Utf8Lf": "9d2c44e47515af8f11314cdc64f74416653b3f76e2cb53d396b0fc818617fa95"
+    },
+    {
+      "path": "handoffs/patches/agent-harness-closeout-2026-07-31.patch.zip",
+      "kind": "patch-archive",
+      "gitBlob": "ef062b6420aa1d9dc7357706c6c6ea4e7d23b139",
+      "sha256Bytes": "d97e8e9d9bd033ab474243cb723f675df8f877568b4775169784a72139b90acb",
+      "applyBase": "pyrgos-ai/doug-harness@4bbb2fdb617a0e4749aaa7e4aa72474cc9864bb3",
+      "applyCheck": "passed"
+    },
+    {
+      "path": "handoffs/patches/general-ai-state-reconciliation-2026-07-31.patch.zip",
+      "kind": "patch-archive",
+      "gitBlob": "c0cb0bb8f4ffc3c7594bd3626d9e41943472e366",
+      "sha256Bytes": "2cb2155fd7f8e2ccfbcc926f6da5e50abfdeba6cf0ee34fb6d890ba1754f3db7",
+      "applyBase": "douglaspmcgowan/general-ai@25e2b54",
+      "applyCheck": "passed",
+      "postApplyVerification": [
+        "VerifyProject",
+        "git diff --check"
+      ]
+    },
+    {
+      "path": "research/graph-aware-agent-planning-spec-2026-07-30.md",
+      "kind": "research-spec",
+      "gitBlob": "05e03399f3f9a434af14302845c7a43f8925c43a",
+      "sha256Utf8Lf": "2037811526a8bfb5b5c78fe0eba41e0aa215c5358b475570f852d0ba9fde9f8e"
+    },
+    {
+      "path": "research/graph-engineering-agent-planning-recon-2026-07-30.md",
+      "kind": "research-recon",
+      "gitBlob": "5cf5ee0e8e060334bb76d41e2a88562ba1bd8a9a",
+      "sha256Utf8Lf": "e6c2f3f3a21baef65b0cb929ba7a5f995d0f8571415c2a8c6413387e875b93fa"
+    },
+    {
+      "path": "research/obsidian-second-brain-recon-2026-07-30.md",
+      "kind": "research-recon",
+      "gitBlob": "4e55197d9ba46dd2a0d831b9e862fe86de424386",
+      "sha256Utf8Lf": "a484e0a944bc6fe2af9471fa1a14a6fc3fcd73dc301339c632bebd82c1ff3bce"
+    },
+    {
+      "path": "research/obsidian-second-brain-spec-2026-07-30.md",
+      "kind": "research-spec",
+      "gitBlob": "363fe2145c214bcdde43c515bb70983746871f89",
+      "sha256Utf8Lf": "41ebf24886014cd3d193def368f477dfd0c8907bbc6ff3d3236b0cd12bee2d5e"
+    }
+  ],
+  "phoneReview": {
+    "url": "https://vault-review-mobile.vercel.app",
+    "stableIds": [
+      "agent-harness--cloud-ready-repository-plan",
+      "agent-harness--cross-device-handoff-2026-07-31",
+      "agent-harness--graph-aware-agent-planning-spec",
+      "agent-harness--graph-engineering-agent-planning-recon",
+      "agent-harness--last-day-execution-retrospective-2026-07-30",
+      "agent-harness--obsidian-second-brain-recon",
+      "agent-harness--obsidian-second-brain-spec"
+    ],
+    "lastSyncEvidence": {
+      "pushed": 167,
+      "unsafeOrInvalidRefused": 0,
+      "decisionsPulled": 0,
+      "unknownLegacyDecisionsRefused": 25
+    }
+  },
+  "obsidian": {
+    "sourceComputerVault": "C:\\Users\\dougl\\Main\\Yoga 7 Local John 1412",
+    "relativeFolder": "Claude\\Engineer",
+    "files": [
+      "Cloud-Ready Repository Plan.md",
+      "Codex Harness Slowness Diagnosis.md",
+      "Cross-Device Harness Handoff.md",
+      "Graph-Aware Agent Planning SPEC.md",
+      "Graph Engineering and Agent Planning Recon.md",
+      "Obsidian Second Brain Recon.md",
+      "Obsidian Second Brain SPEC.md"
+    ],
+    "phoneSyncStateVerifiedHere": false
+  },
+  "sourceComputerBoundaries": {
+    "preserveProjectData": "C:\\Users\\dougl\\My Drive\\Project Data",
+    "googleDriveDesktopRunning": false,
+    "preservedOneDriveWorktrees": [
+      "C:\\Users\\dougl\\OneDrive\\Documents\\General Claude\\168-audit-redesign",
+      "C:\\Users\\dougl\\OneDrive\\Documents\\General Claude\\berkeley-house\\repo-worktree"
+    ],
+    "preservedOneDriveWorktreeTotals": {
+      "files": 48865,
+      "logicalBytes": 2117274252
+    }
+  },
+  "safety": {
+    "containsCredentialValues": false,
+    "credentialBootstrapVariableName": "BITWARDEN_SECRETS_MANAGER_ACCESS_TOKEN",
+    "offLimitsPathsOmitted": true,
+    "mainHarnessEditsOwnedByAnotherAgent": true
+  },
+  "pending": [
+    "The separate main-harness owner must finish and verify canonical harness work.",
+    "The paused harness patch must be reconciled hunk by hunk against newer harness work.",
+    "The general-ai state patch must land through a separately owned review branch before TASK.md, STATUS.md, and MAP.md become current.",
+    "The two OneDrive worktrees must be checkpointed or relocated before any OneDrive-root removal.",
+    "A narrower Project Data synchronization method must replace the resource-heavy Google Drive desktop scan.",
+    "The 14-repository cloud rollout remains plan-only until issue 16 is explicitly promoted."
+  ]
+}
