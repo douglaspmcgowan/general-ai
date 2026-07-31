@@ -71,17 +71,17 @@
   },
   "projectFleet": {
     "canonicalLocalRoots": 27,
-    "withOrigin": 18,
-    "withoutOrigin": 9,
-    "topicRepositories": 14,
-    "fullRemotePortableBaselines": 4,
+    "withOrigin": 26,
+    "withoutOrigin": 1,
+    "topicRepositories": 18,
+    "fullRemotePortableBaselines": 5,
     "operationalCloudDataAdapters": 1,
     "placeholderDataManifests": 19,
     "inventory": "PORTABILITY-INVENTORY.yaml",
     "onboardingActions": {
-      "clone": 14,
-      "attention": 9,
-      "skip": 3,
+      "clone": 15,
+      "attention": 5,
+      "skip": 6,
       "exclude_fixture": 1
     },
     "rolloutIssue": "https://github.com/pyrgos-ai/doug-harness/issues/16"

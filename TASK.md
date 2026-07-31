@@ -10,7 +10,7 @@ Finish repository-first cross-device reconstruction from the canonical harness a
 
 ## Queue
 
-- [ ] T3 — Resolve every attention-required project transport | evidence: all nine `attention` actions in `PORTABILITY-INVENTORY.yaml` are resolved; eight retained remote-less roots receive a remote or explicit consolidation/retirement mapping, and `boundaries-reader` receives its missing topic and portable baseline | owner: project fleet | class: PARALLEL.
+- [~] T3 — Resolve every attention-required project transport | current evidence: `boundaries-reader` now has its topic and merged portable baseline; `general-claude`, `harness`, and `idetc-writing-ide` have explicit consolidation mappings; five private remotes exist and their local v3 migrations are preserved but remain unpushed pending one exact Gitleaks-hook composition approval | evidence required: the remaining five remotes receive reviewed initial branches, default branches, and discovery topics | owner: project fleet | class: PARALLEL.
 - [ ] T4 — Prove the merged onboarding flow on the receiving computer | after: B1, B2, B4 | evidence: a receipt tied to the merged harness commit proves install/stamp, approved Obsidian bundle, PATH/executables, GitHub discovery, declared project verifiers/adapters, Bitwarden token import/read-back, and current General AI, Agent Brain, and Docket access | owner: receiving computer | class: SEQUENTIAL.
 
 ## Blocked
@@ -34,7 +34,7 @@ Finish repository-first cross-device reconstruction from the canonical harness a
 
 ## Completed
 
-- [x] T1 — Publish current phone and agent pickup context | evidence: General AI PR 5 merged at `cec979f`; the access-index body matches Git, the active vault, and Docket at SHA-256 `22e944d6b223c8a02df501b3db416c73e431c182644f68a40bf4bf4167dcb3c8`; the broker pushed 172 cards and refused 0 unsafe or invalid local cards; Agent Brain PR 3 merged the constrained refresh proposal at `fd584d1`.
+- [x] T1 — Publish current phone and agent pickup context | evidence: General AI PR 5 merged at `cec979f`; the access index uses the stable Docket card `agent-harness--cross-device-access-index-2026-07-31`; Agent Brain PR 3 merged the constrained refresh proposal at `fd584d1`; later transport updates preserve the same three-surface publication contract.
 - [x] T2 — Reconcile durable General AI state with current authorities | evidence: the closeout reconciles TASK, STATUS, LOG, machine context, and provenance against General AI `cec979f`, Agent Brain `fd584d1`, the 174-card Docket store, and the current vault copy; project verification and independent review pass.
 - [x] C1 — Replace Drive Capsule distribution with the canonical repository root `ONBOARDING` flow.
 - [x] C2 — Adopt SQLite retention of 2 daily, 2 weekly, and 1 monthly bucket, always preserving the newest verified snapshot and no more than five distinct snapshots.

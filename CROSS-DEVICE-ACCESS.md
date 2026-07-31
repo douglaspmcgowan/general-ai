@@ -40,8 +40,9 @@ GitHub authentication is required for the private harness and private vault mirr
 - The official `obsidian-headless@0.0.14` package runs under the installed Node runtime in a disposable invocation.
 - The Windows `ob` command currently resolves to a separate unsigned third-party client; official bridge automation must use an explicit pinned launcher.
 - Every current Engineer brief has a body-complete Docket card.
-- General AI PR 4 is merged at `340a05f`, including the 27-root portability inventory.
-- Private mirror PR 2 is merged at `337d615`, including the portable Agent Brain contract, schema, policy, state, fixtures, and constrained write zones.
+- General AI PR 6 is merged at `188e12b`, including the reconciled phone and machine pickup state.
+- Private mirror PR 3 is merged at `fd584d1`, including the constrained cross-device index refresh proposal.
+- Boundaries Reader PR 1 is merged at `53df3f7`, including its portable baseline; the repository now participates in `agent-project` discovery.
 - All 12 current Engineer documents in scope have Git-backed copies.
 
 ## Current blockers to complete receiving-computer reconstruction
@@ -50,7 +51,8 @@ GitHub authentication is required for the private harness and private vault mirr
 2. **Approved Obsidian bundle:** the committed onboarding snapshot predates today's plugin installation. It records Web Viewer as disabled and lacks the HTML Page Viewer ID.
 3. **Community-plugin installation:** the current Obsidian export/restore path carries plugin IDs without carrying or installing the pinned plugin package.
 4. **Blank-computer ordering:** Obsidian restoration and Google Drive data-root setup currently run before prerequisite discovery, so a blank profile can fail before receiving a complete `ATTENTION` inventory.
-5. **Real receiving-device proof:** the final claim requires one actual receiving computer to complete the merged clone/ZIP flow and verify installed harness, Obsidian configuration, project discovery, data adapters, and current context.
+5. **Project hook composition:** five new private project remotes remain branchless because their existing fixed-path Gitleaks hooks and the portable PATH-resolved hook need one explicitly approved, backup-preserving replacement.
+6. **Real receiving-device proof:** the final claim requires one actual receiving computer to complete the merged clone/ZIP flow and verify installed harness, Obsidian configuration, project discovery, data adapters, and current context.
 
 ## Fastest completion order
 
@@ -59,16 +61,18 @@ GitHub authentication is required for the private harness and private vault mirr
 3. Capture the live approved Obsidian configuration through the existing onboarding owner.
 4. Add a pinned HTML Page Viewer installation declaration with source, version, expected files, checksum, and verifier.
 5. Refresh the harness setup stamp and onboarding manifest once.
-6. Run focused tests during each change, followed by one integrated suite, Gitleaks, and whitespace validation.
-7. Merge, install from reviewed `master`, and prove one real receiving-computer pickup.
-8. Begin the repository cloud-readiness rollout from [harness issue 16](https://github.com/pyrgos-ai/doug-harness/issues/16): shared template first, then Docket, General AI, Flight Tracker, and Kelly Uniforms, followed by parallel project batches.
+6. Approve and apply the exact backup-preserving Gitleaks hook replacement in the five branchless project remotes, then finish their reviewed initial baselines.
+7. Run focused tests during each change, followed by one integrated suite, Gitleaks, and whitespace validation.
+8. Merge, install from reviewed `master`, and prove one real receiving-computer pickup.
+9. Begin the repository cloud-readiness rollout from [harness issue 16](https://github.com/pyrgos-ai/doug-harness/issues/16): shared template first, then Docket, General AI, Flight Tracker, and Kelly Uniforms, followed by parallel project batches.
 
 ## Repository fleet snapshot
 
 - 27 canonical local repository roots were found after excluding one linked harness worktree.
-- 18 roots have origins; 9 lack origins.
-- GitHub topic discovery returns 14 `agent-project` repositories.
-- Four topic repositories have the full portable baseline on their remote default branch: Docket, Flight Tracker, General AI, and Kelly Uniforms.
+- 26 roots have a configured or mapped Git authority; the one missing origin is the excluded disposable verification fixture.
+- GitHub topic discovery returns 18 `agent-project` repositories.
+- Five topic repositories have the full portable baseline on their remote default branch: Boundaries Reader, Docket, Flight Tracker, General AI, and Kelly Uniforms.
+- Five new private project remotes exist without a default branch; their local initial-baseline migrations remain preserved behind the pre-commit hook-composition guard.
 - Docket has the only operational cloud data adapter.
 - Nineteen local data manifests remain template placeholders.
 - The current full inventory is in [`PORTABILITY-INVENTORY.yaml`](https://github.com/douglaspmcgowan/general-ai/blob/master/PORTABILITY-INVENTORY.yaml); remediation groups and supporting evidence are in the [portability completion audit](https://github.com/douglaspmcgowan/general-ai/blob/master/research/cross-device-portability-completion-audit-2026-07-31.md).
