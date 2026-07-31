@@ -47,6 +47,8 @@ GitHub authentication is required for the private harness and private vault mirr
 
 ## Current blockers to complete receiving-computer reconstruction
 
+The consolidated harness implementation and release owner is [issue 18](https://github.com/pyrgos-ai/doug-harness/issues/18).
+
 1. **Installed harness verification:** harness `master` at `ae3899a` still rejects two legitimate harness-owned mutable files. No published commit or pull request contains the required narrow allowance for exactly `logs/stale-agent-process-cleanup.jsonl` and `state/permissions-snapshot.json`.
 2. **Approved Obsidian bundle:** the committed onboarding snapshot predates today's plugin installation. It records Web Viewer as disabled and lacks the HTML Page Viewer ID.
 3. **Community-plugin installation:** the current Obsidian export/restore path carries plugin IDs without carrying or installing the pinned plugin package.

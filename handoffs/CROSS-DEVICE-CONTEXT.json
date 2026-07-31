@@ -8,6 +8,7 @@
       "visibility": "private",
       "defaultBranch": "master",
       "onboardingEntry": "ONBOARDING/START-HERE.md",
+      "receivingReleaseIssue": "https://github.com/pyrgos-ai/doug-harness/issues/18",
       "cloudPlan": {
         "branch": "codex/cloud-ready-repositories",
         "commit": "4bbb2fdb617a0e4749aaa7e4aa72474cc9864bb3",

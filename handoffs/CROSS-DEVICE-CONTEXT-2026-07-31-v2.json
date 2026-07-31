@@ -59,6 +59,7 @@
   },
   "onboardingAudit": {
     "overall": "PARTIAL",
+    "releaseIssue": "https://github.com/pyrgos-ai/doug-harness/issues/18",
     "manifestRecordsVerified": 30,
     "setupStampRecordsVerified": 363,
     "blockers": [
