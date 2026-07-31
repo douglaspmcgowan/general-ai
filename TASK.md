@@ -6,8 +6,7 @@ Finish repository-first cross-device reconstruction from the canonical harness a
 
 ## Active
 
-- [~] T1 — Publish current phone and agent pickup context | evidence: the existing access index links `PORTABILITY-INVENTORY.yaml`; machine context records General AI `340a05f` and Agent Brain `337d615`; the stable access-index body matches Git, the active vault, and Docket | owner: `codex/access-context-refresh` | class: MAIN.
-- [~] T2 — Reconcile durable General AI state with current authorities | evidence: TASK, STATUS, MAP, BACKBURNER, LOG, data manifest, and provenance agree on repository onboarding, Project Data, current blockers, and completed research; project verification and independent review pass | owner: `codex/access-context-refresh` | class: MAIN.
+- None.
 
 ## Queue
 
@@ -35,6 +34,8 @@ Finish repository-first cross-device reconstruction from the canonical harness a
 
 ## Completed
 
+- [x] T1 — Publish current phone and agent pickup context | evidence: General AI PR 5 merged at `cec979f`; the access-index body matches Git, the active vault, and Docket at SHA-256 `22e944d6b223c8a02df501b3db416c73e431c182644f68a40bf4bf4167dcb3c8`; the broker pushed 172 cards and refused 0 unsafe or invalid local cards; Agent Brain PR 3 merged the constrained refresh proposal at `fd584d1`.
+- [x] T2 — Reconcile durable General AI state with current authorities | evidence: the closeout reconciles TASK, STATUS, LOG, machine context, and provenance against General AI `cec979f`, Agent Brain `fd584d1`, the 174-card Docket store, and the current vault copy; project verification and independent review pass.
 - [x] C1 — Replace Drive Capsule distribution with the canonical repository root `ONBOARDING` flow.
 - [x] C2 — Adopt SQLite retention of 2 daily, 2 weekly, and 1 monthly bucket, always preserving the newest verified snapshot and no more than five distinct snapshots.
 - [x] C3 — Preserve completed cloud, retrospective, second-brain, and graph-planning research in GitHub, the active Obsidian vault, and Docket.
