@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 2,
+  "lastVerified": "2026-07-31",
+  "entrypoint": "CROSS-DEVICE-ACCESS.md",
+  "canonicalSources": {
+    "harness": {
+      "repository": "pyrgos-ai/doug-harness",
+      "visibility": "private",
+      "defaultBranch": "master",
+      "auditedCommit": "ae3899aee2d9b6c1b5ae9a8e703dfef45cf25ece",
+      "onboarding": "ONBOARDING/START-HERE.md"
+    },
+    "coordination": {
+      "repository": "douglaspmcgowan/general-ai",
+      "visibility": "public",
+      "defaultBranch": "master",
+      "entrypoint": "CROSS-DEVICE-ACCESS.md"
+    },
+    "agentBrain": {
+      "repository": "douglaspmcgowan/obsidian-vault-mirror",
+      "visibility": "private",
+      "currentMode": "read-only sanitized mirror",
+      "plannedMode": "constrained branches-and-pull-requests"
+    },
+    "docket": {
+      "url": "https://vault-review-mobile.vercel.app",
+      "localCardCount": 174,
+      "unresolvedCount": 172,
+      "resolvedCount": 2
+    }
+  },
+  "liveObsidianBundle": {
+    "coreWebViewerEnabled": true,
+    "communityPlugin": {
+      "id": "html-page-viewer",
+      "version": "0.1.1",
+      "enabled": true
+    },
+    "syncStatus": "synced",
+    "committedHarnessSnapshotCurrent": false
+  },
+  "headless": {
+    "officialPackage": "obsidian-headless@0.0.14",
+    "officialSmokePassed": true,
+    "activeVaultAttached": false,
+    "syncPerformedByScopingRun": false,
+    "pathCollision": "Windows ob resolves to the separate Belphemur third-party client",
+    "recommendedHost": "dedicated bridge host or VM without desktop Sync"
+  },
+  "onboardingAudit": {
+    "overall": "PARTIAL",
+    "manifestRecordsVerified": 30,
+    "setupStampRecordsVerified": 363,
+    "blockers": [
+      "installed verifier rejects two harness-owned mutable runtime files",
+      "approved Obsidian snapshot predates the live bundle",
+      "community plugin package installation is not reproducible",
+      "blank-profile prerequisite discovery occurs too late",
+      "real receiving-computer proof remains"
+    ]
+  },
+  "projectFleet": {
+    "canonicalLocalRoots": 27,
+    "withOrigin": 18,
+    "withoutOrigin": 9,
+    "topicRepositories": 14,
+    "fullRemotePortableBaselines": 4,
+    "operationalCloudDataAdapters": 1,
+    "placeholderDataManifests": 19,
+    "rolloutIssue": "https://github.com/pyrgos-ai/doug-harness/issues/16"
+  },
+  "preserve": {
+    "projectData": "C:\\Users\\dougl\\My Drive\\Project Data",
+    "oneDriveApplicationState": "retired",
+    "oneDriveWorktrees": [
+      "C:\\Users\\dougl\\OneDrive\\Documents\\General Claude\\168-audit-redesign",
+      "C:\\Users\\dougl\\OneDrive\\Documents\\General Claude\\berkeley-house\\repo-worktree"
+    ]
+  },
+  "containsCredentialValues": false
+}
