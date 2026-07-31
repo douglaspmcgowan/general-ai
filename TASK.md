@@ -10,7 +10,7 @@ Finish repository-first cross-device reconstruction from the canonical harness a
 
 ## Queue
 
-- [~] T3 — Resolve every attention-required project transport | current evidence: `boundaries-reader` now has its topic and merged portable baseline; `general-claude`, `harness`, and `idetc-writing-ide` have explicit consolidation mappings; five private remotes exist and their local v3 migrations are preserved but remain unpushed pending one exact Gitleaks-hook composition approval | evidence required: the remaining five remotes receive reviewed initial branches, default branches, and discovery topics | owner: project fleet | class: PARALLEL.
+- [~] T3 — Resolve every attention-required project transport | current evidence: `boundaries-reader` now has its topic and merged portable baseline; `general-claude`, `harness`, and `idetc-writing-ide` have explicit consolidation mappings; five private remotes exist and their local v3 migrations are preserved but remain unpushed pending the backup-preserving hook migration tracked in [harness issue 17](https://github.com/pyrgos-ai/doug-harness/issues/17) | evidence required: the remaining five remotes receive reviewed initial branches, default branches, and discovery topics | owner: project fleet | class: PARALLEL.
 - [ ] T4 — Prove the merged onboarding flow on the receiving computer | after: B1, B2, B4 | evidence: a receipt tied to the merged harness commit proves install/stamp, approved Obsidian bundle, PATH/executables, GitHub discovery, declared project verifiers/adapters, Bitwarden token import/read-back, and current General AI, Agent Brain, and Docket access | owner: receiving computer | class: SEQUENTIAL.
 
 ## Blocked

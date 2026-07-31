@@ -15,7 +15,7 @@
       "visibility": "public",
       "defaultBranch": "master",
       "entrypoint": "CROSS-DEVICE-ACCESS.md",
-      "auditedCommit": "cec979f07cf637a1fa0b9e9a42cac0d8a2a2a548",
+      "auditedCommit": "582daf5519812d46c0950c625887fb51de1f4661",
       "portabilityInventory": "PORTABILITY-INVENTORY.yaml"
     },
     "agentBrain": {
@@ -84,7 +84,8 @@
       "skip": 6,
       "exclude_fixture": 1
     },
-    "rolloutIssue": "https://github.com/pyrgos-ai/doug-harness/issues/16"
+    "rolloutIssue": "https://github.com/pyrgos-ai/doug-harness/issues/16",
+    "hookMigrationIssue": "https://github.com/pyrgos-ai/doug-harness/issues/17"
   },
   "preserve": {
     "projectData": "C:\\Users\\dougl\\My Drive\\Project Data",
