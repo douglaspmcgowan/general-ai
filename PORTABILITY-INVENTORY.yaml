@@ -1,0 +1,379 @@
+schema_version: 1
+kind: project-portability-inventory
+last_verified: '2026-07-31'
+automation_mode: advisory_only
+provenance:
+  source_audit_url: 'https://github.com/douglaspmcgowan/general-ai/blob/master/research/cross-device-portability-completion-audit-2026-07-31.md'
+  source_audit_merge_commit: '9fa51b6b0fdd3660f63799ec4eb156806322dc5a'
+  inventory_generated_from: 'local-audit-2026-07-31'
+receiving:
+  root_variable: PROJECTS_ROOT
+  source_path_policy: diagnostic_only_never_execute
+  checkout_rule: join_root_variable_with_checkout_directory_after_guarded_action
+  action_guards:
+    clone: authenticated configured remote, expected topic, absent destination or safe clean pull
+    skip: externally managed or consolidated authority; do not clone from this record
+    attention: human or repository-owner decision required before onboarding
+    exclude_fixture: disposable fixture; never onboard
+scope:
+  source_audit_root: 'C:\Users\dougl\projects'
+  canonical_project_count: 27
+  with_origin_count: 18
+  owned_configured_origin_count: 16
+  external_upstream_origin_count: 1
+  shared_origin_exception_count: 1
+  missing_origin_count: 9
+  github_agent_project_count: 14
+  excluded_worktrees:
+    - source_path: 'C:\Users\dougl\projects\agent-harness-harness-v3'
+      reason: linked_worktree_of_agent_harness
+vocabulary:
+  remote_state: [configured, missing, external_upstream, shared_origin_exception]
+  topic_state: [present, missing, unavailable_no_remote, not_applicable]
+  contract_state: [full, partial, absent, unavailable, full_untracked, mixed_tracking]
+  setup_state: [portable, host_bound, hardcoded_cloud_path, missing, placeholder]
+  data_mode: [explicit_none, placeholder, cloud_object_store, regenerable_mixed, manual_external_assets]
+  adapter_status: [operational, missing, not_required]
+  onboarding_action: [clone, skip, attention, exclude_fixture]
+
+projects:
+  - id: 168-audit
+    source_local_path: 'C:\Users\dougl\projects\168-audit'
+    checkout_directory: 168-audit
+    onboarding_action: clone
+    remote: {state: configured, repository: 'douglaspmcgowan/168-audit', default_branch: main}
+    discovery: {agent_project_topic: present, canonical_transport: github_topic}
+    portability: {local_contract: mixed_tracking, remote_default_contract: absent, setup: placeholder}
+    secrets: {manifest: local_untracked, entry_count: 1, classification: needs_classification}
+    data: {manifest: local_untracked, mode: placeholder, adapter: null, adapter_status: missing}
+    status: remediation_required
+    uncertainty: []
+  - id: agent-harness
+    source_local_path: 'C:\Users\dougl\projects\agent-harness'
+    checkout_directory: doug-harness
+    onboarding_action: skip
+    remote: {state: configured, repository: 'pyrgos-ai/doug-harness', default_branch: master}
+    discovery: {agent_project_topic: not_applicable, canonical_transport: harness_onboarding_repository}
+    portability: {local_contract: full, remote_default_contract: full, setup: host_bound}
+    secrets: {manifest: remote_default, entry_count: 3, classification: bootstrap_and_non_secret_config}
+    data: {manifest: remote_default, mode: explicit_none, adapter: null, adapter_status: not_required}
+    status: canonical_harness_authority
+    uncertainty:
+      - Cross-platform cloud bootstrap remains under active harness implementation.
+
+  - id: anna-maria-mcgowan
+    source_local_path: 'C:\Users\dougl\projects\anna-maria-mcgowan'
+    checkout_directory: anna-maria-mcgowan-site
+    onboarding_action: clone
+    remote: {state: configured, repository: 'douglaspmcgowan/anna-maria-mcgowan-site', default_branch: main}
+    discovery: {agent_project_topic: present, canonical_transport: github_topic}
+    portability: {local_contract: full, remote_default_contract: absent, setup: portable}
+    secrets: {manifest: local_tracked_nondefault_branch, entry_count: 1, classification: needs_classification}
+    data: {manifest: local_tracked_nondefault_branch, mode: explicit_none, adapter: null, adapter_status: not_required}
+    status: default_branch_divergence
+    uncertainty:
+      - The reviewed local baseline is on master while GitHub discovers main.
+
+  - id: base-flight-finder
+    source_local_path: 'C:\Users\dougl\projects\base-flight-finder'
+    checkout_directory: flight-finder
+    onboarding_action: skip
+    remote: {state: external_upstream, repository: 'affromero/flight-finder', default_branch: main}
+    discovery: {agent_project_topic: not_applicable, canonical_transport: explicit_upstream_exception}
+    portability: {local_contract: mixed_tracking, remote_default_contract: partial, setup: missing}
+    secrets: {manifest: local_untracked, entry_count: 5, classification: needs_classification}
+    data: {manifest: local_untracked, mode: placeholder, adapter: null, adapter_status: missing}
+    status: owned_fork_or_exception_required
+    uncertainty:
+      - Ownership of a future fork has not been selected.
+
+  - id: berkeley-house
+    source_local_path: 'C:\Users\dougl\projects\berkeley-house'
+    checkout_directory: berkeley-house
+    onboarding_action: clone
+    remote: {state: configured, repository: 'douglaspmcgowan/berkeley-house', default_branch: main}
+    discovery: {agent_project_topic: present, canonical_transport: github_topic}
+    portability: {local_contract: mixed_tracking, remote_default_contract: partial, setup: hardcoded_cloud_path}
+    secrets: {manifest: local_untracked, entry_count: 11, classification: needs_classification}
+    data: {manifest: local_untracked, mode: placeholder, adapter: null, adapter_status: missing}
+    status: partial_cloud_setup
+    uncertainty:
+      - The existing Claude setup suppresses install and link failures; operational success is unverified.
+
+  - id: bible-name-search
+    source_local_path: 'C:\Users\dougl\projects\bible-name-search'
+    checkout_directory: bible-name-search
+    onboarding_action: attention
+    remote: {state: missing, repository: null, default_branch: null}
+    discovery: {agent_project_topic: unavailable_no_remote, canonical_transport: pending_remote_assignment}
+    portability: {local_contract: full_untracked, remote_default_contract: unavailable, setup: host_bound}
+    secrets: {manifest: local_untracked, entry_count: 6, classification: active_and_needs_acquisition}
+    data: {manifest: local_untracked, mode: regenerable_mixed, adapter: null, adapter_status: missing}
+    status: publish_after_portable_setup_and_data_adapter
+    uncertainty:
+      - Transport for licensed corpora and verified SQLite snapshots is unresolved.
+
+  - id: boundaries-reader
+    source_local_path: 'C:\Users\dougl\projects\boundaries-reader'
+    checkout_directory: minimalist-ebook-reader
+    onboarding_action: attention
+    remote: {state: configured, repository: 'douglaspmcgowan/minimalist-ebook-reader', default_branch: main}
+    discovery: {agent_project_topic: missing, canonical_transport: github_remote_missing_topic}
+    portability: {local_contract: full_untracked, remote_default_contract: absent, setup: placeholder}
+    secrets: {manifest: local_untracked, entry_count: 1, classification: needs_classification}
+    data: {manifest: local_untracked, mode: placeholder, adapter: null, adapter_status: missing}
+    status: topic_and_baseline_required
+    uncertainty: []
+
+  - id: claude-global-config
+    source_local_path: 'C:\Users\dougl\projects\claude-global-config'
+    checkout_directory: doug-harness
+    onboarding_action: skip
+    remote: {state: shared_origin_exception, repository: 'pyrgos-ai/doug-harness', default_branch: master}
+    discovery: {agent_project_topic: not_applicable, canonical_transport: consolidate_into_agent_harness}
+    portability: {local_contract: mixed_tracking, remote_default_contract: partial, setup: placeholder}
+    secrets: {manifest: local_untracked, entry_count: 1, classification: needs_classification}
+    data: {manifest: local_untracked, mode: placeholder, adapter: null, adapter_status: missing}
+    status: duplicate_origin_requires_consolidation
+    uncertainty:
+      - Unique retained content has not yet been fully reconciled with agent-harness.
+
+  - id: client-portal
+    source_local_path: 'C:\Users\dougl\projects\client-portal'
+    checkout_directory: client-portal
+    onboarding_action: clone
+    remote: {state: configured, repository: 'douglaspmcgowan/client-portal', default_branch: main}
+    discovery: {agent_project_topic: present, canonical_transport: github_topic}
+    portability: {local_contract: mixed_tracking, remote_default_contract: partial, setup: missing}
+    secrets: {manifest: local_untracked, entry_count: 4, classification: needs_classification}
+    data: {manifest: local_untracked, mode: placeholder, adapter: null, adapter_status: missing}
+    status: baseline_and_setup_required
+    uncertainty: []
+
+  - id: conference-tracker
+    source_local_path: 'C:\Users\dougl\projects\conference-tracker'
+    checkout_directory: conference-tracker
+    onboarding_action: clone
+    remote: {state: configured, repository: 'douglaspmcgowan/conference-tracker', default_branch: main}
+    discovery: {agent_project_topic: present, canonical_transport: github_topic}
+    portability: {local_contract: full_untracked, remote_default_contract: absent, setup: placeholder}
+    secrets: {manifest: local_untracked, entry_count: 1, classification: needs_classification}
+    data: {manifest: local_untracked, mode: placeholder, adapter: null, adapter_status: missing}
+    status: baseline_and_data_declaration_required
+    uncertainty: []
+
+  - id: contact-form-caller
+    source_local_path: 'C:\Users\dougl\projects\contact-form-caller'
+    checkout_directory: contact-form-caller
+    onboarding_action: attention
+    remote: {state: missing, repository: null, default_branch: null}
+    discovery: {agent_project_topic: unavailable_no_remote, canonical_transport: pending_remote_assignment}
+    portability: {local_contract: full_untracked, remote_default_contract: unavailable, setup: placeholder}
+    secrets: {manifest: local_untracked, entry_count: 5, classification: needs_classification}
+    data: {manifest: local_untracked, mode: placeholder, adapter: null, adapter_status: missing}
+    status: remote_setup_and_secret_classification_required
+    uncertainty:
+      - No exact-name repository exists under the audited GitHub account.
+
+  - id: docket
+    source_local_path: 'C:\Users\dougl\projects\docket'
+    checkout_directory: docket
+    onboarding_action: clone
+    remote: {state: configured, repository: 'douglaspmcgowan/docket', default_branch: master}
+    discovery: {agent_project_topic: present, canonical_transport: github_topic}
+    portability: {local_contract: full, remote_default_contract: full, setup: portable}
+    secrets: {manifest: remote_default, entry_count: 11, classification: classified_value_safe}
+    data: {manifest: remote_default, mode: cloud_object_store, adapter: '.agents/data/Manage-DocketBlob.ps1', adapter_status: operational}
+    status: strongest_cloud_baseline
+    uncertainty:
+      - Clean cloud-environment credential provisioning and runtime proof remain outstanding.
+
+  - id: drive-organizer
+    source_local_path: 'C:\Users\dougl\projects\drive-organizer'
+    checkout_directory: drive-organizer
+    onboarding_action: attention
+    remote: {state: missing, repository: null, default_branch: null}
+    discovery: {agent_project_topic: unavailable_no_remote, canonical_transport: pending_publish_or_archive_decision}
+    portability: {local_contract: full_untracked, remote_default_contract: unavailable, setup: placeholder}
+    secrets: {manifest: local_untracked, entry_count: 1, classification: needs_classification}
+    data: {manifest: local_untracked, mode: placeholder, adapter: null, adapter_status: missing}
+    status: publish_or_archive_decision_required
+    uncertainty:
+      - Canonical transport for Drive review input is unresolved.
+
+  - id: fellowship-tracker
+    source_local_path: 'C:\Users\dougl\projects\fellowship-tracker'
+    checkout_directory: fellowship-tracker
+    onboarding_action: clone
+    remote: {state: configured, repository: 'douglaspmcgowan/fellowship-tracker', default_branch: main}
+    discovery: {agent_project_topic: present, canonical_transport: github_topic}
+    portability: {local_contract: mixed_tracking, remote_default_contract: partial, setup: missing}
+    secrets: {manifest: local_untracked, entry_count: 1, classification: needs_classification}
+    data: {manifest: local_untracked, mode: placeholder, adapter: null, adapter_status: missing}
+    status: baseline_setup_and_data_authority_required
+    uncertainty: []
+
+  - id: flight-tracker
+    source_local_path: 'C:\Users\dougl\projects\flight-tracker'
+    checkout_directory: flight-tracker
+    onboarding_action: clone
+    remote: {state: configured, repository: 'douglaspmcgowan/flight-tracker', default_branch: master}
+    discovery: {agent_project_topic: present, canonical_transport: github_topic}
+    portability: {local_contract: full, remote_default_contract: full, setup: host_bound}
+    secrets: {manifest: remote_default, entry_count: 1, classification: needs_classification}
+    data: {manifest: remote_default, mode: explicit_none, adapter: null, adapter_status: not_required}
+    status: cloud_readable_coordination_only
+    uncertainty:
+      - Application source remains in the external base-flight-finder repository.
+
+  - id: general-ai
+    source_local_path: 'C:\Users\dougl\projects\general-ai'
+    checkout_directory: general-ai
+    onboarding_action: clone
+    remote: {state: configured, repository: 'douglaspmcgowan/general-ai', default_branch: master}
+    discovery: {agent_project_topic: present, canonical_transport: github_topic}
+    portability: {local_contract: full, remote_default_contract: full, setup: host_bound}
+    secrets: {manifest: remote_default, entry_count: 1, classification: configured_local_data_root}
+    data: {manifest: remote_default, mode: explicit_none, adapter: null, adapter_status: not_required}
+    status: cloud_readable_bootstrap_dependency_remaining
+    uncertainty:
+      - Setup currently assumes an installed user-profile harness.
+
+  - id: general-claude
+    source_local_path: 'C:\Users\dougl\projects\general-claude'
+    checkout_directory: general-claude
+    onboarding_action: attention
+    remote: {state: missing, repository: null, default_branch: null}
+    discovery: {agent_project_topic: unavailable_no_remote, canonical_transport: preserved_predecessor_pending_consolidation}
+    portability: {local_contract: full, remote_default_contract: unavailable, setup: host_bound}
+    secrets: {manifest: local_tracked, entry_count: 1, classification: configured_local_data_root}
+    data: {manifest: local_tracked, mode: explicit_none, adapter: null, adapter_status: not_required}
+    status: consolidate_remaining_context_into_general_ai
+    uncertainty:
+      - The exact remaining unique uncommitted context has not been adjudicated.
+
+  - id: grandpa-help
+    source_local_path: 'C:\Users\dougl\projects\grandpa-help'
+    checkout_directory: grandpa-help
+    onboarding_action: attention
+    remote: {state: missing, repository: null, default_branch: null}
+    discovery: {agent_project_topic: unavailable_no_remote, canonical_transport: pending_publish_or_archive_decision}
+    portability: {local_contract: full_untracked, remote_default_contract: unavailable, setup: placeholder}
+    secrets: {manifest: local_untracked, entry_count: 1, classification: needs_classification}
+    data: {manifest: local_untracked, mode: placeholder, adapter: null, adapter_status: missing}
+    status: publish_or_archive_decision_required
+    uncertainty:
+      - Records boundary and remote visibility have not been selected.
+
+  - id: harness
+    source_local_path: 'C:\Users\dougl\projects\harness'
+    checkout_directory: harness
+    onboarding_action: attention
+    remote: {state: missing, repository: null, default_branch: null}
+    discovery: {agent_project_topic: unavailable_no_remote, canonical_transport: consolidate_into_agent_harness}
+    portability: {local_contract: full_untracked, remote_default_contract: unavailable, setup: placeholder}
+    secrets: {manifest: local_untracked, entry_count: 1, classification: needs_classification}
+    data: {manifest: local_untracked, mode: placeholder, adapter: null, adapter_status: missing}
+    status: duplicate_harness_candidate
+    uncertainty:
+      - History and consumers require reconciliation before retirement.
+
+  - id: harness-bootstrap-verification-20260726
+    source_local_path: 'C:\Users\dougl\projects\harness-bootstrap-verification-20260726'
+    checkout_directory: harness-bootstrap-verification-20260726
+    onboarding_action: exclude_fixture
+    remote: {state: missing, repository: null, default_branch: null}
+    discovery: {agent_project_topic: unavailable_no_remote, canonical_transport: exclude_disposable_fixture}
+    portability: {local_contract: full_untracked, remote_default_contract: unavailable, setup: placeholder}
+    secrets: {manifest: local_untracked, entry_count: 1, classification: needs_classification}
+    data: {manifest: local_untracked, mode: placeholder, adapter: null, adapter_status: missing}
+    status: exclude_from_project_discovery
+    uncertainty:
+      - Consumer search is required before cleanup.
+
+  - id: idetc-writing-ide
+    source_local_path: 'C:\Users\dougl\projects\idetc-writing-ide'
+    checkout_directory: idetc-writing-ide
+    onboarding_action: attention
+    remote: {state: missing, repository: null, default_branch: null}
+    discovery: {agent_project_topic: unavailable_no_remote, canonical_transport: pending_canonical_relationship_decision}
+    portability: {local_contract: full_untracked, remote_default_contract: unavailable, setup: placeholder}
+    secrets: {manifest: local_untracked, entry_count: 1, classification: needs_classification}
+    data: {manifest: local_untracked, mode: placeholder, adapter: null, adapter_status: missing}
+    status: decide_relationship_with_redline_idetc
+    uncertainty:
+      - Independent-project status versus consolidation has not been selected.
+
+  - id: jars-of-clay
+    source_local_path: 'C:\Users\dougl\projects\jars-of-clay'
+    checkout_directory: jars-of-clay
+    onboarding_action: clone
+    remote: {state: configured, repository: 'douglaspmcgowan/jars-of-clay', default_branch: main}
+    discovery: {agent_project_topic: present, canonical_transport: github_topic}
+    portability: {local_contract: full_untracked, remote_default_contract: partial, setup: placeholder}
+    secrets: {manifest: local_untracked, entry_count: 5, classification: needs_classification}
+    data: {manifest: local_untracked, mode: placeholder, adapter: null, adapter_status: missing}
+    status: full_baseline_setup_and_data_boundary_required
+    uncertainty: []
+
+  - id: kelly-uniforms-business
+    source_local_path: 'C:\Users\dougl\projects\kelly-uniforms-business'
+    checkout_directory: kelly-uniforms-business
+    onboarding_action: clone
+    remote: {state: configured, repository: 'douglaspmcgowan/kelly-uniforms-business', default_branch: master}
+    discovery: {agent_project_topic: present, canonical_transport: github_topic}
+    portability: {local_contract: full, remote_default_contract: full, setup: host_bound}
+    secrets: {manifest: remote_default, entry_count: 5, classification: broker_and_config_required}
+    data: {manifest: remote_default, mode: manual_external_assets, adapter: null, adapter_status: missing}
+    status: cloud_readable_asset_transport_remaining
+    uncertainty:
+      - Storage adapter for seven client-provided raster assets is unresolved.
+
+  - id: legal-doc-studio
+    source_local_path: 'C:\Users\dougl\projects\legal-doc-studio'
+    checkout_directory: legal-doc-studio
+    onboarding_action: clone
+    remote: {state: configured, repository: 'douglaspmcgowan/legal-doc-studio', default_branch: master}
+    discovery: {agent_project_topic: present, canonical_transport: github_topic}
+    portability: {local_contract: full_untracked, remote_default_contract: absent, setup: placeholder}
+    secrets: {manifest: local_untracked, entry_count: 1, classification: needs_classification}
+    data: {manifest: local_untracked, mode: placeholder, adapter: null, adapter_status: missing}
+    status: baseline_and_document_boundary_required
+    uncertainty: []
+
+  - id: legal-solutions-website
+    source_local_path: 'C:\Users\dougl\projects\legal-solutions-website'
+    checkout_directory: legal-solutions-website
+    onboarding_action: clone
+    remote: {state: configured, repository: 'douglaspmcgowan/legal-solutions-website', default_branch: main}
+    discovery: {agent_project_topic: present, canonical_transport: github_topic}
+    portability: {local_contract: mixed_tracking, remote_default_contract: partial, setup: placeholder}
+    secrets: {manifest: local_untracked, entry_count: 1, classification: needs_classification}
+    data: {manifest: local_untracked, mode: placeholder, adapter: null, adapter_status: missing}
+    status: baseline_setup_and_deployment_mapping_required
+    uncertainty: []
+
+  - id: motion-to-dismiss
+    source_local_path: 'C:\Users\dougl\projects\motion-to-dismiss'
+    checkout_directory: motion-to-dismiss
+    onboarding_action: attention
+    remote: {state: missing, repository: null, default_branch: null}
+    discovery: {agent_project_topic: unavailable_no_remote, canonical_transport: pending_remote_and_records_decision}
+    portability: {local_contract: full_untracked, remote_default_contract: unavailable, setup: placeholder}
+    secrets: {manifest: local_untracked, entry_count: 1, classification: needs_classification}
+    data: {manifest: local_untracked, mode: placeholder, adapter: null, adapter_status: missing}
+    status: remote_and_document_boundary_required
+    uncertainty:
+      - Canonical remote and supporting-record transport are unresolved.
+
+  - id: redline-idetc
+    source_local_path: 'C:\Users\dougl\projects\redline-idetc'
+    checkout_directory: redline-idetc
+    onboarding_action: clone
+    remote: {state: configured, repository: 'douglaspmcgowan/redline-idetc', default_branch: main}
+    discovery: {agent_project_topic: present, canonical_transport: github_topic}
+    portability: {local_contract: full_untracked, remote_default_contract: absent, setup: placeholder}
+    secrets: {manifest: local_untracked, entry_count: 1, classification: needs_classification}
+    data: {manifest: local_untracked, mode: placeholder, adapter: null, adapter_status: missing}
+    status: baseline_setup_and_exchange_transport_required
+    uncertainty: []
