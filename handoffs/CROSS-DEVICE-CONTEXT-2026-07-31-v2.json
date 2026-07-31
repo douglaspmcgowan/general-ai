@@ -14,13 +14,21 @@
       "repository": "douglaspmcgowan/general-ai",
       "visibility": "public",
       "defaultBranch": "master",
-      "entrypoint": "CROSS-DEVICE-ACCESS.md"
+      "entrypoint": "CROSS-DEVICE-ACCESS.md",
+      "auditedCommit": "340a05fde53f1f1c6a08bf8c73698a2449956273",
+      "portabilityInventory": "PORTABILITY-INVENTORY.yaml"
     },
     "agentBrain": {
       "repository": "douglaspmcgowan/obsidian-vault-mirror",
       "visibility": "private",
-      "currentMode": "read-only sanitized mirror",
-      "plannedMode": "constrained branches-and-pull-requests"
+      "auditedCommit": "337d615895b2dd42884cf868a90534a61f661da8",
+      "currentMode": "read-only human notes with constrained branches-and-pull-requests for agent proposals",
+      "agentWritablePrefixes": [
+        "proposals/",
+        "agent-notes/"
+      ],
+      "contract": "AGENTS.md",
+      "policy": "agent-brain-policy.json"
     },
     "docket": {
       "url": "https://vault-review-mobile.vercel.app",
@@ -67,6 +75,13 @@
     "fullRemotePortableBaselines": 4,
     "operationalCloudDataAdapters": 1,
     "placeholderDataManifests": 19,
+    "inventory": "PORTABILITY-INVENTORY.yaml",
+    "onboardingActions": {
+      "clone": 14,
+      "attention": 9,
+      "skip": 3,
+      "exclude_fixture": 1
+    },
     "rolloutIssue": "https://github.com/pyrgos-ai/doug-harness/issues/16"
   },
   "preserve": {
