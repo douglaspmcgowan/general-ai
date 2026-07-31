@@ -14,8 +14,8 @@
 - The cloud-ready repository rollout is planning-only. The guide is on `pyrgos-ai/doug-harness` branch `codex/cloud-ready-repositories` at commit `4bbb2fd`, and implementation is tracked in [issue #16](https://github.com/pyrgos-ai/doug-harness/issues/16). No repository has earned cloud-ready status.
 - `recovery\general-claude-history.bundle` preserves the committed `general-claude` history at source commit `f8c1f39ed369d8694eb9f82c50f622883bf29a7e`.
 - Completed Obsidian second-brain and graph-aware agent-planning research is preserved under `research\`, mirrored to the active Obsidian vault, and published to Docket for phone access.
-- General AI `master` at `340a05f` contains the phone-safe cross-device index, current handoff/audit, and 27-root portability inventory.
-- Private Agent Brain `main` at `337d615` contains portable Claude/Codex loaders, map/spec/schema/state, fixtures, and constrained `proposals/` and `agent-notes/` write zones; mirrored human notes remain read-only.
+- General AI PR 5 merged at `cec979f`. The phone-safe cross-device index, current handoff/audit, and 27-root portability inventory are available from `master`; the index matches the active vault and Docket at SHA-256 `22e944d6b223c8a02df501b3db416c73e431c182644f68a40bf4bf4167dcb3c8`.
+- Private Agent Brain `main` at `fd584d1` contains portable Claude/Codex loaders, map/spec/schema/state, fixtures, constrained `proposals/` and `agent-notes/` write zones, and the reviewed cross-device index refresh proposal from PR 3; mirrored human notes remain read-only.
 - The live Obsidian bundle has Web Viewer enabled and `html-page-viewer@0.1.1` installed. Harness `master` at `ae3899a` still carries the older bundle and lacks the pinned community-plugin installation path.
 - Harness `master` also lacks the exact two-path mutable-runtime verifier allowance and still runs prerequisite discovery after dependent Obsidian and Project Data stages. These three harness blockers remain with the active harness owner and gate the real receiving-computer proof.
 

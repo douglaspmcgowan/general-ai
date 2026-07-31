@@ -15,26 +15,28 @@
       "visibility": "public",
       "defaultBranch": "master",
       "entrypoint": "CROSS-DEVICE-ACCESS.md",
-      "auditedCommit": "340a05fde53f1f1c6a08bf8c73698a2449956273",
+      "auditedCommit": "cec979f07cf637a1fa0b9e9a42cac0d8a2a2a548",
       "portabilityInventory": "PORTABILITY-INVENTORY.yaml"
     },
     "agentBrain": {
       "repository": "douglaspmcgowan/obsidian-vault-mirror",
       "visibility": "private",
-      "auditedCommit": "337d615895b2dd42884cf868a90534a61f661da8",
+      "auditedCommit": "fd584d121438ef3bb448962bd1e88fbabdab2f00",
       "currentMode": "read-only human notes with constrained branches-and-pull-requests for agent proposals",
       "agentWritablePrefixes": [
         "proposals/",
         "agent-notes/"
       ],
       "contract": "AGENTS.md",
-      "policy": "agent-brain-policy.json"
+      "policy": "agent-brain-policy.json",
+      "refreshProposal": "https://github.com/douglaspmcgowan/obsidian-vault-mirror/pull/3"
     },
     "docket": {
       "url": "https://vault-review-mobile.vercel.app",
       "localCardCount": 174,
       "unresolvedCount": 172,
-      "resolvedCount": 2
+      "resolvedCount": 2,
+      "accessIndexCardId": "agent-harness--cross-device-access-index-2026-07-31"
     }
   },
   "liveObsidianBundle": {
