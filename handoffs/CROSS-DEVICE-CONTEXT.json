@@ -21,9 +21,11 @@
       "repository": "douglaspmcgowan/general-ai",
       "visibility": "public",
       "defaultBranch": "master",
-      "portabilityInventoryCommit": "582daf5519812d46c0950c625887fb51de1f4661",
+      "inventoryAuthorityBranch": "master",
+      "sourceInventoryAuditCommit": "582daf5519812d46c0950c625887fb51de1f4661",
       "entrypoint": "CROSS-DEVICE-ACCESS.md",
       "portabilityInventory": "PORTABILITY-INVENTORY.yaml",
+      "receivingReceiptSchema": "handoffs/RECEIVING-DEVICE-RECEIPT.schema.json",
       "handoff": "handoffs/HANDOFF-CROSS-DEVICE-HARNESS-2026-07-31.md",
       "hookMigrationIssue": "https://github.com/pyrgos-ai/doug-harness/issues/17"
     },
@@ -159,8 +161,8 @@
     "Harness master must move prerequisite discovery before dependent Obsidian and Project Data stages and pass a blank-profile regression.",
     "The consolidated task-state hook suite has six failing chain and PROMPT_LOG regressions.",
     "The merged harness release must complete one real receiving-computer onboarding run.",
-    "Five project actions require attention: private remotes exist, while their reviewed initial branches remain gated by the backup-preserving Gitleaks hook migration in harness issue 17.",
-    "Nineteen project data manifests remain placeholders; Docket has the sole operational cloud-data adapter.",
+    "The five formerly branchless private project repositories now have reviewed default branches and agent-project discovery topics; their remaining data, licensing, and privilege reviews are declared per project.",
+    "Seventeen project data manifests remain placeholders; Bible Name Search has declared but unpublished DVC and SQLite generations, and Docket has the sole operational cloud-data adapter.",
     "The two OneDrive worktrees must be checkpointed or relocated before any OneDrive-root removal.",
     "The 14-repository cloud rollout remains plan-only until issue 16 is explicitly promoted."
   ]

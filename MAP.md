@@ -21,6 +21,7 @@
 | `CROSS-DEVICE-ACCESS.md` | Phone, computer, or cloud-agent pickup | Current human entrypoint and ordered links |
 | `PORTABILITY-INVENTORY.yaml` | Receiving-device project discovery | Machine-readable action and transport state for 27 retained roots |
 | `handoffs\CROSS-DEVICE-CONTEXT-2026-07-31-v2.json` | Agent pickup | Machine-readable commits, paths, blockers, and boundaries |
+| `handoffs\RECEIVING-DEVICE-RECEIPT.schema.json` | Real receiving-computer verification | Value-safe structure for the final reconstruction receipt |
 
 ## System map
 
@@ -40,6 +41,9 @@ flowchart LR
     GA --> D
     GA --> V["Active Obsidian vault"]
     GA --> A["Private Agent Brain mirror"]
+    I --> RC["Receiving-device receipt"]
+    R --> RC
+    RC --> GA
 ```
 
 ## Authorities and important paths
@@ -57,6 +61,7 @@ flowchart LR
 | Shared research | `research\` | Committed architecture, task, second-brain, and graph-planning research |
 | Cross-device entrypoint | `CROSS-DEVICE-ACCESS.md` | Ordered phone-safe links and current reconstruction blockers |
 | Fleet inventory | `PORTABILITY-INVENTORY.yaml` | Guarded clone, attention, skip, and fixture-exclusion actions |
+| Receiving receipt schema | `handoffs\RECEIVING-DEVICE-RECEIPT.schema.json` | Twelve-section, value-safe proof envelope tied to an exact harness commit |
 | Agent Brain | `https://github.com/douglaspmcgowan/obsidian-vault-mirror` | Curated cloud context and constrained proposal/agent-note branches |
 
 The Drive Capsule has no active authority. Its former folder was removed recoverably after repository onboarding passed. `My Drive\Project Data` remains an intentional external data path.
@@ -73,6 +78,7 @@ The Drive Capsule has no active authority. Its former folder was removed recover
 8. Docket makes briefs and decisions available on phone and other devices through its authenticated HTTPS/Vercel Blob path.
 9. The private Agent Brain mirror supplies curated context to cloud agents. Agent-authored changes use reviewed branches under `proposals/` and `agent-notes/`; a future trusted bridge owns reviewed import into the personal vault.
 10. The future cloud rollout follows `agent-harness\ONBOARDING\CLOUD-AGENTS.md` and issue #16. Planning does not grant cloud-ready status.
+11. The real receiving run writes one dated receipt conforming to `handoffs\RECEIVING-DEVICE-RECEIPT.schema.json`; the receipt records hashes, statuses, and value-safe identifiers while excluding credential values and protected data contents.
 
 ## Integrations
 

@@ -1,0 +1,333 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/douglaspmcgowan/general-ai/master/handoffs/RECEIVING-DEVICE-RECEIPT.schema.json",
+  "title": "Receiving Device Receipt",
+  "description": "Value-safe evidence that a receiving computer acquired, installed, and exercised the cross-agent harness. Credential values and protected data contents are forbidden.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "runMetadata",
+    "harness",
+    "obsidian",
+    "projectData",
+    "executables",
+    "github",
+    "projectVerification",
+    "dataAdapters",
+    "bitwarden",
+    "accessSurfaces",
+    "attentionInventory",
+    "finalAssessment"
+  ],
+  "properties": {
+    "runMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["receiptSchemaVersion", "runId", "startedAt", "completedAt", "machineAlias", "operatingSystem"],
+      "properties": {
+        "receiptSchemaVersion": { "const": 1 },
+        "runId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "startedAt": { "type": "string", "format": "date-time" },
+        "completedAt": { "type": "string", "format": "date-time" },
+        "machineAlias": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "description": "A user-selected machine label; avoid serial numbers and credential identifiers."
+        },
+        "operatingSystem": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["family", "edition", "version", "build", "architecture"],
+          "properties": {
+            "family": { "type": "string", "enum": ["windows", "macos", "linux"] },
+            "edition": { "type": "string", "minLength": 1, "maxLength": 128 },
+            "version": { "type": "string", "minLength": 1, "maxLength": 128 },
+            "build": { "type": "string", "minLength": 1, "maxLength": 128 },
+            "architecture": { "type": "string", "enum": ["x64", "arm64", "x86", "other"] }
+          }
+        }
+      }
+    },
+    "harness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "acquisitionMode", "branch", "commit", "onboardingEntry", "manifestSha256", "manifestVerified", "installPath", "installStatus", "setupIntegrityStamp"],
+      "properties": {
+        "repository": { "$ref": "#/$defs/repositoryName" },
+        "acquisitionMode": { "type": "string", "enum": ["git-clone", "authenticated-zip"] },
+        "branch": { "type": "string", "minLength": 1, "maxLength": 255 },
+        "commit": { "$ref": "#/$defs/gitCommit" },
+        "onboardingEntry": { "const": "ONBOARDING/START-HERE.md" },
+        "manifestSha256": { "$ref": "#/$defs/sha256" },
+        "manifestVerified": { "type": "boolean" },
+        "installPath": { "type": "string", "minLength": 1 },
+        "installStatus": { "$ref": "#/$defs/resultStatus" },
+        "setupIntegrityStamp": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["present", "verified", "sha256"],
+          "properties": {
+            "present": { "type": "boolean" },
+            "verified": { "type": "boolean" },
+            "sha256": { "$ref": "#/$defs/sha256" }
+          }
+        }
+      }
+    },
+    "obsidian": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["receivingSideBackupCreated", "backupReference", "restoreStatus", "bundle", "plugins", "prohibitedPathsExcluded"],
+      "properties": {
+        "receivingSideBackupCreated": { "type": "boolean" },
+        "backupReference": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Value-safe local path or receipt-relative identifier; never include vault contents."
+        },
+        "restoreStatus": { "$ref": "#/$defs/resultStatus" },
+        "bundle": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["version", "sha256", "verified"],
+          "properties": {
+            "version": { "type": "string", "minLength": 1, "maxLength": 128 },
+            "sha256": { "$ref": "#/$defs/sha256" },
+            "verified": { "type": "boolean" }
+          }
+        },
+        "plugins": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "version", "enabled", "verified"],
+            "properties": {
+              "id": { "type": "string", "minLength": 1, "maxLength": 128 },
+              "version": { "type": "string", "minLength": 1, "maxLength": 128 },
+              "enabled": { "type": "boolean" },
+              "verified": { "type": "boolean" }
+            }
+          },
+          "uniqueItems": true
+        },
+        "prohibitedPathsExcluded": {
+          "type": "boolean",
+          "description": "Records the exclusion result without naming or exposing protected contents."
+        }
+      }
+    },
+    "projectData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["projectDataRoot", "projectDataSyncRoot", "environmentPersisted", "rootsExist", "rootsWritable"],
+      "properties": {
+        "projectDataRoot": { "type": "string", "minLength": 1 },
+        "projectDataSyncRoot": { "type": "string", "minLength": 1 },
+        "environmentPersisted": { "type": "boolean" },
+        "rootsExist": { "type": "boolean" },
+        "rootsWritable": { "type": "boolean" }
+      }
+    },
+    "executables": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "required", "discovered", "resolvedPath", "version", "status"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 128 },
+          "required": { "type": "boolean" },
+          "discovered": { "type": "boolean" },
+          "resolvedPath": { "type": ["string", "null"] },
+          "version": { "type": ["string", "null"], "maxLength": 256 },
+          "status": { "$ref": "#/$defs/resultStatus" }
+        }
+      }
+    },
+    "github": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authenticationAvailable", "authenticatedIdentityVerified", "discoveryTopic", "discoveryStatus", "repositories"],
+      "properties": {
+        "authenticationAvailable": { "type": "boolean" },
+        "authenticatedIdentityVerified": {
+          "type": "boolean",
+          "description": "Boolean verification only; omit account email and authentication material."
+        },
+        "discoveryTopic": { "const": "agent-project" },
+        "discoveryStatus": { "$ref": "#/$defs/resultStatus" },
+        "repositories": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["repository", "defaultBranch", "commit", "operation", "status", "workingTreeClean", "actionsStatus"],
+            "properties": {
+              "repository": { "$ref": "#/$defs/repositoryName" },
+              "defaultBranch": { "type": "string", "minLength": 1, "maxLength": 255 },
+              "commit": { "$ref": "#/$defs/gitCommit" },
+              "operation": { "type": "string", "enum": ["cloned", "pulled", "already-current", "attention"] },
+              "status": { "$ref": "#/$defs/resultStatus" },
+              "workingTreeClean": { "type": "boolean" },
+              "actionsStatus": { "type": "string", "enum": ["pass", "attention", "fail", "not-checked", "not-configured"] }
+            }
+          }
+        }
+      }
+    },
+    "projectVerification": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["repository", "commit", "verifier", "status", "evidenceSummary"],
+        "properties": {
+          "repository": { "$ref": "#/$defs/repositoryName" },
+          "commit": { "$ref": "#/$defs/gitCommit" },
+          "verifier": { "type": "string", "minLength": 1, "maxLength": 512 },
+          "status": { "$ref": "#/$defs/resultStatus" },
+          "evidenceSummary": { "type": "string", "minLength": 1, "maxLength": 2000 }
+        }
+      }
+    },
+    "dataAdapters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["repository", "adapter", "operation", "status", "artifactChecksums"],
+        "properties": {
+          "repository": { "$ref": "#/$defs/repositoryName" },
+          "adapter": { "type": "string", "enum": ["none", "regenerable", "dvc", "sqlite", "other-declared"] },
+          "operation": { "type": "string", "enum": ["restore", "pull", "verify", "snapshot", "none-declared", "regenerate"] },
+          "status": { "$ref": "#/$defs/resultStatus" },
+          "artifactChecksums": {
+            "type": "array",
+            "description": "Checksums and opaque artifact identifiers only; protected data contents are forbidden.",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["artifactId", "sha256", "verified"],
+              "properties": {
+                "artifactId": { "type": "string", "minLength": 1, "maxLength": 255 },
+                "sha256": { "$ref": "#/$defs/sha256" },
+                "verified": { "type": "boolean" }
+              }
+            }
+          },
+          "snapshotRetention": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["daily", "weekly", "monthly", "preserveNewestVerified", "distinctSnapshotsRetained"],
+            "properties": {
+              "daily": { "type": "integer", "minimum": 0 },
+              "weekly": { "type": "integer", "minimum": 0 },
+              "monthly": { "type": "integer", "minimum": 0 },
+              "preserveNewestVerified": { "const": true },
+              "distinctSnapshotsRetained": { "type": "integer", "minimum": 0, "maximum": 5 }
+            }
+          }
+        },
+        "allOf": [
+          {
+            "if": { "properties": { "adapter": { "const": "sqlite" } }, "required": ["adapter"] },
+            "then": { "properties": { "snapshotRetention": {} }, "required": ["snapshotRetention"] },
+            "else": { "properties": { "snapshotRetention": false } }
+          }
+        ]
+      }
+    },
+    "bitwarden": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Value-safe machine-account evidence. Credential values, tokens, passwords, and account identifiers are forbidden.",
+      "required": ["importVariableName", "sourceScope", "sourceDetected", "machineAccountConfigured", "brokerReadbackSucceeded", "projectAccessVerified", "clearedAfterSetup"],
+      "properties": {
+        "importVariableName": { "const": "BITWARDEN_SECRETS_MANAGER_ACCESS_TOKEN" },
+        "sourceScope": { "type": "string", "enum": ["process", "user", "machine"] },
+        "sourceDetected": { "type": "boolean" },
+        "machineAccountConfigured": { "type": "boolean" },
+        "brokerReadbackSucceeded": { "type": "boolean" },
+        "projectAccessVerified": { "type": "boolean" },
+        "clearedAfterSetup": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["processAbsent", "userAbsent", "machineAbsent"],
+          "properties": {
+            "processAbsent": { "type": "boolean" },
+            "userAbsent": { "type": "boolean" },
+            "machineAbsent": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    "accessSurfaces": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["surface", "locator", "reachable", "contentVerified", "phoneSafe"],
+        "properties": {
+          "surface": { "type": "string", "enum": ["general-ai", "harness", "agent-brain", "docket"] },
+          "locator": { "type": "string", "minLength": 1, "maxLength": 2048 },
+          "reachable": { "type": "boolean" },
+          "contentVerified": { "type": "boolean" },
+          "phoneSafe": { "type": "boolean" }
+        }
+      },
+      "allOf": [
+        { "contains": { "$ref": "#/$defs/generalAiSurface" }, "minContains": 1, "maxContains": 1 },
+        { "contains": { "$ref": "#/$defs/harnessSurface" }, "minContains": 1, "maxContains": 1 },
+        { "contains": { "$ref": "#/$defs/agentBrainSurface" }, "minContains": 1, "maxContains": 1 },
+        { "contains": { "$ref": "#/$defs/docketSurface" }, "minContains": 1, "maxContains": 1 }
+      ]
+    },
+    "attentionInventory": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "severity", "summary", "blocking", "owner", "relatedSection"],
+        "properties": {
+          "code": { "type": "string", "pattern": "^[A-Z0-9][A-Z0-9_-]{0,63}$" },
+          "severity": { "type": "string", "enum": ["info", "warning", "error"] },
+          "summary": { "type": "string", "minLength": 1, "maxLength": 2000 },
+          "blocking": { "type": "boolean" },
+          "owner": { "type": "string", "minLength": 1, "maxLength": 128 },
+          "relatedSection": {
+            "type": "string",
+            "enum": ["runMetadata", "harness", "obsidian", "projectData", "executables", "github", "projectVerification", "dataAdapters", "bitwarden", "accessSurfaces"]
+          }
+        }
+      }
+    },
+    "finalAssessment": {
+      "type": "object",
+      "description": "The assessment applies to the exact commit recorded once at harness.commit.",
+      "additionalProperties": false,
+      "required": ["status", "assessedAt", "summary", "allRequiredEvidenceCollected"],
+      "properties": {
+        "status": { "type": "string", "enum": ["PASS", "ATTENTION", "FAIL"] },
+        "assessedAt": { "type": "string", "format": "date-time" },
+        "summary": { "type": "string", "minLength": 1, "maxLength": 2000 },
+        "allRequiredEvidenceCollected": { "type": "boolean" }
+      }
+    }
+  },
+  "$defs": {
+    "gitCommit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "sha256": { "type": "string", "pattern": "^[0-9a-fA-F]{64}$" },
+    "repositoryName": { "type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$" },
+    "resultStatus": { "type": "string", "enum": ["pass", "attention", "fail", "skipped"] },
+    "generalAiSurface": { "type": "object", "required": ["surface"], "properties": { "surface": { "const": "general-ai" } } },
+    "harnessSurface": { "type": "object", "required": ["surface"], "properties": { "surface": { "const": "harness" } } },
+    "agentBrainSurface": { "type": "object", "required": ["surface"], "properties": { "surface": { "const": "agent-brain" } } },
+    "docketSurface": { "type": "object", "required": ["surface"], "properties": { "surface": { "const": "docket" } } }
+  }
+}
