@@ -14,9 +14,10 @@ Use this page as the current phone, computer, and cloud-agent entrypoint for the
 6. [Existing cross-device handoff](https://github.com/douglaspmcgowan/general-ai/blob/master/handoffs/HANDOFF-CROSS-DEVICE-HARNESS-2026-07-31.md)
 7. [Machine-readable pickup context](https://github.com/douglaspmcgowan/general-ai/blob/master/handoffs/CROSS-DEVICE-CONTEXT-2026-07-31-v2.json)
 8. [Current portability completion audit](https://github.com/douglaspmcgowan/general-ai/blob/master/research/cross-device-portability-completion-audit-2026-07-31.md)
-9. [Machine-readable fleet portability inventory](https://github.com/douglaspmcgowan/general-ai/blob/master/PORTABILITY-INVENTORY.yaml)
-10. [Docket](https://vault-review-mobile.vercel.app)
-11. [Private Obsidian vault mirror](https://github.com/douglaspmcgowan/obsidian-vault-mirror)
+9. [Receiving-device receipt schema](https://github.com/douglaspmcgowan/general-ai/blob/master/handoffs/RECEIVING-DEVICE-RECEIPT.schema.json)
+10. [Machine-readable fleet portability inventory](https://github.com/douglaspmcgowan/general-ai/blob/master/PORTABILITY-INVENTORY.yaml)
+11. [Docket](https://vault-review-mobile.vercel.app)
+12. [Private Obsidian vault mirror](https://github.com/douglaspmcgowan/obsidian-vault-mirror)
 
 GitHub authentication is required for the private harness and private vault mirror. Docket uses its existing authenticated access.
 
@@ -40,7 +41,8 @@ GitHub authentication is required for the private harness and private vault mirr
 - The official `obsidian-headless@0.0.14` package runs under the installed Node runtime in a disposable invocation.
 - The Windows `ob` command currently resolves to a separate unsigned third-party client; official bridge automation must use an explicit pinned launcher.
 - Every current Engineer brief has a body-complete Docket card.
-- General AI PR 7 is merged at `582daf5`, including the current project-transport inventory and pickup state.
+- General AI PR 9 is merged at `60a3107` and records the receiving-release owner. Treat repository `master` as the live coordination head rather than copying that commit into new handoffs.
+- General AI PR 7 at `582daf5` is the historical source audit for the 27-root inventory; repository `master` owns the reconciled live inventory.
 - Private mirror PR 3 is merged at `fd584d1`, including the constrained cross-device index refresh proposal.
 - Boundaries Reader PR 1 is merged at `53df3f7`, including its portable baseline; the repository now participates in `agent-project` discovery.
 - All 12 current Engineer documents in scope have Git-backed copies.
@@ -53,7 +55,7 @@ The consolidated harness implementation and release owner is [issue 18](https://
 2. **Approved Obsidian bundle:** the committed onboarding snapshot predates today's plugin installation. It records Web Viewer as disabled and lacks the HTML Page Viewer ID.
 3. **Community-plugin installation:** the current Obsidian export/restore path carries plugin IDs without carrying or installing the pinned plugin package.
 4. **Blank-computer ordering:** Obsidian restoration and Google Drive data-root setup currently run before prerequisite discovery, so a blank profile can fail before receiving a complete `ATTENTION` inventory.
-5. **Project hook composition:** five new private project remotes remain branchless because their existing fixed-path Gitleaks hooks and the portable PATH-resolved hook need one explicitly approved, backup-preserving replacement. The fail-closed implementation owner is [harness issue 17](https://github.com/pyrgos-ai/doug-harness/issues/17).
+5. **Project data completion:** the five formerly branchless private remotes are clone-ready with reviewed portable baselines. Bible Name Search still needs its parent-root convention reconciled before initial DVC generations and verified SQLite snapshots publish; Drive Organizer, Grandpa Help, and Motion to Dismiss retain explicit project-data declaration or review items.
 6. **Real receiving-device proof:** the final claim requires one actual receiving computer to complete the merged clone/ZIP flow and verify installed harness, Obsidian configuration, project discovery, data adapters, and current context.
 
 ## Fastest completion order
@@ -63,20 +65,21 @@ The consolidated harness implementation and release owner is [issue 18](https://
 3. Capture the live approved Obsidian configuration through the existing onboarding owner.
 4. Add a pinned HTML Page Viewer installation declaration with source, version, expected files, checksum, and verifier.
 5. Refresh the harness setup stamp and onboarding manifest once.
-6. Approve and apply the exact backup-preserving Gitleaks hook replacement in the five branchless project remotes through [harness issue 17](https://github.com/pyrgos-ai/doug-harness/issues/17), then finish their reviewed initial baselines.
-7. Run focused tests during each change, followed by one integrated suite, Gitleaks, and whitespace validation.
-8. Merge, install from reviewed `master`, and prove one real receiving-computer pickup.
-9. Begin the repository cloud-readiness rollout from [harness issue 16](https://github.com/pyrgos-ai/doug-harness/issues/16): shared template first, then Docket, General AI, Flight Tracker, and Kelly Uniforms, followed by parallel project batches.
+6. Run focused tests during each change, followed by one integrated suite, Gitleaks, and whitespace validation.
+7. Merge, install from reviewed `master`, and prove one real receiving-computer pickup using the committed receipt schema.
+8. Reconcile project-data attention items from the receiving receipt, beginning with Bible Name Search's adapter-root convention and first verified generations.
+9. After explicit approval, migrate the five local hooks through the backup-preserving path tracked in [harness issue 17](https://github.com/pyrgos-ai/doug-harness/issues/17).
+10. Begin the repository cloud-readiness rollout from [harness issue 16](https://github.com/pyrgos-ai/doug-harness/issues/16): shared template first, then Docket, General AI, Flight Tracker, and Kelly Uniforms, followed by parallel project batches.
 
 ## Repository fleet snapshot
 
 - 27 canonical local repository roots were found after excluding one linked harness worktree.
 - 26 roots have a configured or mapped Git authority; the one missing origin is the excluded disposable verification fixture.
-- GitHub topic discovery returns 18 `agent-project` repositories.
-- Five topic repositories have the full portable baseline on their remote default branch: Boundaries Reader, Docket, Flight Tracker, General AI, and Kelly Uniforms.
-- Five new private project remotes exist without a default branch; their local initial-baseline migrations remain preserved behind the pre-commit hook-composition guard.
+- GitHub topic discovery returns 20 unique `agent-project` repositories; 21 local inventory roots map to them because `idetc-writing-ide` and `redline-idetc` share one remote authority.
+- Ten clone-action topic repositories have a reviewed portable baseline on their remote default branch: Bible Name Search, Boundaries Reader, Contact Form Caller, Docket, Drive Organizer, Flight Tracker, General AI, Grandpa Help, Kelly Uniforms, and Motion to Dismiss.
+- The five new private repositories preserve their existing fail-closed local hooks; the optional portable-hook migration remains separately tracked in harness issue 17.
 - Docket has the only operational cloud data adapter.
-- Nineteen local data manifests remain template placeholders.
+- Seventeen local data manifests remain template placeholders.
 - The current full inventory is in [`PORTABILITY-INVENTORY.yaml`](https://github.com/douglaspmcgowan/general-ai/blob/master/PORTABILITY-INVENTORY.yaml); remediation groups and supporting evidence are in the [portability completion audit](https://github.com/douglaspmcgowan/general-ai/blob/master/research/cross-device-portability-completion-audit-2026-07-31.md).
 
 ## Second Brain and Headless boundary

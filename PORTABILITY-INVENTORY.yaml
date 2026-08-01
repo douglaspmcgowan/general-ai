@@ -5,7 +5,7 @@ automation_mode: advisory_only
 provenance:
   source_audit_url: 'https://github.com/douglaspmcgowan/general-ai/blob/master/research/cross-device-portability-completion-audit-2026-07-31.md'
   source_audit_merge_commit: '9fa51b6b0fdd3660f63799ec4eb156806322dc5a'
-  inventory_generated_from: 'local-audit-2026-07-31'
+  inventory_generated_from: 'local-audit-plus-reviewed-baselines-2026-07-31'
 receiving:
   root_variable: PROJECTS_ROOT
   source_path_policy: diagnostic_only_never_execute
@@ -23,7 +23,8 @@ scope:
   external_upstream_origin_count: 1
   shared_origin_exception_count: 4
   missing_origin_count: 1
-  github_agent_project_count: 18
+  github_agent_project_count: 20
+  topic_mapped_local_root_count: 21
   excluded_worktrees:
     - source_path: 'C:\Users\dougl\projects\agent-harness-harness-v3'
       reason: linked_worktree_of_agent_harness
@@ -33,7 +34,7 @@ vocabulary:
   contract_state: [full, partial, absent, unavailable, full_untracked, mixed_tracking]
   setup_state: [portable, host_bound, hardcoded_cloud_path, missing, placeholder]
   data_mode: [explicit_none, placeholder, cloud_object_store, regenerable_mixed, manual_external_assets]
-  adapter_status: [operational, missing, not_required]
+  adapter_status: [operational, declared_unpublished, missing, not_required]
   onboarding_action: [clone, skip, attention, exclude_fixture]
 
 projects:
@@ -103,16 +104,16 @@ projects:
   - id: bible-name-search
     source_local_path: 'C:\Users\dougl\projects\bible-name-search'
     checkout_directory: bible-name-search
-    onboarding_action: attention
-    remote: {state: configured, repository: 'douglaspmcgowan/bible-name-search', default_branch: null}
-    discovery: {agent_project_topic: present, canonical_transport: github_remote_pending_initial_baseline}
-    portability: {local_contract: full_untracked, remote_default_contract: unavailable, setup: host_bound}
-    secrets: {manifest: local_untracked, entry_count: 6, classification: active_and_needs_acquisition}
-    data: {manifest: local_untracked, mode: regenerable_mixed, adapter: null, adapter_status: missing}
-    status: private_remote_created_initial_baseline_blocked_on_hook_composition
+    onboarding_action: clone
+    remote: {state: configured, repository: 'douglaspmcgowan/bible-name-search', default_branch: master}
+    discovery: {agent_project_topic: present, canonical_transport: github_topic}
+    portability: {local_contract: full, remote_default_contract: full, setup: portable}
+    secrets: {manifest: remote_default, entry_count: 8, classification: value_safe_with_licensed_acquisition_pending}
+    data: {manifest: remote_default, mode: regenerable_mixed, adapter: 'Sync-DvcProjectData.ps1 + Sync-SqliteProjectData.ps1', adapter_status: declared_unpublished}
+    status: portable_baseline_data_generations_attention
     uncertainty:
-      - The private remote has no branch until the reviewed v3 migration is committed and pushed.
-      - Transport for licensed corpora and verified SQLite snapshots is unresolved.
+      - The shared adapters use a parent-root convention while the application currently treats PROJECT_DATA_ROOT as the project directory; initial DVC generations and verified SQLite snapshots remain unpublished.
+      - Licensed ESV and NLT acquisition remains required before either corpus can be restored.
 
   - id: boundaries-reader
     source_local_path: 'C:\Users\dougl\projects\boundaries-reader'
@@ -166,15 +167,14 @@ projects:
   - id: contact-form-caller
     source_local_path: 'C:\Users\dougl\projects\contact-form-caller'
     checkout_directory: contact-form-caller
-    onboarding_action: attention
-    remote: {state: configured, repository: 'douglaspmcgowan/contact-form-caller', default_branch: null}
-    discovery: {agent_project_topic: present, canonical_transport: github_remote_pending_initial_baseline}
-    portability: {local_contract: full_untracked, remote_default_contract: unavailable, setup: placeholder}
-    secrets: {manifest: local_untracked, entry_count: 5, classification: needs_classification}
-    data: {manifest: local_untracked, mode: placeholder, adapter: null, adapter_status: missing}
-    status: private_remote_created_initial_baseline_blocked_on_hook_composition
-    uncertainty:
-      - The private remote has no branch until the reviewed v3 migration is committed and pushed.
+    onboarding_action: clone
+    remote: {state: configured, repository: 'douglaspmcgowan/contact-form-caller', default_branch: master}
+    discovery: {agent_project_topic: present, canonical_transport: github_topic}
+    portability: {local_contract: full, remote_default_contract: full, setup: portable}
+    secrets: {manifest: remote_default, entry_count: 6, classification: classified_value_safe}
+    data: {manifest: remote_default, mode: explicit_none, adapter: null, adapter_status: not_required}
+    status: portable_baseline_project_data_not_required
+    uncertainty: []
 
   - id: docket
     source_local_path: 'C:\Users\dougl\projects\docket'
@@ -192,16 +192,15 @@ projects:
   - id: drive-organizer
     source_local_path: 'C:\Users\dougl\projects\drive-organizer'
     checkout_directory: drive-organizer
-    onboarding_action: attention
-    remote: {state: configured, repository: 'douglaspmcgowan/drive-organizer', default_branch: null}
-    discovery: {agent_project_topic: present, canonical_transport: github_remote_pending_initial_baseline}
-    portability: {local_contract: full_untracked, remote_default_contract: unavailable, setup: placeholder}
-    secrets: {manifest: local_untracked, entry_count: 1, classification: needs_classification}
-    data: {manifest: local_untracked, mode: placeholder, adapter: null, adapter_status: missing}
-    status: private_remote_created_initial_baseline_blocked_on_hook_composition
+    onboarding_action: clone
+    remote: {state: configured, repository: 'douglaspmcgowan/drive-organizer', default_branch: master}
+    discovery: {agent_project_topic: present, canonical_transport: github_topic}
+    portability: {local_contract: full, remote_default_contract: full, setup: portable}
+    secrets: {manifest: remote_default, entry_count: 1, classification: non_secret_configuration}
+    data: {manifest: remote_default, mode: placeholder, adapter: null, adapter_status: missing}
+    status: portable_baseline_runtime_input_transport_attention
     uncertainty:
-      - The private remote has no branch until the reviewed v3 migration is committed and pushed.
-      - Canonical transport for Drive review input is unresolved.
+      - Canonical transport for ignored Drive review inputs data.js and inventory.json remains undeclared.
 
   - id: fellowship-tracker
     source_local_path: 'C:\Users\dougl\projects\fellowship-tracker'
@@ -257,15 +256,14 @@ projects:
   - id: grandpa-help
     source_local_path: 'C:\Users\dougl\projects\grandpa-help'
     checkout_directory: grandpa-help
-    onboarding_action: attention
-    remote: {state: configured, repository: 'douglaspmcgowan/grandpa-help', default_branch: null}
-    discovery: {agent_project_topic: missing, canonical_transport: github_remote_pending_initial_baseline}
-    portability: {local_contract: full_untracked, remote_default_contract: unavailable, setup: placeholder}
-    secrets: {manifest: local_untracked, entry_count: 1, classification: needs_classification}
-    data: {manifest: local_untracked, mode: placeholder, adapter: null, adapter_status: missing}
-    status: private_remote_created_initial_baseline_blocked_on_hook_composition
+    onboarding_action: clone
+    remote: {state: configured, repository: 'douglaspmcgowan/grandpa-help', default_branch: master}
+    discovery: {agent_project_topic: present, canonical_transport: github_topic}
+    portability: {local_contract: full, remote_default_contract: full, setup: portable}
+    secrets: {manifest: remote_default, entry_count: 1, classification: needs_classification}
+    data: {manifest: remote_default, mode: placeholder, adapter: null, adapter_status: missing}
+    status: portable_baseline_secret_and_data_declaration_attention
     uncertainty:
-      - The private remote has no branch or topic until the reviewed v3 migration is committed and pushed.
       - The supporting record remains excluded from Git.
 
   - id: harness
@@ -359,16 +357,15 @@ projects:
   - id: motion-to-dismiss
     source_local_path: 'C:\Users\dougl\projects\motion-to-dismiss'
     checkout_directory: motion-to-dismiss
-    onboarding_action: attention
-    remote: {state: configured, repository: 'douglaspmcgowan/motion-to-dismiss', default_branch: null}
-    discovery: {agent_project_topic: missing, canonical_transport: github_remote_pending_initial_baseline}
-    portability: {local_contract: full_untracked, remote_default_contract: unavailable, setup: placeholder}
-    secrets: {manifest: local_untracked, entry_count: 1, classification: needs_classification}
-    data: {manifest: local_untracked, mode: placeholder, adapter: null, adapter_status: missing}
-    status: private_remote_created_initial_baseline_blocked_on_hook_composition
+    onboarding_action: clone
+    remote: {state: configured, repository: 'douglaspmcgowan/motion-to-dismiss', default_branch: master}
+    discovery: {agent_project_topic: present, canonical_transport: github_topic}
+    portability: {local_contract: full, remote_default_contract: full, setup: portable}
+    secrets: {manifest: remote_default, entry_count: 1, classification: needs_classification}
+    data: {manifest: remote_default, mode: placeholder, adapter: null, adapter_status: missing}
+    status: portable_baseline_legal_and_data_attention
     uncertainty:
-      - The private remote has no branch or topic until the reviewed v3 migration is committed and pushed.
-      - The motion and research records remain excluded from Git.
+      - The ignored motion and research records remain outside Git pending explicit privilege, privacy, and publication review.
 
   - id: redline-idetc
     source_local_path: 'C:\Users\dougl\projects\redline-idetc'

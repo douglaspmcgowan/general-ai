@@ -14,9 +14,12 @@
       "repository": "douglaspmcgowan/general-ai",
       "visibility": "public",
       "defaultBranch": "master",
+      "liveBranch": "master",
       "entrypoint": "CROSS-DEVICE-ACCESS.md",
-      "auditedCommit": "582daf5519812d46c0950c625887fb51de1f4661",
-      "portabilityInventory": "PORTABILITY-INVENTORY.yaml"
+      "inventoryAuthorityBranch": "master",
+      "sourceInventoryAuditCommit": "582daf5519812d46c0950c625887fb51de1f4661",
+      "portabilityInventory": "PORTABILITY-INVENTORY.yaml",
+      "receivingReceiptSchema": "handoffs/RECEIVING-DEVICE-RECEIPT.schema.json"
     },
     "agentBrain": {
       "repository": "douglaspmcgowan/obsidian-vault-mirror",
@@ -74,14 +77,15 @@
     "canonicalLocalRoots": 27,
     "withOrigin": 26,
     "withoutOrigin": 1,
-    "topicRepositories": 18,
-    "fullRemotePortableBaselines": 5,
+    "topicRepositories": 20,
+    "topicMappedLocalRoots": 21,
+    "cloneReadyFullRemotePortableBaselines": 10,
     "operationalCloudDataAdapters": 1,
-    "placeholderDataManifests": 19,
+    "placeholderDataManifests": 17,
     "inventory": "PORTABILITY-INVENTORY.yaml",
     "onboardingActions": {
-      "clone": 15,
-      "attention": 5,
+      "clone": 20,
+      "attention": 0,
       "skip": 6,
       "exclude_fixture": 1
     },
