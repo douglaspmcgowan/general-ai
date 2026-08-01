@@ -19,7 +19,30 @@ Use this page as the current phone, computer, and cloud-agent entrypoint for the
 11. [Docket](https://vault-review-mobile.vercel.app)
 12. [Private Obsidian vault mirror](https://github.com/douglaspmcgowan/obsidian-vault-mirror)
 
-GitHub authentication is required for the private harness and private vault mirror. Docket uses its existing authenticated access.
+GitHub authentication is required for the private harness and private vault mirror. Docket uses its existing authenticated access. Every public link above returns HTTP 200 anonymously; the private links return 404 until a GitHub session is signed in, and each of those paths was confirmed present on its default branch.
+
+## Provisioning and recovery — read these before running anything
+
+The ordered list above orients you. These are the files a receiving computer actually needs in order to provision itself, and they were previously reachable only by browsing the repository.
+
+1. [`START-HERE.md`](https://github.com/douglaspmcgowan/general-ai/blob/master/START-HERE.md) — this repository's own ordered read path, including the `gh auth status` step that must precede any harness clone.
+2. [`secret-manifest.md`](https://github.com/douglaspmcgowan/general-ai/blob/master/secret-manifest.md) and [`secret-manifest.json`](https://github.com/douglaspmcgowan/general-ai/blob/master/secret-manifest.json) — the value-free inventory of which runtime variables a new machine must provision. Names and purposes only; no values live in Git.
+3. [`recovery/`](https://github.com/douglaspmcgowan/general-ai/tree/master/recovery) — the restore and backup scripts, the value-free credential command policy, and `general-claude-history.bundle`, which preserves the committed `general-claude` history at `f8c1f39`.
+4. [`STATUS.md`](https://github.com/douglaspmcgowan/general-ai/blob/master/STATUS.md) and [`TASK.md`](https://github.com/douglaspmcgowan/general-ai/blob/master/TASK.md) — the durable capability state and the live blocker queue. This page paraphrases the blockers; those two files are the authority.
+5. [`MAP.md`](https://github.com/douglaspmcgowan/general-ai/blob/master/MAP.md) — the architecture, authority, and path map, including the integration failure-behavior table.
+6. [`MIGRATION.md`](https://github.com/douglaspmcgowan/general-ai/blob/master/MIGRATION.md) — the cutover ledger and preserved-data evidence.
+7. [`data-manifest.yaml`](https://github.com/douglaspmcgowan/general-ai/blob/master/data-manifest.yaml) and [`skills-manifest.json`](https://github.com/douglaspmcgowan/general-ai/blob/master/skills-manifest.json) — project data adapter policy and skill bindings.
+8. [`backlog/general-security/BITLOCKER-READINESS-BRIEF.md`](https://github.com/douglaspmcgowan/general-ai/blob/master/backlog/general-security/BITLOCKER-READINESS-BRIEF.md) — disk-encryption readiness for a receiving computer.
+
+`handoffs/patches/*.patch.zip` are superseded recovery evidence. Do not apply them. `START-HERE.md` carries the reason.
+
+## If GitHub access to the private repositories is unavailable
+
+The public half of this repository stands alone as coordination history. The executable harness does not. If a phone or a new computer cannot reach `pyrgos-ai/doug-harness`:
+
+1. Sign in to GitHub as `douglaspmcgowan` and confirm membership in the `pyrgos-ai` organization. That account holds push on the harness repository.
+2. If organization access itself is lost, the local canonical harness on the source computer at `C:\Users\dougl\.agents` remains the working authority, and `recovery/general-claude-history.bundle` plus the nightly agent backups preserve committed history offline.
+3. Do not attempt to reconstruct the harness from the coordination repository alone. It carries history and context rather than the installable harness.
 
 ## Current state
 
@@ -27,7 +50,7 @@ GitHub authentication is required for the private harness and private vault mirr
 - `douglaspmcgowan/general-ai` carries coordination, research, recovery context, and cross-device handoffs.
 - The active personal vault remains the human-authoring source and uses Obsidian Sync for desktop and phone.
 - The private `obsidian-vault-mirror` is the curated Agent Brain surface for cloud-agent context. Its portable contract permits agent-authored branches only under `proposals/` and `agent-notes/`; mirrored human notes remain read-only.
-- Docket is the phone review surface. The local store currently has 174 cards: 172 unresolved and 2 resolved.
+- Docket is the phone review surface. The local store currently has 175 cards; the most recent brokered publication pushed 173 and refused 0 unsafe or invalid local cards.
 - Bitwarden Secrets Manager uses the existing `Agents` organization, `Agent Runtime` project, and connected machine account. The one-time bootstrap variable name is `BITWARDEN_SECRETS_MANAGER_ACCESS_TOKEN`.
 - `C:\Users\dougl\My Drive\Project Data` remains the external transport for declared DVC objects, verified SQLite snapshots, and other project artifacts.
 - The OneDrive application is retired. Two preserved OneDrive-root Git worktrees still contain unique local work and remain protected until checkpointed or relocated.

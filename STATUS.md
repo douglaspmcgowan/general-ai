@@ -9,7 +9,7 @@
 - `C:\Users\dougl\My Drive\Project Data` remains the external artifact transport. DVC objects, verified SQLite snapshots, and other declared project assets use project-owned `data-manifest.yaml` adapters.
 - SQLite snapshot retention defaults to 2 daily, 2 weekly, and 1 monthly bucket. The newest verified snapshot always survives and the union retains at most five distinct snapshots; projects may override all three nonnegative counts.
 - Bitwarden Secrets Manager reuses the existing `Agents` organization, `Agent Runtime` project, `REVIEW_SECRET`, and connected machine account. The exact-command broker uses the machine token without putting credential values in Git.
-- Docket uses its Vercel Blob authority for phone-accessible cards. The local store currently contains 174 cards: 172 unresolved and 2 resolved.
+- Docket uses its Vercel Blob authority for phone-accessible cards. The local store currently contains 175 cards; the most recent brokered publication pushed 173 and refused 0 unsafe or invalid local cards.
 - GitHub topic `agent-project` is the repository-discovery authority. Repository source and value-safe configuration travel through Git; excluded runtime data travels only through declared project-data adapters.
 - The cloud-ready repository rollout is planning-only. The guide is on `pyrgos-ai/doug-harness` branch `codex/cloud-ready-repositories` at commit `4bbb2fd`, and implementation is tracked in [issue #16](https://github.com/pyrgos-ai/doug-harness/issues/16). No repository has earned cloud-ready status.
 - `recovery\general-claude-history.bundle` preserves the committed `general-claude` history at source commit `f8c1f39ed369d8694eb9f82c50f622883bf29a7e`.
@@ -20,6 +20,10 @@
 - The live Obsidian bundle has Web Viewer enabled and `html-page-viewer@0.1.1` installed. Harness `master` at `ae3899a` still carries the older bundle and lacks the pinned community-plugin installation path.
 - Harness `master` also lacks the exact two-path mutable-runtime verifier allowance and still runs prerequisite discovery after dependent Obsidian and Project Data stages. These three harness blockers remain with the active harness owner and gate the real receiving-computer proof.
 - [Harness issue 18](https://github.com/pyrgos-ai/doug-harness/issues/18) is the consolidated implementation and release owner for those receiving-device blockers and the final receipt.
+- General AI PR 10 merged at `84f1cf6`. `handoffs/RECEIVING-DEVICE-RECEIPT.schema.json` is the value-safe twelve-section receipt a receiving computer emits. It compiles as JSON Schema 2020-12, accepts a positive fixture, and rejects twelve negative fixtures including credential fields, over-cap or misplaced SQLite retention, duplicate or missing access surfaces, and an abbreviated harness commit.
+- A read-only audit confirmed all 15 access-index links resolve. The eight private links return 404 anonymously as an authentication gate over paths that verifiably exist on their default branches, and every public link returns HTTP 200 with no authentication. The Docket surface returns 200.
+- The access index now also links the provisioning and recovery set that a receiving computer needs directly: `START-HERE.md`, both secret manifests, `recovery/`, `STATUS.md`, `TASK.md`, `MAP.md`, `MIGRATION.md`, both project manifests, and the BitLocker readiness brief. It carries a fallback for the case where private-repository access is unavailable.
+- The vault brief `Claude/Engineer/START HERE - Cross-Device Harness.md` was rewritten with absolute URLs and a cross-device surfaces table so it works from a phone and outside this repository. Recoverable pre-change copies of both refreshed vault briefs are under `Claude/Engineer/_backups/`.
 
 ## Remaining boundaries
 
