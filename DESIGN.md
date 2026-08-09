@@ -40,6 +40,8 @@ beige-brass-espresso "premium consumer" palette is the same tell; rotate off it.
 - Cover relevant default, hover, focus, active, disabled, loading, empty, error, and success states.
 - Use semantic structure and native controls, visible keyboard focus, logical tab order, accessible names, sufficient contrast, and non-color state cues.
 - Support narrow, medium, and wide layouts, zoom, text resizing, touch targets, and reduced motion.
+- A design skill's silence on accessibility is not an exemption. Seven of the sixteen design-adjacent skill packages carry no accessibility content at all, so the two bullets above are the floor whichever skill is driving.
+- A visual world is chosen, not accumulated. Template packs, style presets, and named aesthetics contradict each other by construction — `retro-windows` bans every rounded corner where `capsule` requires a 9999px radius. Commit to one, take its taste entire, and treat the others as unread. The rules here apply to all of them.
 - Inspect the existing design system, screenshots, and implementation before proposing a new rule or component.
 - Verify browser-visible work with browser or end-to-end tests across responsive, keyboard, loading, empty, and error behavior.
 
@@ -53,7 +55,9 @@ Concrete things to reach for — animation packages and working skeletons, icon 
 - **Type** `~/.agents/design/type/families.md`
 - **Design systems** `~/.agents/design/systems/install.md` and `sources.md`
 - **Design languages** `~/.agents/design/languages/registry.md` — read it before committing a visual world or generating a new design language, and register the world committed for this project there in the same work unit
-- **Surface craft** `~/.agents/design/craft/` — `high-end.md` (surface construction), `from-reference.md` (building faithfully from a reference image), `device-mockups.md`
+- **Surface craft** `~/.agents/design/craft/` — `high-end.md` (surface construction), `from-reference.md` (building faithfully from a reference image), `from-code.md` (reading a design system out of a live product's own CSS), `device-mockups.md`
+- **Fundamentals** `~/.agents/design/fundamentals.md` — the arithmetic under a decision: palette construction (60-30-10, one accent, warm neutrals, the colourblind-safe sets and the grayscale test), type-scale ratios with a worked scale and measure, and grid selection. Read it when the palette or scale is not already decided
+- **Slides and posters** `~/.agents/design/slides-and-posters.md` — the only leaf addressing a non-web medium: deck frameworks, PowerPoint craft, HTML deck frameworks, and the academic poster including A0 sizing and the ≥24pt body floor
 - **Pre-ship matrix** `~/.agents/design/preflight.md` — the mechanical finish check for landing, marketing and portfolio surfaces; not dashboards, not product UI
 - **Dashboards and data-dense product UI** — this tree does not own them yet, and the gap is easy to miss because everything above *sounds* general. The pre-ship matrix disclaims them in its own scope line, and the universal rules below contain no rule about chart form, tile hierarchy, table craft or metric emphasis. The nearest real guidance is the ten-dimension rubric inside the `/design-review` command — tile prominence, one-accent discipline, elevation over borders, chart form matched to the data's meaning, tables built as tools — which is written to critique a running app rather than to generate one. A blind probe on 2026-08-08 reached it only by grepping the word "dashboard", and reported it would otherwise have "proceeded confidently and wrongly". Read it before designing a dashboard, and treat the rest of this section as not yet covering you
 
