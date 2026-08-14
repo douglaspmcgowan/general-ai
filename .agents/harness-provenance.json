@@ -4,7 +4,7 @@
   "files": [
     {
       "path": "AGENTS.md",
-      "sha256": "bb331bff1a1a2ba0d498c78f4415256e31a76908a573ee04af27781c8a5100cf"
+      "sha256": "b35f26d63ffca2d00ddee6df61b510c231c63e6bf1f97d18415adfba1f17bea7"
     },
     {
       "path": "CLAUDE.md",
@@ -16,7 +16,7 @@
     },
     {
       "path": "DESIGN.md",
-      "sha256": "6f70cf330750401484bcbb820b15f7dbae75b0bdcbb5531a8cd070b2365abd26"
+      "sha256": "4387362eaaa853bf693911ec2a3524d6d5f32430576adc9e7b418c4b12f5560e"
     },
     {
       "path": "MAP.md",
@@ -28,7 +28,7 @@
     },
     {
       "path": "skills-manifest.json",
-      "sha256": "39ccd78c0494d3c8dcc80e701084ca2d2ee76ae50559d08bdc6d1160319ed308"
+      "sha256": "a510263442988f009d164f78b9842e2b5df0de8cf71ef37dabbc4b030860ccba"
     },
     {
       "path": "data-manifest.yaml",

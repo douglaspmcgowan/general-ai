@@ -79,9 +79,8 @@
     {
       "capability": "parallel-work",
       "canonical": [
-        "parallelize"
+        "dispatching-parallel-agents"
       ],
-      "baselineOverride": "Binds the first-party parallelize decomposition skill rather than the baseline dispatching-parallel-agents. Both skills exist canonically. Recorded 2026-08-08 to describe the binding that was already here; it has not been confirmed as a deliberate choice, so revert it to the baseline if it was not.",
       "delivery": "vendored"
     },
     {
