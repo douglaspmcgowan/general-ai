@@ -21,7 +21,9 @@ Finish repository-first cross-device reconstruction from the canonical harness a
 
 ## Needs decision
 
-- None. Future cloud implementation, Agent Brain automation, and preserved OneDrive data retirement remain parked in `BACKBURNER.md`.
+None.
+
+Future cloud implementation, Agent Brain automation, and preserved OneDrive data retirement remain parked in `BACKBURNER.md`.
 
 ## Constraints
 
@@ -44,6 +46,7 @@ Finish repository-first cross-device reconstruction from the canonical harness a
 - [x] C4 — Publish the phone-safe access index and pickup context through General AI PR 3 at `9fa51b6`.
 - [x] C5 — Publish the portable Agent Brain contract through private mirror PR 2 at `337d615`.
 - [x] C6 — Publish the 27-root portability inventory through General AI PR 4 at `340a05f`.
+- [x] Q1 — Answer whether an Antigravity agent or a Cursor agent can operate a browser, natively or through Playwright | evidence: Google Antigravity ships a browser subagent that clicks, scrolls, types, reads console logs, and captures DOM, screenshots, markdown, and video, driven over the Chrome DevTools Protocol without an extension in Antigravity 2.0 (<https://antigravity.google/docs/browser-subagent>), and Google publishes an AGY CLI UI-testing codelab combining it with Playwright (<https://codelabs.developers.google.com/agentic-ui-automation-with-antigravity>); Cursor ships an official Browser tool over CDP exposed to the agent as MCP tools, which stops at logins and long-running tasks (<https://cursor.com/docs/agent/tools/browser>); any agent CLI with shell access can also drive Playwright directly or through the Playwright MCP server (<https://github.com/microsoft/playwright-mcp>), which the harness `playwright-setup` skill installs and audits | owner: isolated General AI branch | class: MAIN.
 
 ## Verification
 
