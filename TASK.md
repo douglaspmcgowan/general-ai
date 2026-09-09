@@ -21,8 +21,8 @@ Finish repository-first cross-device reconstruction from the canonical harness a
 
 ## Needs decision
 
-- D1 resolved 2026-09-09 - Douglas: `Clients` has no repeat cadence. It stays a one-off due 2026-08-28; no Todoist change needed.
-- Future cloud implementation, Agent Brain automation, and preserved OneDrive data retirement remain parked in `BACKBURNER.md`.
+Nothing is awaiting a decision. Future cloud implementation, Agent Brain automation, and preserved
+OneDrive data retirement stay parked in `BACKBURNER.md`; resolved decisions are recorded in `LOG.md`.
 
 ## Constraints
 
