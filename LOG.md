@@ -53,3 +53,10 @@
 2026-07-31 | Expanded the access index to also link the provisioning and recovery set (`START-HERE.md`, both secret manifests, `recovery/`, `STATUS.md`, `TASK.md`, `MAP.md`, `MIGRATION.md`, both project manifests, and the BitLocker readiness brief) with a fallback for unavailable private-repository access.
 2026-07-31 | Rewrote the vault brief `Claude/Engineer/START HERE - Cross-Device Harness.md` with absolute URLs and a cross-device surfaces table, and preserved recoverable pre-change copies of both refreshed vault briefs under `Claude/Engineer/_backups/`.
 2026-07-31 | Docket's most recent brokered publication pushed 173 of 175 local cards, refusing 0 unsafe or invalid cards.
+
+## 2026-09-09 — Microsoft To Do → Todoist migration
+
+- Extracted 146 frames (2 fps) from `Videos/Recording 2026-09-08 232926.mp4` and read them across four parallel scouts to recover per-task repeat cadences and reminders not present in the pasted list.
+- Imported 91 top-level tasks + 19 subtasks into Todoist project "Open Tasks" (`6ghjmXMH4vrfmxg4`) via `api.todoist.com/api/v1`; 4 completed client subtasks closed. Verified: 122 open tasks in project, 75 recurring, 0 missing, 0 failures.
+- Installed Todoist desktop 9.30.0 (`winget Doist.Todoist`).
+- Open: "Clients" showed a repeat glyph in To Do but its cadence was never visible in the recording; imported as a one-off due 2026-08-28. Needs Douglas's cadence.
