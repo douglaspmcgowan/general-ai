@@ -60,3 +60,6 @@
 - Imported 91 top-level tasks + 19 subtasks into Todoist project "Open Tasks" (`6ghjmXMH4vrfmxg4`) via `api.todoist.com/api/v1`; 4 completed client subtasks closed. Verified: 122 open tasks in project, 75 recurring, 0 missing, 0 failures.
 - Installed Todoist desktop 9.30.0 (`winget Doist.Todoist`).
 - Open: "Clients" showed a repeat glyph in To Do but its cadence was never visible in the recording; imported as a one-off due 2026-08-28. Needs Douglas's cadence.
+- 2026-09-09 — Correction from Douglas: `Open Tasks` holds only undated tasks. Moved the 91 dated top-level imports (subtasks followed) from `Open Tasks` to Inbox via `POST /api/v1/tasks/{id}/move`; audit after: Inbox 91 dated, Open Tasks 15 undated / 0 dated. Pre-existing dated tasks left untouched per his direction.
+- 2026-09-09 — Douglas: `Clients` has no repeat cadence; left as a one-off. D1 closed.
+- 2026-09-09 — Authored `.agents/references/todoist.md` in the harness and repaired `Test-ToolReferences.test.ps1` (unassigned `$map` threw under StrictMode, so no reference file was verifiable). PR: pyrgos-ai/doug-harness#635.

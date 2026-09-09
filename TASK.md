@@ -21,7 +21,7 @@ Finish repository-first cross-device reconstruction from the canonical harness a
 
 ## Needs decision
 
-- [!] D1 - Repeat cadence for the Todoist `Clients` task | waiting on: @Douglas | The Microsoft To Do row showed a repeat glyph but its detail pane was never opened in `Videos/Recording 2026-09-08 232926.mp4`, so the interval is unrecoverable from the recording. Imported as a one-off due 2026-08-28 in Todoist project `Open Tasks` (`6ghjmXMH4vrfmxg4`); set `due_string` once he names the interval.
+- D1 resolved 2026-09-09 - Douglas: `Clients` has no repeat cadence. It stays a one-off due 2026-08-28; no Todoist change needed.
 - Future cloud implementation, Agent Brain automation, and preserved OneDrive data retirement remain parked in `BACKBURNER.md`.
 
 ## Constraints
