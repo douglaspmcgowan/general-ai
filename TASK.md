@@ -10,18 +10,20 @@ Finish repository-first cross-device reconstruction from the canonical harness a
 
 ## Queue
 
-- [ ] T4 — Prove the merged onboarding flow on the receiving computer | after: B1, B2, B4 | implementation owner: [harness issue 18](https://github.com/pyrgos-ai/doug-harness/issues/18) | evidence: a receipt tied to the merged harness commit proves install/stamp, approved Obsidian bundle, PATH/executables, GitHub discovery, declared project verifiers/adapters, Bitwarden token import/read-back, and current General AI, Agent Brain, and Docket access | owner: receiving computer | class: SEQUENTIAL.
+- None — every remaining item is blocked; see below.
 
 ## Blocked
 
 - [!] B1 — Publish the current approved Obsidian bundle in canonical harness onboarding | owner: active harness owner | evidence required: `webviewer=true`, pinned `html-page-viewer@0.1.1` package/checksums, receiving-side backup and restore fixture, refreshed manifests, reviewed merge, and merged-master install.
+- [!] T4 — Prove the merged onboarding flow on the receiving computer | blocked on: B1, B2 and B4, all three owned by the active harness owner and all three still open | owner: receiving computer | implementation owner: [harness issue 18](https://github.com/pyrgos-ai/doug-harness/issues/18) | evidence required: a receipt tied to the merged harness commit proves install/stamp, approved Obsidian bundle, PATH/executables, GitHub discovery, declared project verifiers/adapters, Bitwarden token import/read-back, and current General AI, Agent Brain, and Docket access | class: SEQUENTIAL.
+  Moved out of the queue 2026-09-20. It was never actionable from this machine: its own owner is another computer and every dependency is blocked, so `continue-dispatch` counted it as actionable work each turn and re-armed on an item no session here can start. The defect in that counting is filed separately; this line records the honest state rather than working around the hook.
 - [!] B2 — Publish the exact mutable-runtime verifier repair | owner: active harness owner | evidence required: harness `master` accepts only `logs/stale-agent-process-cleanup.jsonl` and `state/permissions-snapshot.json`, rejects undeclared siblings, and passes focused plus installed verification.
 - [!] B3 — Restore the consolidated task-state hook suite to green | owner: active harness owner | current evidence: `Test-AgentProjectState.test.ps1` passes; `task-state-reminder.test.js` passes 51 and fails 6 chain/PROMPT_LOG cases.
 - [!] B4 — Move prerequisite discovery ahead of Obsidian and Project Data mutation | owner: active harness owner | evidence required: blank-profile onboarding returns a complete `ATTENTION` inventory before either dependent stage can fail, and a blank-profile regression passes.
 
 ## Needs decision
 
-- None. Future cloud implementation, Agent Brain automation, and preserved OneDrive data retirement remain parked in `BACKBURNER.md`.
+- None | owner: none — nothing is awaiting a decision. Future cloud implementation, Agent Brain automation, and preserved OneDrive data retirement remain parked in `BACKBURNER.md`.
 
 ## Constraints
 
