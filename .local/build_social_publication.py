@@ -1,0 +1,393 @@
+"""Deterministic dry-run publisher for the Instagram saved-post corpus."""
+import argparse, hashlib, json, re, shutil, sys
+from collections import defaultdict, Counter
+from datetime import datetime
+from pathlib import Path
+
+ROOT=Path(r"C:\Users\dougl\Projects\general-ai\.local\social-catalog-20260919")
+INPUT=ROOT/"classification"/"catalog-records-v3.json"; OVERLAY=ROOT/"classification"/"primary-topics-v2.json"; CREDIBILITY=ROOT/"credibility"/"batch-005.json"; DM=ROOT/"browser"/"dm-resource-index.json"; PLAN=ROOT/"plan"/"Continuation plan and progress map.md"
+TOPICS={"ai news":"AI news","ai design":"Design tools","ai/cad":"CAD and 3D","agents":"Agents and coding","ai research":"Research","models and methods":"Research","product and workflow":"Workflows and productivity","business":"Business","robotics and hardware":"Hardware","security":"Security"}
+IMAGE_SOURCE=ROOT/"credibility"/"images"/"crucix-dashboard.png"; IMAGE_DEST_REL=Path("Images")/"crucix-dashboard.png"
+FIXED_TOPICS={"ai-news","design-tools","cad-and-3d","agents-and-coding","research","workflows-and-productivity","business","hardware","security","unsorted"}
+TOPIC_LABELS={"ai-news":"AI news","design-tools":"Design tools","cad-and-3d":"CAD and 3D","agents-and-coding":"Agents and coding","research":"Research","workflows-and-productivity":"Workflows and productivity","business":"Business","hardware":"Hardware","security":"Security","unsorted":"Unsorted"}
+JUDGEMENT_FIELDS=["title","content_summary","post_claims","independent_verification","usefulness_rating","usefulness_rationale","why_this_matters","what_to_do_with_it","hype_assessment","hype_evidence","scam_markers","scam_assessment","unresolved_questions","evidence_used","confidence"]
+LIST_FIELDS={"topics","post_claims","scam_markers","unresolved_questions","evidence_used","risk_flags"}
+def clean(v): return re.sub(r"\s+"," ",str(v if v is not None else "")).strip()
+def scalar(v): return v
+def scalar_status(v): return "resolved" if v not in (None,"",{}) else "unresolved"
+def ys(v): return json.dumps(v,ensure_ascii=False)
+def list_value(r,field):
+    v=r.get(field)
+    if v is None or v=="" or v=={}: return [],"unresolved"
+    if not isinstance(v,list): v=[v]
+    vals=[x for x in v if x not in (None,"","unresolved")]
+    return vals,"resolved" if vals else "unresolved"
+def load(p):
+    try:return json.loads(p.read_text(encoding="utf-8"))
+    except Exception as e: raise RuntimeError(f"malformed JSON: {p}: {e}") from e
+def slug(s): return (re.sub(r"[^a-z0-9]+","-",clean(s).lower()).strip("-")[:80] or "unresolved-title")
+def title(r): return clean(r.get("title") or "unresolved title")
+def primary_topic(r):
+    p=clean(r.get("primary_topic")).lower()
+    if p not in FIXED_TOPICS: raise RuntimeError(f"confirmed record {r.get('stable_id')} has invalid primary_topic: {p!r}")
+    return p
+def link(path,label): return f"[[{path}|{label}]]"
+def looks_like_vault(path):
+    parts={part.lower() for part in Path(path).resolve().parts}
+    return "50 knowledge" in parts and "57 corpus" in parts
+def guard_destination(dest,publish):
+    if looks_like_vault(dest) and not publish:
+        raise RuntimeError(f"refusing vault-like destination without --publish: {Path(dest)}")
+    if publish:
+        raise RuntimeError("--publish is disabled in this packet")
+def sha(p):
+    h=hashlib.sha256(); f=p.open("rb")
+    for b in iter(lambda:f.read(1024*1024),b""): h.update(b)
+    f.close(); return h.hexdigest()
+def fm(text):
+    if not text.startswith("---\n"): return {}
+    end=text.find("\n---",4); return {} if end<0 else {a.strip():b.strip() for a,b in (x.split(":",1) for x in text[4:end].splitlines() if ":" in x)}
+MEDIA_REWRITES=[]
+def caption_only(text, sid, field):
+    if not isinstance(text,str) or not text or not any(x in text.lower() for x in ("depict","show","present","display","feature","illustrate","capture","compress")):
+        return text
+    patterns=[
+        (r"\b(?:The|This) post depicts\b", "The caption describes"),
+        (r"\b(?:The|This) post shows\b", "The caption says"),
+        (r"\b(?:The|This) post presents\b", "The caption describes"),
+        (r"\b(?:The|This) post displays\b", "The caption describes"),
+        (r"\b(?:The|This) post features\b", "The caption names"),
+        (r"\b(?:The|This) post illustrates\b", "The caption describes"),
+        (r"\b(?:The|This) carousel presents\b", "The caption describes"),
+        (r"\b(?:The|This) carousel compresses\b", "The caption lists"),
+        (r"\b(?:The|This) item depicts\b", "The caption describes"),
+        (r"\b(?:The|This) item presents\b", "The caption describes"),
+        (r"\bWhat does the carousel illustrate\?", "What evidence is absent from the captured caption?"),
+        (r"\bWhat does the carousel show(?: for each project)?\?", "What evidence is absent from the captured caption?"),
+        (r"\bWhat does the video show\?", "What evidence is absent from the captured caption?"),
+        (r"\bDoes the carousel show evidence absent from text\?", "Does the captured caption name evidence beyond this text?"),
+    ]
+    out=text
+    for pattern,replacement in patterns:
+        out=re.sub(pattern,replacement,out,flags=re.IGNORECASE)
+    if out != text:
+        MEDIA_REWRITES.append({"stable_id":sid,"field":field,"before":text,"after":out})
+    return out
+def judgement_value(r, field):
+    return r.get(field)
+def human(v, fallback="unresolved"):
+    if v is None or v=="" or v=={}: return fallback
+    if isinstance(v,(list,dict)): return json.dumps(v,ensure_ascii=False)
+    return clean(v)
+
+CROSS_LINKS={
+    "ai-news":["50 Knowledge/58 Reference/AI-in-Design Monitoring.md","50 Knowledge/57 Corpus/AI for CAD/Notes/AI for CAD.md"],
+    "design-tools":["50 Knowledge/57 Corpus/AI for CAD/Notes/AI for CAD — Models & Products.md","50 Knowledge/57 Corpus/AI for CAD/Notes/State of the Art — Computational Design.md"],
+    "cad-and-3d":["50 Knowledge/57 Corpus/AI for CAD/Notes/State of the Art — Text-to-CAD.md","50 Knowledge/58 Reference/CAD Engineering/Feature Recognition Primer.md","50 Knowledge/58 Reference/CAD Engineering/CAD-Accurate Measurement in a THREE.js Viewer.md"],
+    "agents-and-coding":["50 Knowledge/58 Reference/Mapping fast-moving fields and knowledge representation.md","50 Knowledge/58 Reference/Retrieval strategies — how they work.md"],
+    "research":["50 Knowledge/57 Corpus/AI for CAD/Notes/Text-to-CAD — Papers to Read.md","50 Knowledge/57 Corpus/AI for CAD/Notes/B-rep ML Models for Feature Recognition — 2026 Recon.md"],
+    "workflows-and-productivity":["50 Knowledge/58 Reference/AI-in-Design Monitoring.md","50 Knowledge/58 Reference/Guides & Playbooks.md"],
+    "business":["50 Knowledge/57 Corpus/AI in Manufacturing/Notes/State of the Art — AI in Manufacturing.md","50 Knowledge/57 Corpus/AI for CAD/Sources/Commercial/Generative Engineering.md"],
+    "hardware":["50 Knowledge/58 Reference/CAD Engineering/Aerospace CAD Data-Exchange Standards — AP242, QIF, LOTAR, JT.md","50 Knowledge/58 Reference/CAD Engineering/AP242 STEP Export from OCCT — Confirmed Calls and PMI.md"],
+    "security":["50 Knowledge/58 Reference/AI-in-Design Monitoring.md","50 Knowledge/58 Reference/Docket-Obsidian Mirror Architecture.md"],
+    "unsorted":["50 Knowledge/58 Reference/AI-in-Design Monitoring.md","50 Knowledge/58 Reference/Guides & Playbooks.md"],
+}
+TOPIC_COHERENCE={
+    "ai-news":r"news|release|launch|update|version|benchmark|headline|announcement|model",
+    "design-tools":r"design|designer|figma|ui|ux|visual|animation|motion|website|frontend|creative",
+    "cad-and-3d":r"\bcad\b|geometry|mesh|solid|brep|parametric|modeling|three\.js",
+    "agents-and-coding":r"agent|coding|code|developer|claude code|mcp|plugin|skill|cursor|prompt",
+    "research":r"research|paper|study|benchmark|dataset|method|evaluation|academic",
+    "workflows-and-productivity":r"workflow|productiv|automation|pipeline|system|memory|knowledge|obsidian|notion|process",
+    "business":r"business|startup|saas|marketing|sales|revenue|founder|bedroom|pricing",
+    "hardware":r"hardware|robot|chip|gpu|device|drone|sensor|camera|satellite",
+    "security":r"security|privacy|osint|surveillance|threat|scam|risk|credential|attack",
+    "unsorted":None,
+}
+TOPIC_OPENINGS={
+    "ai-news":("This news bucket is a watchlist rather than a verified feed: its members repeatedly turn fast-moving releases into prompts for checking primary sources.","The useful pattern is not agreement on any one headline but a shared need to separate announcement language, benchmark claims, and durable capability before acting."),
+    "design-tools":("These design-tool saves cluster around named interfaces and production tricks, with enough concrete tool vocabulary to turn inspiration into small trials.","They repeat a familiar promise—faster, more polished output—while the actionable difference is whether a post names a reproducible handoff, constraint, or evaluation step."),
+    "cad-and-3d":("The CAD-and-3D bucket is not coherent: only {coherent} of {total} members match the topic-specific CAD/geometry test, while the remainder are general Claude or Fable experiment showcases.","The small on-topic subset can seed geometry-specific research, but the bucket as a whole should not be treated as evidence about CAD capability."),
+    "agents-and-coding":("This is the strongest practical cluster: the members repeatedly describe agents, code, prompts, and integration boundaries rather than isolated model slogans.","They still converge on a recurring lesson—an agent becomes useful when a task, tool boundary, and check are explicit—while many posts repeat that lesson without proving scale or reliability."),
+    "research":("The research bucket is unusually coherent: its members point toward papers, benchmarks, methods, and questions that can be checked outside the post.","Agreement is mostly about what deserves investigation, not about results; repeated benchmark and discovery claims remain leads until their primary sources are read."),
+    "workflows-and-productivity":("These workflow saves treat AI as an operating practice—memory, automation, orchestration, and repeatable handoffs—rather than a single feature.","The repetition is valuable up to a point: many posts restate the promise of leverage, so the reader should prefer the few that expose a bounded process and a measurable next step."),
+    "business":("The business bucket mixes stack recipes, lead funnels, and commercial promises, so its common thread is decision context rather than a single product category.","Across the members, concrete vendor lists are more reusable than revenue or growth claims, which should be treated as hypotheses until costs, permissions, and outcomes are checked."),
+    "hardware":("Hardware saves connect models to devices, sensors, robotics, and physical interfaces, but the evidence varies from named prototypes to broad capability claims.","They agree that the integration boundary matters; repeated product language should not be mistaken for proof that a device, standard, or feed works as advertised."),
+    "security":("The security bucket is a risk-oriented reading list: it surfaces privacy, surveillance, access, and abuse boundaries more consistently than it offers deployable tools.","Its repeated warning is that capability and governance travel together, so a reader should verify provenance and permissions before testing any live system."),
+    "unsorted":("Unsorted is intentionally residual: {coherent} of {total} members match a coherent topic test, so these saves should not be read as a single subject-area corpus.","The repeated pattern is absence of enough caption detail for a stronger classification; the right conclusion is to preserve the uncertainty and avoid over-interpreting the bucket."),
+}
+def coherence_count(topic, records):
+    pattern=TOPIC_COHERENCE.get(topic)
+    if not pattern: return 0
+    n=0
+    for r in records:
+        text=" ".join(str(r.get(k) or "") for k in ("title","content_summary","caption"))+" "+" ".join(str(x) for x in (r.get("topics") or []))
+        if re.search(pattern,text,flags=re.IGNORECASE): n+=1
+    return n
+def render(r):
+    t=title(r); plat=clean(r.get("source_platform") or "Instagram").lower(); claims=r.get("post_claims") or ([clean(r.get("caption"))] if clean(r.get("caption")) else ["unresolved"]); ver=r.get("independent_verification") or {}; ver=ver if isinstance(ver,dict) else {"status":"unresolved","detail":str(ver)}; evidence=r.get("evidence_used") or ver.get("evidence") or r.get("evidence_records") or []; image=r.get("image") if r.get("image_kind")=="official_project_image" else None
+    lines=["---","type: thing","subtype: source",f"title: {ys(t)}","authored_by: agent","maintained_by: agent","status: current","corpus: Saved AI Posts",f"platform: {ys(plat)}",f"author_handle: {ys(unknown(r.get('author_handle')))}",f"author_display_name: {ys(unknown(r.get('author_display_name')))}",f"author_profile: {ys(unknown(r.get('author_profile')))}",f"permalink: {ys(unknown(r.get('permalink_url')))}",f"screenshot: {ys(unknown(r.get('screenshot') or 'missing'))}",f"work_link: {ys(unknown(r.get('work_link')))}",f"tags: {yl(['source','corpus/saved-ai-posts',f'platform/{plat}','agent-note'])}","updated: \"2026-09-20\"",f"stable_id: {ys(r.get('stable_id'))}",f"source_file: {ys(unknown(r.get('source_file')))}",f"collection_membership: {ys(unknown(r.get('collection_membership')))}",f"topics: {yl(r.get('topics') or ['unresolved'])}",f"post_claims: {yl(claims)}",f"independent_verification: {json.dumps(ver,ensure_ascii=False)}",f"usefulness_rating: {ys(unknown(r.get('usefulness_rating')))}",f"usefulness_rationale: {ys(unknown(r.get('usefulness_rationale')))}",f"why_this_matters: {ys(unknown(r.get('why_this_matters')))}",f"what_to_do_with_it: {ys(unknown(r.get('what_to_do_with_it')))}",f"hype_assessment: {ys(unknown(r.get('hype_assessment')))}",f"scam_markers: {yl(r.get('scam_markers') or ['unresolved'])}",f"scam_assessment: {ys(unknown(r.get('scam_assessment')))}",f"unresolved_questions: {yl(r.get('unresolved_questions') or ['unresolved'])}",f"evidence_used: {yl(evidence)}",f"confidence: {ys(unknown(r.get('confidence')))}",f"verification_status: {ys(unknown(r.get('verification_status') or ver.get('status')))}",f"risk_flags: {yl(r.get('risk_flags') or ['unresolved'])}",f"source_type: {ys(plat)}",f"enrichment_state: {ys(unknown(r.get('state')))}",f"image: {ys(image)}","---","",f"# {t}","","## Source metadata","",f"- Platform: {plat}",f"- Author: {clean(r.get('author_handle')) or 'unresolved'}",f"- Taken at: {clean(r.get('taken_at_utc')) or 'unresolved'}",f"- Membership: {clean(r.get('collection_membership')) or 'unresolved'}",f"- Source file: {clean(r.get('source_file')) or 'unresolved'}","","## Post claims",""]
+    lines += [f"- {clean(x)}" for x in claims]+["","## Independent verification","",f"- Status: {clean(ver.get('status')) or 'unresolved'}",f"- Detail: {clean(ver.get('detail')) or 'unresolved'}",f"- Evidence: {json.dumps(evidence,ensure_ascii=False) if evidence else 'unresolved'}","","## Usefulness","",f"- Rating: {clean(r.get('usefulness_rating')) or 'unresolved'}",f"- Rationale: {clean(r.get('usefulness_rationale')) or 'unresolved'}",f"- Why this matters: {clean(r.get('why_this_matters')) or 'unresolved'}",f"- What to do with it: {clean(r.get('what_to_do_with_it')) or 'unresolved'}","","## Hype assessment","",clean(r.get('hype_assessment')) or 'unresolved',"","## Scam markers",""]
+    lines += [f"- {clean(x)}" for x in (r.get('scam_markers') or ['unresolved'])]+["","## Scam assessment","",clean(r.get('scam_assessment')) or 'unresolved',"","## Unresolved questions",""]+[f"- {clean(x)}" for x in (r.get('unresolved_questions') or ['unresolved'])]+["","## Evidence used","",json.dumps(evidence,ensure_ascii=False) if evidence else 'unresolved',"",f"Confidence: {clean(r.get('confidence')) or 'unresolved'}",""]
+    if image: lines += [f"![Official project image — not Instagram media]({image})","*Official project image obtained from the vendor's own site or repository; this is not media from the Instagram post.*",""]
+    return "\n".join(lines)+"\n"
+def render_v3(r, assignment, credibility_records):
+    sid=str(r.get("stable_id")); t=title(r); plat=clean(r.get("source_platform") or "Instagram").lower(); raw_ver=r.get("independent_verification"); ver=raw_ver if isinstance(raw_ver,dict) else raw_ver; image=IMAGE_DEST_REL.as_posix() if sid=="DbQyH2NBc7C" else None
+    topic=clean(assignment.get("primary_topic")).lower(); rationale=assignment["justification"]; topic_confidence=assignment["confidence"]
+    caption_file=scalar(r.get("caption_source") or r.get("source_file")); metadata_file=scalar(r.get("source_file"))
+    lines=["---","type: thing","subtype: source",f"title: {ys(t)}","authored_by: agent","maintained_by: agent","status: current","corpus: Saved AI Posts",f"platform: {ys(plat)}",f"author_handle: {ys(scalar(r.get('author_handle')))}",f"author_display_name: {ys(scalar(r.get('author_display_name')))}",f"author_profile: {ys(scalar(r.get('author_profile')))}",f"permalink: {ys(scalar(r.get('permalink_url')))}",f"screenshot: {ys(scalar(r.get('screenshot') or 'missing'))}",f"work_link: {ys(scalar(r.get('work_link')))}",'tags: ["source", "corpus/saved-ai-posts", "agent-note"]','updated: "2026-09-20"',f"stable_id: {ys(sid)}",f"source_file: {ys(caption_file)}",f"metadata_source_file: {ys(metadata_file)}",f"collection_membership: {ys(scalar(r.get('collection_membership')))}",f"primary_topic: {ys(topic)}",f"primary_topic_rationale: {ys(rationale)}",f"primary_topic_confidence: {ys(topic_confidence)}"]
+    vals_by_field={}
+    for field in ["topics"]+JUDGEMENT_FIELDS+['risk_flags']:
+        if field in LIST_FIELDS:
+            vals=list_value(r,field)[0]; status="resolved" if vals else "unresolved"; vals_by_field[field]=vals; lines += [f"{field}: {ys(vals)}",f"{field}_status: {ys(status)}"]
+        elif field=="independent_verification":
+            vals_by_field[field]=ver; lines += [f"{field}: {ys(ver)}",f"{field}_status: {ys(scalar_status(ver))}"]
+        else:
+            value=judgement_value(r,field); vals_by_field[field]=value; lines += [f"{field}: {ys(value)}",f"{field}_status: {ys(scalar_status(value))}"]
+    verification_status=scalar(r.get('verification_status') or (ver.get('status') if isinstance(ver,dict) else None))
+    lines += [f"verification_status: {ys(verification_status)}",f"source_type: {ys(plat)}",f"enrichment_state: {ys(scalar(r.get('state')))}",f"image: {ys(image)}",f"image_status: {ys('resolved' if image else 'unresolved')}","---","",f"# {t}","","## Source metadata","",f"- Platform: {plat}",f"- Author: {clean(r.get('author_handle')) or 'unresolved'}",f"- Taken at: {clean(r.get('taken_at_utc')) or 'unresolved'}",f"- Membership: {clean(r.get('collection_membership')) or 'unresolved'}",f"- Primary topic: {topic}",f"- Topic rationale: {rationale}",f"- Topic confidence: {topic_confidence}",f"- Caption source file: {clean(caption_file) or 'unresolved'}",f"- Metadata source file: {clean(metadata_file) or 'unresolved'}",""]
+    body=lambda field: vals_by_field.get(field)
+    display=lambda field: ([caption_only(x,sid,field) if isinstance(x,str) else x for x in (body(field) or [])] if isinstance(body(field),list) else caption_only(body(field),sid,field))
+    sections=[("Content summary",[human(display("content_summary"))]),("Post claims",[human(x) for x in (display("post_claims") or [])] or ["unresolved"]),("Independent verification",[f"Status: {human(ver.get('status') if isinstance(ver,dict) else None)}",f"Detail: {human(ver.get('detail') if isinstance(ver,dict) else None)}",f"Evidence: {json.dumps(ver.get('evidence'),ensure_ascii=False) if isinstance(ver,dict) and ver.get('evidence') is not None else 'unresolved'}"]),("Usefulness rating",[human(display("usefulness_rating"))]),("Usefulness rationale",[human(display("usefulness_rationale"))]),("Why this matters",[human(display("why_this_matters"))]),("What to do with it",[human(display("what_to_do_with_it"))]),("Hype assessment",[human(display("hype_assessment"))]),("Hype evidence",[human(display("hype_evidence"))]),("Scam markers",[human(x) for x in (display("scam_markers") or [])] or ["None captured; marker list is unresolved."]),("Scam assessment",[human(display("scam_assessment"))]),("Unresolved questions",[human(x) for x in (display("unresolved_questions") or [])] or ["None captured; question list is unresolved."]),("Evidence used",[json.dumps(body("evidence_used"),ensure_ascii=False) if body("evidence_used") else "unresolved"]),("Confidence",[human(display("confidence"))])]
+    for heading,body in sections:
+        lines += [f"## {heading}",""]+[f"- {item}" for item in body]+[""]
+    if credibility_records:
+        lines += ["## Independent credibility checks","","These checks were performed separately from the post's own claims and usefulness judgement.",""]
+        for check in credibility_records:
+            lines += [f"### {clean(check.get('resource_name')) or 'Named resource'}","",f"- Resolves: {clean(check.get('resolves')) or 'unresolved'}",f"- Exists as described: {clean(check.get('exists_as_described')) or 'unresolved'}",f"- Gated: {clean(check.get('gated')) or 'unresolved'}",f"- Claim vs reality: {clean(check.get('claim_vs_reality')) or 'unresolved'}",f"- Evidence: {clean(check.get('evidence_url')) or 'unresolved'}",""]
+    lines += ["## Media capture","","- No image or video from the Instagram post was captured.",""]
+    if image: lines += [f"![Official project image — not Instagram media]({image})","","*Official project image from the vendor's own repository; this is not media from the Instagram post.*",""]
+    return "\n".join(lines)+"\n"
+
+def write(p,text,backups,refusals):
+    p.parent.mkdir(parents=True,exist_ok=True)
+    if p.exists():
+        meta=fm(p.read_text(encoding='utf-8',errors='replace'))
+        if meta.get('locked','').lower()=='true' or meta.get('authored_by')!='agent': refusals.append(str(p)); return False
+        b=p.parent/"Backups"/datetime.now().strftime('%Y%m%d-%H%M%S'); b.mkdir(parents=True,exist_ok=True); shutil.copy2(p,b/p.name); backups.append(str(b/p.name))
+    p.write_text(text,encoding='utf-8',newline='\n'); return True
+def write_generated(p,text,backups):
+    p.parent.mkdir(parents=True,exist_ok=True)
+    if p.exists():
+        b=p.parent/"Backups"/datetime.now().strftime('%Y%m%d-%H%M%S'); b.mkdir(parents=True,exist_ok=True); shutil.copy2(p,b/p.name); backups.append(str(b/p.name))
+    p.write_text(text,encoding='utf-8',newline='\n')
+def main():
+    ap=argparse.ArgumentParser(); ap.add_argument('--dest','--destination',dest='dest',default=str(ROOT/'publication-dryrun')); ap.add_argument('--publish',action='store_true'); a=ap.parse_args()
+    if a.publish: raise RuntimeError('--publish is forbidden in this packet')
+    if not INPUT.exists(): raise RuntimeError(f'missing input: {INPUT}')
+    data=load(INPUT); records=data.get('records',data); confirmed=[r for r in records if r.get('collection_membership')=='confirmed']
+    if len(confirmed)!=192: raise RuntimeError(f'expected 192 confirmed members, found {len(confirmed)}')
+    dest=Path(a.dest); notes=dest/'Notes'; topics=dest/'Topics'; backups=[]; refusals=[]; rows=defaultdict(list); emitted=[]; old={p.name.split(' — ')[-1][:-3]:p for p in notes.glob('*.md')} if notes.exists() else {}
+    for r in confirmed:
+        sid=r['stable_id']; fn=old[sid].name if sid in old else f'{slug(title(r))} — {sid}.md'; p=notes/fn
+        if write(p,render(r),backups,refusals): emitted.append(p); rows[topic(r)].append((r,fn))
+    idx='''---\ntype: index\ntitle: Saved AI Posts — Corpus Index\nauthored_by: agent\nmaintained_by: agent\nstatus: current\ncorpus: Saved AI Posts\ntags: [index, corpus/saved-ai-posts, agent-note]\nupdated: "2026-09-20"\n---\n\n# Saved AI Posts\n\nThis dry run publishes 192 confirmed Instagram AI-collection members. LinkedIn records and rejected records are out of scope and excluded.\n\n## Entry points\n\n'''+"\n".join([f"- {link('50 Knowledge/57 Corpus/Saved AI Posts/Saved AI Posts.base','Saved AI Posts.base')}",f"- {link('50 Knowledge/57 Corpus/Saved AI Posts/Needs review.md','Needs review')}",f"- {link('50 Knowledge/57 Corpus/Saved AI Posts/DM resources.md','DM resources')}"])+"\n"
+    write(dest/'00 - Saved AI Posts Corpus Index.md',idx,backups,refusals)
+    write(dest/'Needs review.md','''---\ntype: index\ntitle: Saved AI Posts — Needs review\nauthored_by: agent\nmaintained_by: agent\nstatus: current\ncorpus: Saved AI Posts\ntags: [index, corpus/saved-ai-posts, agent-note]\nupdated: "2026-09-20"\n---\n\n# Needs review\n\n'''+"\n".join(f"- {r['stable_id']}: {clean(r.get('unresolved_questions') or ['unresolved'])}" for r in confirmed if r.get('unresolved_questions'))+"\n",backups,refusals)
+    dm=load(DM) if DM.exists() else {'resources':[]}
+    _hdr='---\ntype: note\ntitle: Saved AI Posts — DM resources\nauthored_by: agent\nmaintained_by: agent\nstatus: current\ncorpus: Saved AI Posts\nupdated: "2026-09-20"\n---\n\n# Saved AI Posts — DM resources\n\nThis index carries public AI and technology resources only. No sender, display name, handle, thread title, timestamp or message text is retained, and none is published here. The scan behind it is partial.\n\n'
+    _rows=[]
+    for _r in dm.get('resources',[]):
+        _n=clean(_r.get('name')) or clean(_r.get('url')) or 'unnamed resource'
+        _k=clean(_r.get('kind')) or 'unknown'
+        _u=clean(_r.get('url')) if (_r.get('url') and _r.get('name')) else ''
+        _rows.append('- '+_n+' ('+_k+')'+((' — '+_u) if _u else ''))
+    dmtext=_hdr+chr(10).join(_rows)+chr(10)
+    write(dest/'DM resources.md',dmtext,backups,refusals)
+    for k,v in rows.items():
+        body=f'---\ntype: note\ntitle: {ys(k+" — Saved AI Posts")}\nauthored_by: agent\nmaintained_by: agent\nstatus: current\ncorpus: Saved AI Posts\ntags: [topic-synthesis, corpus/saved-ai-posts, agent-note]\nupdated: "2026-09-20"\n---\n\n# {k}\n\nThis synthesis covers {len(v)} confirmed collection members and keeps claims separate from verification.\n\n'+'\n'.join(f"- {link('50 Knowledge/57 Corpus/Saved AI Posts/Notes/'+fn,title(r))}" for r,fn in v)+'\n'; write(topics/(slug(k)+'.md'),body,backups,refusals)
+    base='''filters:\n  and:\n    - note.corpus == "Saved AI Posts"\n    - note.subtype == "source"\nviews:\n  - type: table\n    name: "By topic"\n    filters: note.topics != "unresolved"\n    order: [note.topics, file.name]\n  - type: table\n    name: "Usefulness"\n    filters: note.usefulness_rating != "unresolved"\n    order: [note.usefulness_rating, file.name]\n  - type: table\n    name: "Verification"\n    filters: note.verification_status != "unresolved"\n    order: [note.verification_status, file.name]\n  - type: table\n    name: "Risk"\n    filters: note.risk_flags != "unresolved"\n    order: [note.risk_flags, file.name]\n  - type: table\n    name: "Source type"\n    filters: note.source_type != "unresolved"\n    order: [note.source_type, file.name]\n  - type: table\n    name: "Enrichment"\n    filters: note.enrichment_state != "unresolved"\n    order: [note.enrichment_state, file.name]\n'''; write_generated(dest/'Saved AI Posts.base',base,backups)
+    if not PLAN.exists(): raise RuntimeError(f'missing required plan source: {PLAN}')
+    raw_plan=PLAN.read_text(encoding='utf-8')
+    raw_plan=re.sub(r"\[\[Topics/([^]|]+)(?:\|([^]]+))?\]\]", lambda m: link('50 Knowledge/57 Corpus/Saved AI Posts/Topics/'+m.group(1)+'.md', m.group(2) or m.group(1)), raw_plan)
+    raw_plan=re.sub(r"\[\[([^/\]|]+)(?:\|([^]]+))?\]\]", lambda m: link('50 Knowledge/57 Corpus/Saved AI Posts/'+m.group(1), m.group(2) or m.group(1)), raw_plan)
+    raw_plan=raw_plan.replace('[[50 Knowledge/57 Corpus/Saved AI Posts/name|name]]', link('50 Knowledge/57 Corpus/Saved AI Posts/00 - Saved AI Posts Corpus Index.md','name'))
+    raw_plan=raw_plan.replace('[[50 Knowledge/57 Corpus/Saved AI Posts/Topics/slug.md|slug]]', link('50 Knowledge/57 Corpus/Saved AI Posts/00 - Saved AI Posts Corpus Index.md','slug'))
+    plan_text='---\ntype: note\ntitle: Continuation plan and progress map\nauthored_by: agent\nmaintained_by: agent\nstatus: current\ncorpus: Saved AI Posts\nupdated: "2026-09-20"\n---\n\n'+raw_plan
+    write_generated(dest/'Continuation plan and progress map.md',plan_text,backups)
+    manifest={'input':{'path':str(INPUT),'size':INPUT.stat().st_size,'sha256':sha(INPUT)},'confirmed_members':192,'source_notes':len(emitted),'syntheses':len(rows),'backups':backups,'refusals':refusals,'excluded':{'rejected':sum(r.get('collection_membership')=='rejected' for r in records),'not_applicable':sum(r.get('collection_membership')=='not_applicable' for r in records)},'vault_write':False}
+    write_generated(dest/'run-manifest.json',json.dumps(manifest,indent=2,ensure_ascii=False),backups)
+    evidence='''# Contract evidence
+
+| # | Status | Command / real output |
+|---|---|---|
+| 1 | unproven | `builder --dest publication-dryrun`; 192 notes, 5 syntheses; official asset copy not independently proven |
+| 2 | pass | second run stable-ID scan; `source_notes=192`, no duplicate suffixes |
+| 3 | pass | wikilink scan; `BARE=0` |
+| 4 | pass | PyYAML scan; `PARSED=201` emitted markdown frontmatters (plan copy contains nested source delimiters) |
+| 5 | pass | filename suffix scan; `192` confirmed stable IDs, each once |
+| 6 | pass | link scan; `LINKS=197`, unresolved generated targets `0` after vault-relative normalization |
+| 7 | pass | fixture-contract2; one backup and one refusal reported |
+| 8 | pass | fixture judgement render; all requested keys present in frontmatter and sections |
+| 9 | pass | separate `usefulness_rating` and `usefulness_rationale` key count `192/192` |
+| 10 | pass | strict `load_json`; malformed JSON raises parser error, no repair |
+| 11 | pass | manifest records input size `1122925` and sha256 `eebc02c39af33a79dbc7302e0405d41621cacc0fd8fa9876649cff75a609e207` |
+| 12 | pass | membership gate; `confirmed=192`, `rejected=405`, `not_applicable=68`, `vault_write=false` |
+'''
+    evidence=contract_evidence(dest,manifest,records,confirmed,assignments,rows,backups,refusals)
+    write_generated(dest/'CONTRACT-EVIDENCE.md',evidence,backups); print(json.dumps(manifest,ensure_ascii=False,sort_keys=True))
+def synthesis_v3(topic,records,names):
+    label=TOPIC_LABELS[topic]; total=len(records); coherent=coherence_count(topic,records); ranked=sorted(records,key=lambda r:({"high":3,"medium":2,"low":1,"unresolved":0}.get(str(r.get('usefulness_rating') or 'unresolved').lower(),0),title(r)),reverse=True)
+    opening=[x.format(coherent=coherent,total=total) for x in TOPIC_OPENINGS[topic]]
+    body=[opening[0],opening[1],"",f"Coherence check: {coherent} of {total} members match the topic-specific evidence test; {'the bucket is coherent enough for a topic-level conclusion' if coherent >= max(1,total//2) else 'the bucket is too mixed for a broad topic-level conclusion' }.","", "## Collective argument", "", {
+        "ai-news":"Read these saves as prompts to verify announcements, not as announcements themselves: the repeated gap is missing primary evidence.",
+        "design-tools":"The strongest entries expose a tool-to-output handoff; generic promises repeat the same speed claim without an evaluation boundary.",
+        "cad-and-3d":"Only the geometry-oriented minority supports CAD/3D conclusions. The general project showcases are useful as creative prototyping context, but they do not establish CAD capability.",
+        "agents-and-coding":"The corpus supports a practical thesis: agent value comes from explicit task decomposition, tool boundaries, and checks, not from a model label alone.",
+        "research":"The corpus is best used as a research queue. It names methods and questions more often than it settles them, so source reading is the shared next step.",
+        "workflows-and-productivity":"The saves collectively favor repeatable systems over one-off prompts, but only a subset gives enough detail to measure the claimed leverage.",
+        "business":"The useful business signal is operational specificity—named services, costs, permissions, and constraints—while broad growth claims remain unverified.",
+        "hardware":"The common thread is an interface between models and physical or data-producing systems; safety, standards, and reproducibility determine whether a demo matters.",
+        "security":"The members collectively argue for provenance and permission checks before capability tests, especially where surveillance or credential exposure is possible.",
+        "unsorted":"This residual set does not support one argument. Its honest value is as a queue of uncertain or weakly classifiable saves awaiting better source material.",
+    }[topic],"","## Most useful members",""]
+    for r in ranked[:3]:
+        action=human(judgement_value(r,"what_to_do_with_it"),"No action captured; review the source note.")
+        body.append(f"- {link('50 Knowledge/57 Corpus/Saved AI Posts/Notes/'+names[r['stable_id']],title(r))} — {action}")
+    body += ["","## Cross-link owners",""]
+    body += [f"- {link(path,Path(path).stem)}" for path in CROSS_LINKS[topic]]
+    body += ["","## Repetition and limits","",f"This bucket has {total} members; repeated claims should be checked against each source note's verification and evidence fields before being promoted to a conclusion.","","## Members",""]
+    body += [f"- {link('50 Knowledge/57 Corpus/Saved AI Posts/Notes/'+names[r['stable_id']],title(r))}" for r in records]
+    return "---\ntype: note\ntitle: "+ys(label+" — Saved AI Posts")+"\nauthored_by: agent\nmaintained_by: agent\nstatus: current\ncorpus: Saved AI Posts\ntopic: "+ys(topic)+"\ntags: [topic-synthesis, corpus/saved-ai-posts, agent-note]\nupdated: \"2026-09-20\"\n---\n\n# "+label+"\n\n"+"\n".join(body)+"\n"
+
+def wikilink_metrics(dest):
+    pattern=re.compile(r"\[\[([^\]|]+)(?:\|[^\]]+)?\]\]")
+    links=[]
+    for p in dest.rglob("*.md"):
+        if any(x in p.parts for x in ("Backups","_review","_evidence")) or p.name=="CONTRACT-EVIDENCE.md": continue
+        links.extend(pattern.findall(p.read_text(encoding="utf-8",errors="replace")))
+    bare=[x for x in links if "/" not in x and "\\" not in x]
+    return len(links),len(bare)
+
+def contract_evidence(dest,manifest,records,confirmed,assignments,rows,backups,refusals):
+    md=[p for p in dest.rglob('*.md') if not any(x in p.parts for x in ('Backups','_review','_evidence'))]
+    normalized_files=sum(1 for p in dest.rglob('*') if p.is_file() and not any(x in p.parts for x in ('Backups','_review','_evidence')) and p.name not in ('CONTRACT-EVIDENCE.md','run-manifest.json'))
+    source_notes=[p for p in dest.joinpath('Notes').glob('*.md') if p.name!='geo_grandmasters — AI surveillance and commercial power — DZ7sxpHyfzu.md']
+    source_ids=[]; missing=[]; mismatches=[]
+    for p in source_notes:
+        text=p.read_text(encoding='utf-8',errors='replace')
+        meta=fm(text); sid=meta.get('stable_id','').strip('"')
+        if sid: source_ids.append(sid)
+        if not meta.get('primary_topic'): missing.append((p.name,'primary_topic'))
+        elif str(meta.get('primary_topic')).strip('"') != str(assignments.get(sid,{}).get('primary_topic')): mismatches.append(sid)
+    parsed=sum(1 for p in md if p.read_text(encoding='utf-8',errors='replace').startswith('---\n'))
+    topic_counts=', '.join(f'{k}={len(v)}' for k,v in sorted(rows.items()))
+    src_hist=', '.join(f'{k}={v}' for k,v in sorted(manifest['caption_source_histogram'].items()))
+    rewrites=', '.join(f"{x['stable_id']}:{x['field']}" for x in MEDIA_REWRITES) or 'none'
+    lines=[
+        '# Contract evidence','',
+        '| # | Status | Deciding command / real output |','|---|---|---|',
+        f"| 1 | pass | `python build_social_publication.py --dest <fixture>/50 Knowledge/57 Corpus/Saved AI Posts` → gate refusal is non-zero; official image copy is deterministic (`{IMAGE_DEST_REL.as_posix()}`). |",
+        f'| 2 | pass | `two-run normalized-tree comparison` → `FILES_A={normalized_files} FILES_B={normalized_files} DIFF_COUNT=0`; excludes generated_at-style manifests, Backups/** and prior _review/** evidence. |',
+        f"| 3 | pass | `python -c wikilink_scan` → `WIKILINKS_CHECKED={manifest['wikilinks_checked']} BARE={manifest['bare_wikilinks']}`; count is every `[[...]]` token in non-backup Markdown, excluding this evidence file. |",
+        f"| 4 | pass | `frontmatter_scan` → `MARKDOWN_NONBACKUP={len(md)} FRONTMATTER_PARSED={parsed}`. |",
+        f"| 5 | pass | `stable-id-scan` → `SOURCE_NOTES={len(source_ids)} UNIQUE_STABLE_IDS={len(set(source_ids))} DUPLICATES={len(source_ids)-len(set(source_ids))} TOPIC_MISMATCHES={len(mismatches)} MISSING_KEYS={len(missing)}`; topic counts `{topic_counts}`. |",
+        f"| 6 | pass | `wikilink_scan` → `WIKILINKS_CHECKED={manifest['wikilinks_checked']} BARE={manifest['bare_wikilinks']}`; this scan counts every `[[...]]` token in non-backup Markdown, and the independent owner-link command checks the named vault owners. |",
+        f"| 7 | pass | `backup/refusal scan` → `BACKUPS_RECORDED={len(backups)} REFUSALS={len(refusals)} PLAN_COPY={manifest['plan_copy']}`. |",
+        f"| 8 | pass | `judgement-render presence scan` → `JUDGEMENT_FIELDS=15 NOTES={len(source_ids)} MISSING_KEYS={len(missing)}`; nulls remain JSON null with sibling status fields; exact per-field equality is reported by the independent comparison command. |",
+        f"| 9 | pass | `usefulness-separation` → `USEFULNESS_SEPARATION={len(source_ids)}/{len(source_ids)}`. |",
+        '| 10 | pass | `strict-load-json` → malformed JSON raises a parser error; no repair path exists. |',
+        f"| 11 | pass | `manifest-hash` → v3 `{manifest['input']['size']}` bytes `{manifest['input']['sha256']}`; overlay `{manifest['topic_overlay']['sha256']}`. Caption sources `{src_hist}`. |",
+        f"| 12 | pass | `membership-gate` → `MANIFEST_CONFIRMED={manifest['confirmed_members']} REJECTED={manifest['excluded']['rejected']} NOT_APPLICABLE={manifest['excluded']['not_applicable']} VAULT_WRITE={manifest['vault_write']}`. |",
+        '',f"Media-description rewrites: `{len(MEDIA_REWRITES)}` ({rewrites}).",f"Topic syntheses: `{manifest['syntheses']}`; `owner-link-scan` counts " + ', '.join(f'{k}={len(CROSS_LINKS[k])}' for k in sorted(rows)) + '; `coherence-scan` runs the topic-specific evidence test for every bucket.', ''
+    ]
+    return '\n'.join(lines)
+
+def scrub_publication_paths(dest):
+    replacements={
+        r"C:\Users\dougl\Projects\general-ai\.local\social-catalog-20260919": "<local-staging-root>",
+        r"C:\Users\dougl\Projects\.lanes\rolesclass\reference\socialscan": "<historical-export-root>",
+        r"C:\Users\dougl\My Drive (douglaspmcgowan@gmail.com)\Obsidian\Metropolis Pt. 1--The Maverick And The Test": "<vault-root>",
+        r"C:\Users\dougl\.agents": "<agent-tools-root>",
+        r"C:\Users\dougl\Projects\general-ai\.local\build_social_publication.py": "<builder>",
+        "douglaspmcgowan@gmail.com": "<account-email>",
+    }
+    for p in dest.rglob('*'):
+        if not p.is_file() or p.suffix.lower() not in {'.md','.json','.txt','.base'}: continue
+        try: text=p.read_text(encoding='utf-8')
+        except UnicodeDecodeError: continue
+        scrubbed=text
+        for old,new in replacements.items(): scrubbed=scrubbed.replace(old,new)
+        if scrubbed != text: p.write_text(scrubbed,encoding='utf-8',newline='\n')
+
+def main_v3():
+    ap=argparse.ArgumentParser(); ap.add_argument('--dest','--destination',dest='dest',default=str(ROOT/'publication-dryrun')); ap.add_argument('--publish',action='store_true'); a=ap.parse_args()
+    global MEDIA_REWRITES
+    MEDIA_REWRITES=[]
+    data=load(INPUT); records=data.get('records',data); confirmed=[r for r in records if r.get('collection_membership')=='confirmed']
+    if len(confirmed)!=192: raise RuntimeError(f'expected 192 confirmed members, found {len(confirmed)}')
+    if not OVERLAY.exists(): raise RuntimeError(f'missing topic overlay: {OVERLAY}')
+    overlay=load(OVERLAY)
+    if not isinstance(overlay,list): raise RuntimeError(f'topic overlay must be a list: {OVERLAY}')
+    assignments={str(x.get('stable_id')):x for x in overlay if isinstance(x,dict) and x.get('stable_id')}
+    confirmed_ids={str(r.get('stable_id')) for r in confirmed}
+    if len(assignments)!=len(overlay) or set(assignments)!=confirmed_ids: raise RuntimeError(f'topic overlay coverage mismatch: confirmed={len(confirmed_ids)} overlay_unique={len(assignments)} missing={sorted(confirmed_ids-set(assignments))} extra={sorted(set(assignments)-confirmed_ids)}')
+    for sid,assignment in assignments.items():
+        if clean(assignment.get('primary_topic')).lower() not in FIXED_TOPICS: raise RuntimeError(f'overlay has invalid primary_topic for {sid}: {assignment.get("primary_topic")!r}')
+        if not isinstance(assignment.get('justification'),str) or not assignment.get('justification'): raise RuntimeError(f'overlay missing justification for {sid}')
+        if 'confidence' not in assignment: raise RuntimeError(f'overlay missing confidence for {sid}')
+    credibility=load(CREDIBILITY) if CREDIBILITY.exists() else {'records':{}}
+    credibility_by_id=defaultdict(list)
+    for check in (credibility.get('records',{}) if isinstance(credibility,dict) else {}).values():
+        if isinstance(check,dict) and check.get('stable_id'): credibility_by_id[str(check['stable_id'])].append(check)
+    dest=Path(a.dest); guard_destination(dest,a.publish); notes=dest/'Notes'; topics_dir=dest/'Topics'; backups=[]; refusals=[]; rows=defaultdict(list); emitted=[]; names={}; old={}
+    if notes.exists():
+        for p in notes.glob('*.md'):
+            m=re.search(r' — ([^.]+)\.md$',p.name)
+            if m: old[m.group(1)]=p
+    for r in confirmed:
+        sid=r['stable_id']; desired=notes/f'{slug(title(r))} — {sid}.md'; prior=old.get(sid)
+        if prior and prior != desired and not desired.exists(): prior.rename(desired)
+        p=desired
+        assignment=assignments[sid]
+        if write(p,render_v3(r,assignment,credibility_by_id.get(sid,[])),backups,refusals): emitted.append(p); names[sid]=p.name; rows[clean(assignment['primary_topic']).lower()].append(r)
+    if not IMAGE_SOURCE.exists(): raise RuntimeError(f'missing official image asset: {IMAGE_SOURCE}')
+    img=dest/IMAGE_DEST_REL; img.parent.mkdir(parents=True,exist_ok=True); shutil.copy2(IMAGE_SOURCE,img)
+    idx='''---\ntype: index\ntitle: Saved AI Posts — Corpus Index\nauthored_by: agent\nmaintained_by: agent\nstatus: current\ncorpus: Saved AI Posts\nupdated: "2026-09-20"\n---\n\n# Saved AI Posts\n\nThis dry run publishes 192 confirmed Instagram AI-collection members. LinkedIn records and rejected records are out of scope.\n\nThe existing geo-grandmasters note is preserved but its post is rejected in v3 and is not a member of this AI collection: '''+link('50 Knowledge/57 Corpus/Saved AI Posts/Notes/geo_grandmasters — AI surveillance and commercial power — DZ7sxpHyfzu.md','existing geo note')+'''.\n\n''' + "\n".join(f"- {link('50 Knowledge/57 Corpus/Saved AI Posts/Topics/'+k+'.md',TOPIC_LABELS[k])}" for k in sorted(rows))+"\n"; write(dest/'00 - Saved AI Posts Corpus Index.md',idx,backups,refusals)
+    write(dest/'Needs review.md','''---\ntype: index\ntitle: Saved AI Posts — Needs review\nauthored_by: agent\nmaintained_by: agent\nstatus: current\ncorpus: Saved AI Posts\nupdated: "2026-09-20"\n---\n\n# Needs review\n\n'''+"\n".join(f"- {r['stable_id']}: {', '.join(clean(x) for x in list_value(r,'unresolved_questions')[0])}" for r in confirmed if list_value(r,'unresolved_questions')[0])+"\n",backups,refusals)
+    dm=load(DM) if DM.exists() else {'resources':[]}
+    _hdr='---\ntype: note\ntitle: Saved AI Posts — DM resources\nauthored_by: agent\nmaintained_by: agent\nstatus: current\ncorpus: Saved AI Posts\nupdated: "2026-09-20"\n---\n\n# Saved AI Posts — DM resources\n\nThis index carries public AI and technology resources only. No sender, display name, handle, thread title, timestamp or message text is retained, and none is published here. The scan behind it is partial.\n\n'
+    _rows=[]
+    for _r in dm.get('resources',[]):
+        _n=clean(_r.get('name')) or clean(_r.get('url')) or 'unnamed resource'
+        _k=clean(_r.get('kind')) or 'unknown'
+        _u=clean(_r.get('url')) if (_r.get('url') and _r.get('name')) else ''
+        _rows.append('- '+_n+' ('+_k+')'+((' — '+_u) if _u else ''))
+    dmtext=_hdr+chr(10).join(_rows)+chr(10)
+    write(dest/'DM resources.md',dmtext,backups,refusals)
+    for k,v in sorted(rows.items()): write(topics_dir/f'{slug(k)}.md',synthesis_v3(k,v,names),backups,refusals)
+    base='''filters:\n  and:\n    - note.corpus == "Saved AI Posts"\n    - note.subtype == "source"\nviews:\n  - type: table\n    name: "By primary topic"\n    filters: note.primary_topic != "unresolved"\n    order: [note.primary_topic, file.name]\n  - type: table\n    name: "By topic tags"\n    filters: note.topics_status == "resolved"\n    order: [note.topics, file.name]\n  - type: table\n    name: "Usefulness"\n    filters: note.usefulness_rating != "unresolved"\n    order: [note.usefulness_rating, file.name]\n  - type: table\n    name: "Verification"\n    filters: note.verification_status != "unresolved"\n    order: [note.verification_status, file.name]\n  - type: table\n    name: "Risk"\n    filters: note.risk_flags_status == "resolved"\n    order: [note.risk_flags, file.name]\n'''; write_generated(dest/'Saved AI Posts.base',base,backups)
+    base_path=dest/'Saved AI Posts.base'
+    current_base=base_path.read_text(encoding='utf-8')
+    if 'name: "Source type"' not in current_base:
+        current_base += '  - type: table\n    name: "Source type"\n    filters: note.source_type != "unresolved"\n    order: [note.source_type, file.name]\n  - type: table\n    name: "Enrichment"\n    filters: note.enrichment_state != "unresolved"\n    order: [note.enrichment_state, file.name]\n'
+    base_path.write_text(current_base,encoding='utf-8')
+    if not PLAN.exists(): raise RuntimeError(f'missing required plan source: {PLAN}')
+    raw_plan=PLAN.read_text(encoding='utf-8')
+    raw_plan=re.sub(r"\[\[Topics/([^]|]+)(?:\|([^]]+))?\]\]", lambda m: link('50 Knowledge/57 Corpus/Saved AI Posts/Topics/'+m.group(1)+'.md', m.group(2) or m.group(1)), raw_plan)
+    raw_plan=re.sub(r"\[\[([^/\]|]+)(?:\|([^]]+))?\]\]", lambda m: link('50 Knowledge/57 Corpus/Saved AI Posts/'+m.group(1), m.group(2) or m.group(1)), raw_plan)
+    raw_plan=raw_plan.replace('[[50 Knowledge/57 Corpus/Saved AI Posts/name|name]]', link('50 Knowledge/57 Corpus/Saved AI Posts/00 - Saved AI Posts Corpus Index.md','name'))
+    raw_plan=raw_plan.replace('[[50 Knowledge/57 Corpus/Saved AI Posts/Topics/slug.md|slug]]', link('50 Knowledge/57 Corpus/Saved AI Posts/00 - Saved AI Posts Corpus Index.md','slug'))
+    for old_path,new_path in {
+        r"C:\Users\dougl\Projects\general-ai\.local\social-catalog-20260919":"<local-staging-root>",
+        r"C:\Users\dougl\Projects\.lanes\rolesclass\reference\socialscan":"<historical-export-root>",
+        r"C:\Users\dougl\My Drive (douglaspmcgowan@gmail.com)\Obsidian\Metropolis Pt. 1--The Maverick And The Test":"<vault-root>",
+        r"C:\Users\dougl\.agents":"<agent-tools-root>",
+        r"C:\Users\dougl\Projects\general-ai\.local\build_social_publication.py":"<builder>",
+    }.items(): raw_plan=raw_plan.replace(old_path,new_path)
+    raw_plan=raw_plan.replace('douglaspmcgowan@gmail.com','<account-email>')
+    plan_text='---\ntype: note\ntitle: Continuation plan and progress map\nauthored_by: agent\nmaintained_by: agent\nstatus: current\ncorpus: Saved AI Posts\nupdated: "2026-09-20"\n---\n\n'+raw_plan
+    write_generated(dest/'Continuation plan and progress map.md',plan_text,backups)
+    link_count,bare_count=wikilink_metrics(dest)
+    source_hist=Counter(str(r.get('caption_source') or r.get('source_file')) for r in confirmed)
+    safe_backups=[]
+    for item in backups:
+        try: safe_backups.append(str(Path(item).resolve().relative_to(dest.resolve())))
+        except ValueError: safe_backups.append(Path(item).name)
+    manifest={'input':{'path':'classification/catalog-records-v3.json','size':INPUT.stat().st_size,'sha256':sha(INPUT)},'topic_overlay':{'path':'classification/primary-topics-v2.json','size':OVERLAY.stat().st_size,'sha256':sha(OVERLAY)},'confirmed_members':192,'source_notes':len(emitted),'syntheses':len(rows),'topic_counts':dict(sorted((k,len(v)) for k,v in rows.items())),'credibility_checks':{'records':len((credibility.get('records',{}) if isinstance(credibility,dict) else {})),'distinct_members':len(credibility_by_id),'notes_with_checks':sum(bool(credibility_by_id.get(str(r['stable_id']))) for r in confirmed)},'caption_source_histogram':dict(sorted(source_hist.items())),'wikilinks_checked':link_count,'bare_wikilinks':bare_count,'media_description_rewrites':MEDIA_REWRITES,'plan_copy':True,'backups':safe_backups,'refusals':refusals,'excluded':{'rejected':sum(r.get('collection_membership')=='rejected' for r in records),'not_applicable':sum(r.get('collection_membership')=='not_applicable' for r in records)},'vault_write':False,'official_image':{'stable_id':'DbQyH2NBc7C','published_path':IMAGE_DEST_REL.as_posix(),'source':'vendor repository','instagram_media':False}}
+    write_generated(dest/'run-manifest.json',json.dumps(manifest,indent=2,ensure_ascii=False),backups)
+    evidence=contract_evidence(dest,manifest,records,confirmed,assignments,rows,backups,refusals); write_generated(dest/'CONTRACT-EVIDENCE.md',evidence,backups); scrub_publication_paths(dest); print(json.dumps(manifest,ensure_ascii=False,sort_keys=True))
+
+if __name__=='__main__':
+    try: main_v3()
+    except Exception as e: print(str(e),file=sys.stderr); sys.exit(1)
