@@ -23,7 +23,7 @@ Finish repository-first cross-device reconstruction from the canonical harness a
 
 ## Needs decision
 
-- D-SC7 — Scrub the raw DM capture? `.local/social-catalog-20260919/browser/instagram-dm-ai-resources.json` and its `.bak` still hold sender names, handles and thread URLs for 8 threads; nothing published uses them. Recommended: archive both into vault-root `26_Sensitive\` is NOT proposed (outside scope); instead delete the identity fields from both files, keeping resource names and URLs, since the privacy-safe `dm-resource-index.json` and `dm-scan-002.json` already carry everything the corpus uses | owner: Douglas.
+- D-SC7 — Scrub the raw DM capture? `.local/social-catalog-20260919/browser/instagram-dm-ai-resources.json` and its `.bak` still hold sender names, handles and thread URLs for 8 threads; nothing published uses them. Recommended: remove the identity fields from both files and keep only resource names and URLs, because the privacy-safe `dm-resource-index.json` and `dm-scan-002.json` already carry everything the corpus uses | owner: Douglas.
 - None | owner: n/a — future cloud implementation, Agent Brain automation, and preserved OneDrive data retirement remain parked in `BACKBURNER.md`.
 
 ## Constraints
