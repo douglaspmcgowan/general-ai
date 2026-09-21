@@ -53,3 +53,4 @@
 2026-07-31 | Expanded the access index to also link the provisioning and recovery set (`START-HERE.md`, both secret manifests, `recovery/`, `STATUS.md`, `TASK.md`, `MAP.md`, `MIGRATION.md`, both project manifests, and the BitLocker readiness brief) with a fallback for unavailable private-repository access.
 2026-07-31 | Rewrote the vault brief `Claude/Engineer/START HERE - Cross-Device Harness.md` with absolute URLs and a cross-device surfaces table, and preserved recoverable pre-change copies of both refreshed vault briefs under `Claude/Engineer/_backups/`.
 2026-07-31 | Docket's most recent brokered publication pushed 173 of 175 local cards, refusing 0 unsafe or invalid cards.
+2026-09-21 | Deleted T4 and B1–B4 from TASK.md at Douglas's direction (allow-delete); the cross-device onboarding proof and its harness blockers are no longer tracked here.
