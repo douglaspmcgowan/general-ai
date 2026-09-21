@@ -9,11 +9,12 @@ test_human_authored_and_locked_targets_are_refused_byte_identical (test_publish_
 test_pin_mismatch_refuses (test_publish_social_corpus.PublisherTests.test_pin_mismatch_refuses) ... ok
 test_report_contains_actions_and_geo_hashes (test_publish_social_corpus.PublisherTests.test_report_contains_actions_and_geo_hashes) ... ok
 test_script_contains_no_file_deletion_calls (test_publish_social_corpus.PublisherTests.test_script_contains_no_file_deletion_calls) ... ok
+test_source_under_excluded_vault_path_refuses_before_reading (test_publish_social_corpus.PublisherTests.test_source_under_excluded_vault_path_refuses_before_reading) ... ok
 test_target_outside_corpus_folder_refuses (test_publish_social_corpus.PublisherTests.test_target_outside_corpus_folder_refuses) ... ok
 test_unchanged_files_keep_mtime (test_publish_social_corpus.PublisherTests.test_unchanged_files_keep_mtime) ... ok
 
 ----------------------------------------------------------------------
-Ran 10 tests in 6.302s
+Ran 11 tests in 1.244s
 
 OK
 ```

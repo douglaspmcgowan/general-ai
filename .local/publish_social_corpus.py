@@ -232,6 +232,20 @@ def publish(
     root_path = Path(vault_root)
     target = validate_target(root_path, corpus_target(root_path))
     backup_path = Path(backup_root) if backup_root is not None else source_path.parent / "vault-backups"
+    guarded_paths = (
+        (source_path, "source"),
+        (backup_path, "backup-root"),
+        (Path(pin), "pin") if pin is not None else None,
+        (Path(write_pin), "write-pin") if write_pin is not None else None,
+        (Path(report), "report") if report is not None else None,
+    )
+    for guarded in guarded_paths:
+        if guarded is None:
+            continue
+        guarded_path, label = guarded
+        reason = _forbidden_reason(root_path, guarded_path)
+        if reason:
+            raise Refusal(f"{label} falls under excluded vault path ({reason}): {guarded_path}")
     if _under(backup_path, root_path):
         raise Refusal(f"backup-root is inside vault: {backup_path}")
 

@@ -148,6 +148,13 @@ class PublisherTests(unittest.TestCase):
         with self.assertRaises(publisher.Refusal):
             publisher.validate_target(vault, vault / "other")
 
+    def test_source_under_excluded_vault_path_refuses_before_reading(self):
+        import publish_social_corpus as publisher
+
+        excluded_source = self.vault / "AI Reference" / "source"
+        with self.assertRaises(publisher.Refusal):
+            publisher.publish(excluded_source, self.vault)
+
     def test_script_contains_no_file_deletion_calls(self):
         text = SCRIPT.read_text(encoding="utf-8")
         for token in ("os.remove", ".unlink(", "rmtree(", "shutil.move"):
