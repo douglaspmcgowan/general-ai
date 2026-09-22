@@ -5,6 +5,7 @@
 Finish repository-first cross-device reconstruction from the canonical harness and project GitHub authorities, preserve approved Obsidian configuration and declared external project data, retire or map legacy roots, and prove the complete flow on another computer.
 
 ## Active
+- [ ] SC20 — Bring in new posts saved to the Instagram AI collection since 2026-09-19 | Douglas 2026-09-21: "There are some new posts recently since you last ran in the AI thing that I want you to check out and bring in" | done when: the collection feed is re-enumerated, new shortcodes captured with full captions, judged, classified, entity-linked, rendered and published, with counts | owner: this session (Claude in Chrome) | class: MAIN. | 2026-09-22: the earlier "signed out" block was the wrong connected browser; the signed-in Chrome (Browser 1) enumerated 206 total, 14 new, 0 removed. Captions are in the worktree at `.local/social-catalog-20260919/browser/ai-collection-new-20260921.json`. Next: judge, classify, link entities and update comparisons, then publish after SC17 lands.
 
 
 ## Queue
@@ -12,8 +13,6 @@ Finish repository-first cross-device reconstruction from the canonical harness a
 - [ ] T4 — Prove the merged onboarding flow on the receiving computer | after: B1, B2, B4 | implementation owner: [harness issue 18](https://github.com/pyrgos-ai/doug-harness/issues/18) | evidence: a receipt tied to the merged harness commit proves install/stamp, approved Obsidian bundle, PATH/executables, GitHub discovery, declared project verifiers/adapters, Bitwarden token import/read-back, and current General AI, Agent Brain, and Docket access | owner: receiving computer | class: SEQUENTIAL.
 
 ## Blocked
-- [ ] SC20 — Bring in new posts saved to the Instagram AI collection since 2026-09-19 | Douglas 2026-09-21: "There are some new posts recently since you last ran in the AI thing that I want you to check out and bring in" | done when: the collection feed is re-enumerated, new shortcodes captured with full captions, judged, classified, entity-linked, rendered and published, with counts | owner: this session (Claude in Chrome) | class: MAIN. | 2026-09-22: the earlier "signed out" block was the wrong connected browser; the signed-in Chrome (Browser 1) enumerated 206 total, 14 new, 0 removed. Captions are in the worktree at `.local/social-catalog-20260919/browser/ai-collection-new-20260921.json`. Next: judge, classify, link entities and update comparisons, then publish after SC17 lands.
-
 - [!] B1 — Publish the current approved Obsidian bundle in canonical harness onboarding | owner: active harness owner | evidence required: `webviewer=true`, pinned `html-page-viewer@0.1.1` package/checksums, receiving-side backup and restore fixture, refreshed manifests, reviewed merge, and merged-master install.
 - [!] B2 — Publish the exact mutable-runtime verifier repair | owner: active harness owner | evidence required: harness `master` accepts only `logs/stale-agent-process-cleanup.jsonl` and `state/permissions-snapshot.json`, rejects undeclared siblings, and passes focused plus installed verification.
 - [!] B3 — Restore the consolidated task-state hook suite to green | owner: active harness owner | current evidence: `Test-AgentProjectState.test.ps1` passes; `task-state-reminder.test.js` passes 51 and fails 6 chain/PROMPT_LOG cases.
