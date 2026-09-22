@@ -29,6 +29,7 @@ EXCLUDED_FILES = (
 )
 GEO_RELATIVE = Path("Notes") / "geo_grandmasters — AI surveillance and commercial power — DZ7sxpHyfzu.md"
 PIN_METHOD = "sha256(sorted relative-path\\0sha256\\0size\\n)"
+CANVAS_DEFAULT_EDGE_ENDS = {"fromEnd": "none", "toEnd": "arrow"}
 
 
 class Refusal(RuntimeError):
@@ -131,6 +132,214 @@ def _sha256(content: bytes) -> str:
     return hashlib.sha256(content).hexdigest()
 
 
+def _default_canvas_sides(edge: dict, nodes: dict[str, dict]) -> tuple[str, str] | None:
+    """Return the sides Obsidian chooses from the relative node positions."""
+
+    source = nodes.get(edge.get("fromNode"))
+    target = nodes.get(edge.get("toNode"))
+    if not isinstance(source, dict) or not isinstance(target, dict):
+        return None
+    try:
+        source_center = (float(source["x"]) + float(source["width"]) / 2, float(source["y"]) + float(source["height"]) / 2)
+        target_center = (float(target["x"]) + float(target["width"]) / 2, float(target["y"]) + float(target["height"]) / 2)
+    except (KeyError, TypeError, ValueError):
+        return None
+    dx = target_center[0] - source_center[0]
+    dy = target_center[1] - source_center[1]
+    if dx == 0 and dy == 0:
+        return None
+    if abs(dx) >= abs(dy):
+        return ("right", "left") if dx > 0 else ("left", "right")
+    return ("bottom", "top") if dy > 0 else ("top", "bottom")
+
+
+def _canonical_canvas(value: object) -> bytes | None:
+    if not isinstance(value, dict):
+        return None
+    canvas = dict(value)
+    nodes = canvas.get("nodes")
+    edges = canvas.get("edges")
+    if not isinstance(nodes, list) or not isinstance(edges, list):
+        return None
+    canonical_nodes = [dict(node) if isinstance(node, dict) else node for node in nodes]
+    node_map = {node.get("id"): node for node in canonical_nodes if isinstance(node, dict) and isinstance(node.get("id"), str)}
+    canonical_edges: list[object] = []
+    for edge in edges:
+        if not isinstance(edge, dict):
+            canonical_edges.append(edge)
+            continue
+        normalized = dict(edge)
+        for field, default in CANVAS_DEFAULT_EDGE_ENDS.items():
+            if normalized.get(field) == default:
+                normalized.pop(field, None)
+        default_sides = _default_canvas_sides(normalized, node_map)
+        if default_sides is not None and (normalized.get("fromSide"), normalized.get("toSide")) == default_sides:
+            normalized.pop("fromSide", None)
+            normalized.pop("toSide", None)
+        canonical_edges.append(normalized)
+    canvas["nodes"] = sorted(canonical_nodes, key=lambda item: str(item.get("id", "")) if isinstance(item, dict) else "")
+    canvas["edges"] = sorted(canonical_edges, key=lambda item: str(item.get("id", "")) if isinstance(item, dict) else "")
+    try:
+        return json.dumps(canvas, ensure_ascii=False, separators=(",", ":"), sort_keys=True).encode("utf-8")
+    except (TypeError, ValueError):
+        return None
+
+
+def _canonical_json(content: bytes) -> bytes | None:
+    try:
+        value = json.loads(content.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        return None
+    return _canonical_canvas(value)
+
+
+def _canonical_json_value(content: bytes) -> bytes | None:
+    try:
+        value = json.loads(content.decode("utf-8"))
+        return json.dumps(value, ensure_ascii=False, separators=(",", ":"), sort_keys=True).encode("utf-8")
+    except (UnicodeDecodeError, json.JSONDecodeError, TypeError, ValueError):
+        return None
+
+
+def _yaml_scalar(value: str) -> object:
+    value = value.strip()
+    if not value:
+        return None
+    if value in {"~", "null", "Null", "NULL"}:
+        return None
+    if value.casefold() in {"true", "false"}:
+        return value.casefold() == "true"
+    if value.startswith('"') and value.endswith('"'):
+        return json.loads(value)
+    if value.startswith("'") and value.endswith("'"):
+        return value[1:-1].replace("''", "'")
+    if value.startswith(("[", "{")):
+        try:
+            return json.loads(value)
+        except json.JSONDecodeError:
+            pass
+    try:
+        return json.loads(value)
+    except json.JSONDecodeError:
+        return value
+
+
+def _yaml_commentless(value: str) -> str:
+    quoted: str | None = None
+    escaped = False
+    for index, char in enumerate(value):
+        if quoted == '"' and char == "\\" and not escaped:
+            escaped = True
+            continue
+        if char in {'"', "'"} and not escaped:
+            quoted = None if quoted == char else (char if quoted is None else quoted)
+        if char == "#" and quoted is None and (index == 0 or value[index - 1].isspace()):
+            return value[:index].rstrip()
+        escaped = False
+    return value.rstrip()
+
+
+def _yaml_key_value(value: str) -> tuple[str, str | None] | None:
+    quoted: str | None = None
+    escaped = False
+    for index, char in enumerate(value):
+        if quoted == '"' and char == "\\" and not escaped:
+            escaped = True
+            continue
+        if char in {'"', "'"} and not escaped:
+            quoted = None if quoted == char else (char if quoted is None else quoted)
+        if char == ":" and quoted is None and (index + 1 == len(value) or value[index + 1].isspace()):
+            key = value[:index].strip()
+            if not key:
+                return None
+            if len(key) >= 2 and key[0] == key[-1] and key[0] in {'"', "'"}:
+                key = str(_yaml_scalar(key))
+            return key, value[index + 1 :].strip() or None
+        escaped = False
+    return None
+
+
+def _canonical_yaml(content: bytes) -> bytes | None:
+    try:
+        text = content.decode("utf-8")
+    except UnicodeDecodeError:
+        return None
+    rows: list[tuple[int, str]] = []
+    for raw in text.splitlines():
+        if "\t" in raw[: len(raw) - len(raw.lstrip())]:
+            return None
+        stripped = _yaml_commentless(raw).strip()
+        if not stripped:
+            continue
+        indent = len(raw) - len(raw.lstrip(" "))
+        rows.append((indent, stripped))
+    if not rows:
+        return None
+
+    def parse_block(position: int, indent: int) -> tuple[object, int]:
+        if position >= len(rows) or rows[position][0] < indent:
+            return {}, position
+        sequence = rows[position][1] == "-" or rows[position][1].startswith("- ")
+        if sequence:
+            result: list[object] = []
+            while position < len(rows) and rows[position][0] == indent and (rows[position][1] == "-" or rows[position][1].startswith("- ")):
+                item = rows[position][1][1:].strip()
+                position += 1
+                if not item:
+                    value, position = parse_block(position, rows[position][0] if position < len(rows) and rows[position][0] > indent else indent + 1)
+                    result.append(value)
+                    continue
+                pair = _yaml_key_value(item)
+                if pair is None:
+                    result.append(_yaml_scalar(item))
+                    continue
+                key, raw_value = pair
+                mapping: dict[str, object] = {key: _yaml_scalar(raw_value) if raw_value is not None else None}
+                if raw_value is None and position < len(rows) and rows[position][0] > indent:
+                    nested, position = parse_block(position, rows[position][0])
+                    mapping[key] = nested
+                if position < len(rows) and rows[position][0] > indent:
+                    extra, position = parse_block(position, rows[position][0])
+                    if not isinstance(extra, dict):
+                        raise ValueError("sequence mapping continuation must be a map")
+                    mapping.update(extra)
+                result.append(mapping)
+            return result, position
+        result_map: dict[str, object] = {}
+        while position < len(rows) and rows[position][0] == indent and not rows[position][1].startswith("- ") and rows[position][1] != "-":
+            pair = _yaml_key_value(rows[position][1])
+            if pair is None:
+                raise ValueError("invalid YAML mapping")
+            key, raw_value = pair
+            if key in result_map:
+                raise ValueError("duplicate YAML key")
+            position += 1
+            if raw_value is None and position < len(rows) and rows[position][0] > indent:
+                value, position = parse_block(position, rows[position][0])
+            else:
+                value = _yaml_scalar(raw_value)
+            result_map[key] = value
+        return result_map, position
+
+    try:
+        value, position = parse_block(0, rows[0][0])
+        if position != len(rows):
+            return None
+        return json.dumps(value, ensure_ascii=False, separators=(",", ":"), sort_keys=True).encode("utf-8")
+    except (TypeError, ValueError, json.JSONDecodeError):
+        return None
+
+
+def _canonical_content(relative: str, content: bytes) -> str | None:
+    if relative.casefold().endswith(".canvas"):
+        canonical = _canonical_json(content)
+    elif relative.casefold().endswith(".base"):
+        canonical = _canonical_json_value(content) or _canonical_yaml(content)
+    else:
+        canonical = None
+    return _sha256(canonical) if canonical is not None else None
+
+
 def _pin_tree_hash(entries: dict[str, bytes]) -> str:
     digest = hashlib.sha256()
     for relative in sorted(entries):
@@ -152,7 +361,11 @@ def _pin_payload(entries: dict[str, bytes]) -> dict:
         "tree_method": PIN_METHOD,
         "tree_sha256": _pin_tree_hash(entries),
         "files": {
-            relative: {"sha256": _sha256(entries[relative]), "size": len(entries[relative])}
+            relative: {
+                "sha256": _sha256(entries[relative]),
+                "size": len(entries[relative]),
+                **({"canonical_sha256": canonical} if (canonical := _canonical_content(relative, entries[relative])) else {}),
+            }
             for relative in sorted(entries)
         },
     }
@@ -268,10 +481,14 @@ def publish(
             raise Refusal(f"{label} falls under excluded vault path ({reason}): {guarded_path}")
     if _under(backup_path, root_path):
         raise Refusal(f"backup-root is inside vault: {backup_path}")
-    owned_hashes: dict[str, str] = {}
+    owned_entries: dict[str, dict] = {}
     if owned_pin is not None:
         owned_files = json.loads(Path(owned_pin).read_text(encoding="utf-8")).get("files", {})
-        owned_hashes = {relative: entry["sha256"] for relative, entry in owned_files.items()}
+        owned_entries = {
+            relative: entry
+            for relative, entry in owned_files.items()
+            if isinstance(relative, str) and isinstance(entry, dict)
+        }
 
     if apply:
         _run_rendering_gate(source_path)
@@ -344,8 +561,15 @@ def publish(
             actions.append({"path": relative, "action": "unchanged"})
             continue
         authored_by, locked = _frontmatter_flags(existing[relative])
-        # A file with no frontmatter (canvas, base) is ours only if it is byte-identical to what we last published.
-        if authored_by is None and not locked and owned_hashes.get(relative) == _sha256(existing[relative]):
+        # A file with no frontmatter (canvas, base) is ours only if it matches our last pin.
+        owned_entry = owned_entries.get(relative, {})
+        owned_by_bytes = owned_entry.get("sha256") == _sha256(existing[relative])
+        owned_by_canonical = (
+            relative.casefold().endswith(".canvas")
+            and isinstance(owned_entry.get("canonical_sha256"), str)
+            and owned_entry.get("canonical_sha256") == _canonical_content(relative, existing[relative])
+        )
+        if authored_by is None and not locked and (owned_by_bytes or owned_by_canonical):
             authored_by = "agent"
         if authored_by != "agent" or locked:
             reason = "locked target" if locked else "target is not authored_by: agent"

@@ -130,6 +130,61 @@ class PublisherTests(unittest.TestCase):
         self.assertIn("REFUSE Edited.canvas", result.stdout)
         self.assertEqual((target / "Edited.canvas").read_bytes(), b'{"nodes":[{"id":"douglas"}],"edges":[]}')
 
+    def test_owned_pin_accepts_obsidian_reserialization_but_refuses_moved_node(self):
+        target = self.vault / "50 Knowledge" / "57 Corpus" / "Saved AI Posts"
+        pinned = {
+            "nodes": [
+                {"id": "a", "type": "text", "text": "A", "x": 0, "y": 0, "width": 200, "height": 60},
+                {"id": "b", "type": "text", "text": "B", "x": 300, "y": 0, "width": 200, "height": 60},
+            ],
+            "edges": [{"id": "e", "fromNode": "a", "toNode": "b", "label": "relates"}],
+        }
+        pinned_bytes = json.dumps(pinned, separators=(",", ":")).encode("utf-8")
+        write(target / "Map.canvas", pinned_bytes)
+        write(self.source / "Map.canvas", pinned_bytes)
+        pin = self.root / "prior-pin.json"
+        result = run_cli(self.source, self.vault, "--write-pin", str(pin))
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        pin_data = json.loads(pin.read_text(encoding="utf-8"))
+        self.assertIn("canonical_sha256", pin_data["files"]["Map.canvas"])
+
+        obsidian = {
+            "edges": [{"toEnd": "arrow", "toSide": "left", "label": "relates", "id": "e", "fromEnd": "none", "fromNode": "a", "fromSide": "right", "toNode": "b"}],
+            "nodes": [
+                {"height": 60, "width": 200, "y": 0, "x": 300, "text": "B", "type": "text", "id": "b"},
+                {"height": 60, "width": 200, "y": 0, "x": 0, "text": "A", "type": "text", "id": "a"},
+            ],
+        }
+        obsidian_bytes = json.dumps(obsidian, indent="\t", ensure_ascii=False).encode("utf-8")
+        write(self.source / "Map.canvas", obsidian_bytes)
+        result = run_cli(self.source, self.vault, "--apply", "--owned-pin", str(pin))
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("UPDATE Map.canvas", result.stdout)
+        self.assertEqual((target / "Map.canvas").read_bytes(), obsidian_bytes)
+
+        moved = dict(obsidian)
+        moved["nodes"] = [dict(node) for node in obsidian["nodes"]]
+        moved["nodes"][0]["x"] = 301
+        moved_bytes = json.dumps(moved, indent="\t", ensure_ascii=False).encode("utf-8")
+        write(target / "Map.canvas", moved_bytes)
+        before = moved_bytes
+        result = run_cli(self.source, self.vault, "--apply", "--owned-pin", str(pin))
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("REFUSE Map.canvas", result.stdout)
+        self.assertEqual((target / "Map.canvas").read_bytes(), before)
+
+    def test_write_pin_canonicalizes_json_and_yaml_bases_and_skips_invalid_base(self):
+        write(self.source / "Views.base", b"views:\n  - name: Main\n    type: table\n")
+        write(self.source / "Json.base", b'{"views":[{"type":"table","name":"Main"}]}')
+        write(self.source / "Invalid.base", b": not yaml\n")
+        pin = self.root / "prior-pin.json"
+        result = run_cli(self.source, self.vault, "--write-pin", str(pin))
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        files = json.loads(pin.read_text(encoding="utf-8"))["files"]
+        self.assertIn("canonical_sha256", files["Views.base"])
+        self.assertIn("canonical_sha256", files["Json.base"])
+        self.assertNotIn("canonical_sha256", files["Invalid.base"])
+
     def test_geo_note_is_never_modified_and_orphans_are_kept(self):
         target = self.vault / "50 Knowledge" / "57 Corpus" / "Saved AI Posts"
         geo = b"---\nauthored_by: agent\n---\noriginal geo\n"
