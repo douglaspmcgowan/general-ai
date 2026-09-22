@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import re
 import sys
 from collections import Counter
@@ -13,6 +14,18 @@ from typing import Iterable
 VAULT_ROOT = "50 Knowledge/57 Corpus/Saved AI Posts"
 EXCLUDED = {"Backups", "_review", "_evidence"}
 WIKILINK_RE = re.compile(r"\[\[([^\]]+)\]\]")
+DETAIL_TOPICS = {
+    "ai news.canvas": "ai-news",
+    "design tools.canvas": "design-tools",
+    "cad and 3d.canvas": "cad-and-3d",
+    "agents and coding.canvas": "agents-and-coding",
+    "research.canvas": "research",
+    "workflows and productivity.canvas": "workflows-and-productivity",
+    "business.canvas": "business",
+    "hardware.canvas": "hardware",
+    "security.canvas": "security",
+    "unsorted.canvas": "unsorted",
+}
 TABLE_SEPARATOR_RE = re.compile(r"^\s*\|?\s*:?-{3,}:?\s*(?:\|\s*:?-{3,}:?\s*)+\|?\s*$")
 
 
@@ -104,6 +117,64 @@ def _contains(parent: tuple[float, float, float, float], child: tuple[float, flo
     return parent[0] <= child[0] and parent[1] <= child[1] and parent[2] >= child[2] and parent[3] >= child[3]
 
 
+def _entity_filename_map(entities: list[dict]) -> dict[str, str]:
+    used: dict[str, str] = {}
+    filenames: dict[str, str] = {}
+    invalid = re.compile(r'[<>:"/\\|?*\x00-\x1f]')
+    reserved = {"CON", "PRN", "AUX", "NUL", *(f"COM{i}" for i in range(1, 10)), *(f"LPT{i}" for i in range(1, 10))}
+    for entity in sorted(entities, key=lambda row: str(row["canonical"]).casefold()):
+        canonical = str(entity["canonical"]).strip()
+        stem = canonical if canonical.casefold().endswith(".md") else canonical + ".md"
+        safe = invalid.sub(" - ", stem).rstrip(" .")
+        if safe.split(".")[0].upper() in reserved:
+            safe = "_" + safe
+        if not safe:
+            safe = "unnamed-entity.md"
+        if safe.casefold() in used and used[safe.casefold()] != canonical:
+            safe = safe[:-3] + " — " + hashlib.sha1(canonical.encode("utf-8")).hexdigest()[:8] + ".md"
+        used[safe.casefold()] = canonical
+        filenames[canonical] = safe
+    return filenames
+
+
+def _detail_entity_violations(path: Path, source: Path, nodes: list[dict]) -> list[str]:
+    topic = DETAIL_TOPICS.get(path.name.casefold())
+    if not topic:
+        return []
+    classification = source.parent / "classification"
+    entities_path = classification / "entities-v1.json"
+    topics_path = classification / "primary-topics-v2.json"
+    if not entities_path.is_file() or not topics_path.is_file():
+        return []
+    try:
+        entities = json.loads(entities_path.read_text(encoding="utf-8")).get("entities", [])
+        overlay = {str(row["stable_id"]): str(row["primary_topic"]) for row in json.loads(topics_path.read_text(encoding="utf-8"))}
+    except (OSError, KeyError, TypeError, json.JSONDecodeError):
+        return []
+    category_ids = {stable_id for stable_id, assigned_topic in overlay.items() if assigned_topic == topic}
+    filenames = _entity_filename_map(entities)
+    allowed = {
+        f"{VAULT_ROOT}/Entities/{filenames[str(entity['canonical'])]}"
+        for entity in entities
+        if any(
+            pointer.get("source") == "collection"
+            and str(pointer.get("stable_id")) in category_ids
+            for pointer in entity.get("pointers", [])
+        )
+    }
+    all_entities = {f"{VAULT_ROOT}/Entities/{filename}" for filename in filenames.values()}
+    violations: list[str] = []
+    for node in nodes:
+        if node.get("type") != "text":
+            continue
+        for token in WIKILINK_RE.findall(str(node.get("text", ""))):
+            target, _alias = _split_link(token)
+            target = _unescape(target).split("#", 1)[0]
+            if target in all_entities and target not in allowed:
+                violations.append(f"{path}: entity card {node.get('id')} for {target!r} does not belong to category {topic}")
+    return violations
+
+
 def _resolve_path(source: Path, target: str) -> tuple[Path | None, bool]:
     target = target.replace("\\", "/").strip()
     if not target or target.startswith("#"):
@@ -140,6 +211,14 @@ def _check_canvas(path: Path, source: Path) -> tuple[list[str], Counter]:
     node_ids = {node.get("id") for node in nodes}
     rects = {node.get("id"): _rect(node) for node in nodes}
     groups = [node for node in nodes if node.get("type") == "group"]
+    violations.extend(_detail_entity_violations(path, source, nodes))
+    for group in groups:
+        width = float(group.get("width", 0))
+        height = float(group.get("height", 0))
+        if width > 0 and height / width > 4:
+            violations.append(f"{path}: group {group.get('id')} aspect ratio {height / width:.2f} exceeds 4")
+        if height > 2400:
+            violations.append(f"{path}: group {group.get('id')} height {height:g} exceeds 2400")
     for node in nodes:
         node_type = node.get("type")
         if node_type not in {"text", "file", "link", "group"}:

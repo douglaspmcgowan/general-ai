@@ -510,37 +510,70 @@ def overview_canvas(topic_data: dict[str, Any], entities: list[dict[str, Any]]) 
 
 
 def detail_canvas(topic: str, data: dict[str, Any], entities: list[dict[str, Any]], filenames: dict[str, str], homes: dict[str, tuple[str, str, str | None]]) -> dict[str, Any]:
-    """Lay out every comparison cluster as a non-overlapping group of text cards."""
+    """Lay out only this category's entities as square-ish cluster groups."""
     nodes, edges, add, _edge = canvas_builder()
     add({"type": "file", "file": f"{VAULT_ROOT}/Comparisons/{slug(TOPIC_LABELS[topic])} — comparison.md", "x": 20, "y": 20, "width": 420, "height": 300})
-    all_by_name = {str(entity["canonical"]): entity for entity in entities}
-    clustered = {str(name) for cluster in data["clusters"] for name in cluster.get("entities", [])}
+    category_record_ids = set(data["record_ids"])
+    all_by_name = {
+        str(entity["canonical"]): entity
+        for entity in entities
+        if any(
+            pointer.get("source") == "collection"
+            and str(pointer.get("stable_id")) in category_record_ids
+            for pointer in entity.get("pointers", [])
+        )
+    }
     groups: list[tuple[str, list[str]]] = []
+    clustered: set[str] = set()
+    assigned_to_cluster: set[str] = set()
     for cluster in data["clusters"]:
-        groups.append((f"{cluster['name']} ({len(cluster['post_ids'])} posts)", sorted({str(name) for name in cluster.get("entities", [])}, key=lambda name: (-int(all_by_name[name].get("pointer_count", 0)), name.casefold()))))
+        candidate_names = {
+            str(name) for name in cluster.get("entities", []) if str(name) in all_by_name
+        }
+        clustered.update(candidate_names)
+        names = sorted(
+            candidate_names - assigned_to_cluster,
+            key=lambda name: (-int(all_by_name[name].get("pointer_count", 0)), name.casefold()),
+        )
+        assigned_to_cluster.update(names)
+        if names:
+            groups.append((f"{cluster['name']} ({len(cluster['post_ids'])} posts)", names))
     other = sorted(set(all_by_name) - clustered, key=lambda name: (-int(all_by_name[name].get("pointer_count", 0)), name.casefold()))
     if other:
         groups.append(("Other entities", other))
-    group_width, card_width, card_height, card_gap = 620, 260, 100, 40
-    columns = 2
-    cursor_y = [400] * columns
-    specs: list[tuple[int, int, str, list[str], int]] = []
+    card_width, card_height, card_gap = 260, 90, 40
+    group_padding, label_clear, group_gap = 60, 50, 80
+    group_specs: list[tuple[str, list[str], int, int, int]] = []
     for label, names in groups:
-        rows = max(1, math.ceil(len(names) / 2))
-        height = 60 + rows * card_height + max(0, rows - 1) * card_gap + 60
-        column = min(range(columns), key=lambda current: (cursor_y[current], current))
-        x, y = 20 + column * (group_width + 80), cursor_y[column]
-        specs.append((x, y, label, names, height))
-        cursor_y[column] += height + 80
+        card_columns = min(6, max(1, math.ceil(math.sqrt(len(names)))))
+        rows = max(1, math.ceil(len(names) / card_columns))
+        width = group_padding * 2 + card_columns * card_width + (card_columns - 1) * card_gap
+        height = label_clear + group_padding + rows * card_height + (rows - 1) * card_gap + group_padding
+        group_specs.append((label, names, width, height, card_columns))
+    row_group_columns = 2
+    column_widths = [
+        max((spec[2] for index, spec in enumerate(group_specs) if index % row_group_columns == column), default=0)
+        for column in range(row_group_columns)
+    ]
+    row_heights = [
+        max((spec[3] for index, spec in enumerate(group_specs) if index // row_group_columns == row), default=0)
+        for row in range(math.ceil(len(group_specs) / row_group_columns))
+    ]
+    specs: list[tuple[int, int, str, list[str], int, int, int]] = []
+    for index, (label, names, width, height, card_columns) in enumerate(group_specs):
+        row, column = divmod(index, row_group_columns)
+        x = 20 + sum(column_widths[:column]) + group_gap * column
+        y = 400 + sum(row_heights[:row]) + group_gap * row
+        specs.append((x, y, label, names, width, height, card_columns))
     category_color = str(list(TOPIC_LABELS).index(topic) % 6 + 1)
-    for x, y, label, names, height in specs:
-        add({"type": "group", "label": label, "x": x, "y": y, "width": group_width, "height": height, "color": category_color})
+    for x, y, label, names, width, height, card_columns in specs:
+        add({"type": "group", "label": label, "x": x, "y": y, "width": width, "height": height, "color": category_color})
         for index, canonical in enumerate(names):
-            column, row = index % 2, index // 2
+            column, row = index % card_columns, index // card_columns
             entity = all_by_name[canonical]
-            posts = category_pointer_count(entity, topic, {str(post_id) for cluster in data["clusters"] for post_id in cluster["post_ids"]})
+            posts = category_pointer_count(entity, topic, category_record_ids)
             text = f"{vault_link('Entities/' + filenames[canonical], canonical)}\n{posts} posts"
-            add({"type": "text", "text": text, "x": x + 60 + column * (card_width + card_gap), "y": y + 60 + row * (card_height + card_gap), "width": card_width, "height": card_height, "color": category_color})
+            add({"type": "text", "text": text, "x": x + group_padding + column * (card_width + card_gap), "y": y + label_clear + group_padding + row * (card_height + card_gap), "width": card_width, "height": card_height, "color": category_color})
     return {"nodes": nodes, "edges": edges}
 
 
@@ -646,10 +679,21 @@ def build() -> dict[str, Any]:
     topic_data: dict[str, Any] = {}
     for topic in TOPIC_LABELS:
         doc = topic_docs[topic]
-        ids = {str(pid) for cluster in doc["clusters"] for pid in cluster["post_ids"]}
-        ents = topic_entities(doc, by_name)
-        topic_data[topic] = {"records": [records[sid] for sid in sorted(ids)], "entities": ents, "clusters": doc["clusters"], "doc": doc}
-        note, _ = comparison_note(topic, doc, records, ents, filenames)
+        comparison_ids = {str(pid) for cluster in doc["clusters"] for pid in cluster["post_ids"]}
+        category_record_ids = {stable_id for stable_id, assigned_topic in topic_overlay.items() if assigned_topic == topic}
+        if comparison_ids != category_record_ids:
+            raise RuntimeError(f"comparison post_ids do not match primary_topic assignment for {topic}")
+        comparison_ents = topic_entities(doc, by_name)
+        ents = [
+            entity for entity in entities
+            if any(
+                pointer.get("source") == "collection"
+                and str(pointer.get("stable_id")) in category_record_ids
+                for pointer in entity.get("pointers", [])
+            )
+        ]
+        topic_data[topic] = {"records": [records[sid] for sid in sorted(category_record_ids)], "record_ids": category_record_ids, "entities": ents, "clusters": doc["clusters"], "doc": doc}
+        note, _ = comparison_note(topic, doc, records, comparison_ents, filenames)
         target = comparison_dir / f"{slug(TOPIC_LABELS[topic])} — comparison.md"
         try:
             target.write_text(note, encoding="utf-8", newline="\n")
@@ -678,10 +722,9 @@ def build() -> dict[str, Any]:
             raise
     canvases_dir = PUBLICATION / "Canvases"
     canvases_dir.mkdir(parents=True, exist_ok=True)
-    homes = entity_homes(topic_data, entities)
     detail_canvases: dict[str, dict[str, Any]] = {}
     for topic in TOPIC_LABELS:
-        detail = detail_canvas(topic, topic_data[topic], entities, filenames, homes)
+        detail = detail_canvas(topic, topic_data[topic], entities, filenames, {})
         detail_canvases[topic] = detail
         target = canvases_dir / canvas_filename(topic)
         try:
