@@ -58,6 +58,13 @@ class PublisherTests(unittest.TestCase):
         self.assertIn("EXCLUDED_DIR=Backups/", result.stdout)
         self.assertIn("EXCLUDED_FILE=run-manifest.json", result.stdout)
 
+    def test_apply_refuses_when_rendering_gate_fails(self):
+        write(self.source / "broken.canvas", b'{"nodes":[{"id":"a","type":"file","x":0,"y":0,"width":420,"height":300,"file":"Notes/alpha.md"}],"edges":[]}' )
+        result = run_cli(self.source, self.vault, "--apply")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("rendering check failed", result.stdout)
+        self.assertFalse(self.vault.exists())
+
     def test_apply_creates_then_updates_and_backs_up(self):
         first = run_cli(self.source, self.vault, "--apply")
         self.assertEqual(first.returncode, 0, first.stderr)

@@ -12,6 +12,7 @@ import hashlib
 import json
 import os
 import re
+import subprocess
 import sys
 import tempfile
 from datetime import datetime, timezone
@@ -32,6 +33,23 @@ PIN_METHOD = "sha256(sorted relative-path\\0sha256\\0size\\n)"
 
 class Refusal(RuntimeError):
     """A run-level refusal that must prevent all vault writes."""
+
+
+def _run_rendering_gate(source: Path) -> None:
+    checker = Path(__file__).with_name("check_social_rendering.py")
+    if not checker.is_file():
+        raise Refusal(f"rendering check unavailable: {checker}")
+    result = subprocess.run(
+        [sys.executable, str(checker), str(source)],
+        cwd=str(checker.parent),
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+    )
+    summary = next((line for line in result.stdout.splitlines() if line.startswith("CANVASES=")), "rendering checker produced no summary")
+    if result.returncode:
+        raise Refusal(f"rendering check failed: {summary}")
+    print("RENDERING_CHECK=" + summary)
 
 
 def _lexical(path: os.PathLike[str] | str) -> str:
@@ -248,6 +266,9 @@ def publish(
             raise Refusal(f"{label} falls under excluded vault path ({reason}): {guarded_path}")
     if _under(backup_path, root_path):
         raise Refusal(f"backup-root is inside vault: {backup_path}")
+
+    if apply:
+        _run_rendering_gate(source_path)
 
     pin_entries, _ = _source_files(source_path, copy_set=False)
     copy_entries, excluded = _source_files(source_path, copy_set=True)
