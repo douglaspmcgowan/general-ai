@@ -5,6 +5,7 @@
 Finish repository-first cross-device reconstruction from the canonical harness and project GitHub authorities, preserve approved Obsidian configuration and declared external project data, retire or map legacy roots, and prove the complete flow on another computer.
 
 ## Active
+- [ ] SC16 — Fix the published Saved AI Posts corpus per Douglas 2026-09-21 ("didn't i tell you to have a dedicated file for each resource, and a set of obsidian files mapping things out? also these canvases look awful ... also the links are messed up") | owner: this session; builder lane via fleet (brief `scratchpad/brief-canvas-links-entities.md`) | done when: canvas file paths are vault-root and cards render; canvases are legible (no overlaps, nodes inside groups); aliased wikilinks in tables use `\|`; all 161 entities have a note plus an entity map; `.local/check_social_rendering.py` gates `publish_social_corpus.py --apply`; republished; Verify-VaultLinks BROKEN=0 and lint PASS; opened in Obsidian and looked at | class: MAIN.
 
 
 ## Queue
