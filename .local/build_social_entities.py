@@ -572,7 +572,7 @@ def detail_canvas(topic: str, data: dict[str, Any], entities: list[dict[str, Any
             column, row = index % card_columns, index // card_columns
             entity = all_by_name[canonical]
             posts = category_pointer_count(entity, topic, category_record_ids)
-            text = f"{vault_link('Entities/' + filenames[canonical], canonical)}\n{posts} posts"
+            text = f"{vault_link('Entities/' + filenames[canonical], canonical)}\n{posts} post{'s' if posts != 1 else ''}"
             add({"type": "text", "text": text, "x": x + group_padding + column * (card_width + card_gap), "y": y + label_clear + group_padding + row * (card_height + card_gap), "width": card_width, "height": card_height, "color": category_color})
     return {"nodes": nodes, "edges": edges}
 

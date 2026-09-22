@@ -108,6 +108,28 @@ class PublisherTests(unittest.TestCase):
         self.assertEqual((target / "Notes" / "alpha.md").read_bytes(), human)
         self.assertEqual((target / "Notes" / "nested" / "beta.bin").read_bytes(), locked)
 
+    def test_owned_pin_updates_unedited_frontmatterless_file_and_refuses_edited_one(self):
+        target = self.vault / "50 Knowledge" / "57 Corpus" / "Saved AI Posts"
+        published = b'{"nodes":[],"edges":[]}'
+        write(target / "Map.canvas", published)
+        write(target / "Edited.canvas", b'{"nodes":[{"id":"douglas"}],"edges":[]}')
+        write(self.source / "Map.canvas", b'{"nodes":[],"edges":[] }')
+        write(self.source / "Edited.canvas", b'{"nodes":[],"edges":[] }')
+        pin = self.root / "prior-pin.json"
+        digest = hashlib.sha256(published).hexdigest()
+        pin.write_text(json.dumps({"files": {
+            "Map.canvas": {"sha256": digest, "size": len(published)},
+            "Edited.canvas": {"sha256": digest, "size": len(published)},
+        }}), encoding="utf-8")
+        without = run_cli(self.source, self.vault)
+        self.assertIn("REFUSE Map.canvas", without.stdout)
+        result = run_cli(self.source, self.vault, "--apply", "--owned-pin", str(pin))
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("UPDATE Map.canvas", result.stdout)
+        self.assertEqual((target / "Map.canvas").read_bytes(), b'{"nodes":[],"edges":[] }')
+        self.assertIn("REFUSE Edited.canvas", result.stdout)
+        self.assertEqual((target / "Edited.canvas").read_bytes(), b'{"nodes":[{"id":"douglas"}],"edges":[]}')
+
     def test_geo_note_is_never_modified_and_orphans_are_kept(self):
         target = self.vault / "50 Knowledge" / "57 Corpus" / "Saved AI Posts"
         geo = b"---\nauthored_by: agent\n---\noriginal geo\n"

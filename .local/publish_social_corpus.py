@@ -245,6 +245,7 @@ def publish(
     backup_root: os.PathLike[str] | str | None = None,
     report: os.PathLike[str] | str | None = None,
     write_pin: os.PathLike[str] | str | None = None,
+    owned_pin: os.PathLike[str] | str | None = None,
 ) -> dict:
     source_path = Path(source)
     root_path = Path(vault_root)
@@ -255,6 +256,7 @@ def publish(
         (backup_path, "backup-root"),
         (Path(pin), "pin") if pin is not None else None,
         (Path(write_pin), "write-pin") if write_pin is not None else None,
+        (Path(owned_pin), "owned-pin") if owned_pin is not None else None,
         (Path(report), "report") if report is not None else None,
     )
     for guarded in guarded_paths:
@@ -266,6 +268,10 @@ def publish(
             raise Refusal(f"{label} falls under excluded vault path ({reason}): {guarded_path}")
     if _under(backup_path, root_path):
         raise Refusal(f"backup-root is inside vault: {backup_path}")
+    owned_hashes: dict[str, str] = {}
+    if owned_pin is not None:
+        owned_files = json.loads(Path(owned_pin).read_text(encoding="utf-8")).get("files", {})
+        owned_hashes = {relative: entry["sha256"] for relative, entry in owned_files.items()}
 
     if apply:
         _run_rendering_gate(source_path)
@@ -338,6 +344,9 @@ def publish(
             actions.append({"path": relative, "action": "unchanged"})
             continue
         authored_by, locked = _frontmatter_flags(existing[relative])
+        # A file with no frontmatter (canvas, base) is ours only if it is byte-identical to what we last published.
+        if authored_by is None and not locked and owned_hashes.get(relative) == _sha256(existing[relative]):
+            authored_by = "agent"
         if authored_by != "agent" or locked:
             reason = "locked target" if locked else "target is not authored_by: agent"
             print(f"REFUSE {relative}: {reason}")
@@ -385,6 +394,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--vault-root", required=True, type=Path, help="Obsidian vault root")
     parser.add_argument("--apply", action="store_true", help="perform creates and agent-authored updates")
     parser.add_argument("--pin", type=Path, help="reviewed tree pin JSON")
+    parser.add_argument("--owned-pin", type=Path, help="pin of the last publish; frontmatter-less targets still matching it may be updated")
     parser.add_argument("--write-pin", type=Path, help="write a new pin JSON for this source tree")
     parser.add_argument("--backup-root", type=Path, help="backup destination outside the vault")
     parser.add_argument("--report", type=Path, help="write a JSON run report")
@@ -403,6 +413,7 @@ def main(argv: Iterable[str] | None = None) -> int:
             backup_root=args.backup_root,
             report=args.report,
             write_pin=args.write_pin,
+            owned_pin=args.owned_pin,
         )
     except Refusal as error:
         print(f"REFUSE_RUN: {error}")
