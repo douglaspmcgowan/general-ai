@@ -5,6 +5,10 @@
 Finish repository-first cross-device reconstruction from the canonical harness and project GitHub authorities, preserve approved Obsidian configuration and declared external project data, retire or map legacy roots, and prove the complete flow on another computer.
 
 ## Active
+- [ ] SC17 — Make the canvases spatially meaningful | Douglas 2026-09-21: "map out how everything's related together in the clusters. It shouldn't just be a square list ... spatially make it significant ... something at the top so that the cards ... show meaningful text. I don't have to click in and zoom super in" | done when: position encodes relatedness (clusters and categories placed by shared entities/posts), edges carry labelled relations, every card shows a short hand-written line readable at fit-to-screen zoom, a legend card explains the encoding, gate passes, republished, preview looked at | owner: this session; builder lane | class: MAIN.
+- [ ] SC18 — Fix canvas ownership after Obsidian re-serializes on open | Douglas 2026-09-21: "I would just fix that Obsidian rewrite thing now" | done when: the publisher compares canonical JSON (not bytes) for .canvas targets, a test proves an Obsidian-reformatted unedited canvas updates and a moved node refuses | owner: builder lane | class: PARALLEL.
+- [ ] SC19 — Harness PR for better agent Obsidian writes | Douglas 2026-09-21: "You might want a PR to the harness ... so that we have better Obsidian writes in general for agents" | done when: a pyrgos-ai/doug-harness PR adds canvas vault-root paths, table-pipe escaping, canvas re-serialization-safe ownership and a reusable rendering check to the vault write owner, with tests | owner: builder lane | class: PARALLEL.
+- [ ] SC20 — Bring in new posts saved to the Instagram AI collection since 2026-09-19 | Douglas 2026-09-21: "There are some new posts recently since you last ran in the AI thing that I want you to check out and bring in" | done when: the collection feed is re-enumerated, new shortcodes captured with full captions, judged, classified, entity-linked, rendered and published, with counts | owner: this session (Claude in Chrome) | class: MAIN.
 
 
 ## Queue
