@@ -449,6 +449,7 @@ CLUSTER_LINES = {
     ("agents-and-coding", "Model and benchmark claims"): "Separate named tests and workflows from unlinked performance claims.",
     ("agents-and-coding", "Builder resources and open repositories"): "Inspect the artifact first; distinguish a usable repository from a promotional promise.",
     ("agents-and-coding", "Gated or underspecified recommendations"): "Treat comment gates and blurred names as leads, not implementation evidence.",
+    ("agents-and-coding", "Jev and local decision models"): "Compare fixed-option cloud decisions with local inference, then verify the benchmark conditions.",
     ("ai-news", "Roundups that compress many claims"): "Roundups are triage queues: verify each headline before carrying it forward.",
     ("ai-news", "Video-generation launches and performance claims"): "Verify video-model news with production tests, throughput, and terms.",
     ("ai-news", "Unnamed releases and sponsored serial teasers"): "Missing names and sponsorship make these saves follow-up prompts, not findings.",
@@ -1049,9 +1050,9 @@ def canvas_violations(canvas: dict[str, Any]) -> tuple[int, int]:
 def validate_inputs(topic_docs: dict[str, dict[str, Any]], entities: list[dict[str, Any]], readings: dict[str, dict[str, Any]], records: dict[str, dict[str, Any]]) -> None:
     if set(topic_docs) != set(TOPIC_LABELS):
         raise RuntimeError(f"category files mismatch: {sorted(topic_docs)}")
-    if len(readings) != 46:
-        raise RuntimeError(f"expected 46 entity readings, found {len(readings)}")
     multi = {e["canonical"] for e in entities if int(e.get("pointer_count", 0)) >= 2}
+    if len(readings) != len(multi):
+        raise RuntimeError(f"expected {len(multi)} entity readings, found {len(readings)}")
     if set(readings) != multi:
         raise RuntimeError("entity-readings-v1 does not exactly cover the multi-pointer entity set")
     seen: set[str] = set()
@@ -1066,8 +1067,9 @@ def validate_inputs(topic_docs: dict[str, dict[str, Any]], entities: list[dict[s
         if any(pid not in records for pid in ids):
             raise RuntimeError(f"unknown post id in {topic}")
         seen.update(ids)
-    if len(seen) != 192:
-        raise RuntimeError(f"category files cover {len(seen)} posts, expected 192")
+    expected_count=len(records)
+    if len(seen) != expected_count:
+        raise RuntimeError(f"category files cover {len(seen)} posts, expected {expected_count}")
     for doc in topic_docs.values():
         for cluster in doc["clusters"]:
             for entry in [cluster["summary"], *cluster["comparison"]]:
@@ -1087,8 +1089,9 @@ def build() -> dict[str, Any]:
     topic_overlay = {row["stable_id"]: row["primary_topic"] for row in read_json(TOPIC_JSON)}
     records_list = [row for row in read_json(CATALOG_JSON)["records"] if row.get("collection_membership") == "confirmed"]
     records = {row["stable_id"]: row for row in records_list}
-    if len(records) != 192 or set(topic_overlay) != set(records):
-        raise RuntimeError("confirmed records and topic overlay must both cover exactly 192 records")
+    expected_count=len(records)
+    if set(topic_overlay) != set(records):
+        raise RuntimeError(f"confirmed records and topic overlay must both cover exactly {expected_count} records")
     topic_docs = {p.stem: read_json(p) for p in COMPARISONS.glob("*.json") if p.name != "_cross-category.json"}
     validate_inputs(topic_docs, entities, readings, records)
     by_name = {e["canonical"]: e for e in entities}

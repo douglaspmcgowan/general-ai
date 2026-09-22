@@ -26,6 +26,32 @@ def list_value(r,field):
 def load(p):
     try:return json.loads(p.read_text(encoding="utf-8"))
     except Exception as e: raise RuntimeError(f"malformed JSON: {p}: {e}") from e
+def validate_judgement_coverage(confirmed, judgement_items):
+    confirmed_ids=[str(record.get("stable_id")) for record in confirmed]
+    if any(record.get("stable_id") in (None, "") for record in confirmed):
+        raise RuntimeError("confirmed member is missing stable_id")
+    if len(confirmed_ids) != len(set(confirmed_ids)):
+        raise RuntimeError("confirmed membership contains duplicate stable_id")
+    judgement_ids=[]
+    for item in judgement_items:
+        stable_id=item.get("stable_id") if isinstance(item,dict) else None
+        if stable_id in (None, ""):
+            raise RuntimeError("judgement record is missing stable_id")
+        judgement_ids.append(str(stable_id))
+    counts=Counter(judgement_ids)
+    missing=sorted(set(confirmed_ids)-set(judgement_ids))
+    duplicates=sorted(stable_id for stable_id,count in counts.items() if count != 1)
+    extra=sorted(set(judgement_ids)-set(confirmed_ids))
+    if len(confirmed_ids) != len(judgement_ids):
+        detail=f"; missing judgement for confirmed members: {', '.join(missing)}" if missing else ""
+        raise RuntimeError(f"confirmed member count {len(confirmed_ids)} does not equal judgement record count {len(judgement_ids)}{detail}")
+    if missing:
+        raise RuntimeError(f"missing judgement for confirmed members: {', '.join(missing)}")
+    if duplicates:
+        raise RuntimeError(f"confirmed members must have exactly one judgement; duplicate judgement records: {', '.join(duplicates)}")
+    if extra:
+        raise RuntimeError(f"judgement records target non-confirmed members: {', '.join(extra)}")
+    return {"confirmed":len(confirmed_ids),"judgements":len(judgement_ids),"missing":missing,"duplicates":duplicates,"extra":extra}
 def judgement_correction_paths():
     paths=[]; seen=set()
     for base in (ROOT/"classification", JUDGEMENT_DIR):
@@ -299,13 +325,12 @@ def main():
     ap=argparse.ArgumentParser(); ap.add_argument('--dest','--destination',dest='dest',default=str(ROOT/'publication-dryrun')); ap.add_argument('--publish',action='store_true'); a=ap.parse_args()
     if a.publish: raise RuntimeError('--publish is forbidden in this packet')
     if not INPUT.exists(): raise RuntimeError(f'missing input: {INPUT}')
-    data=load(INPUT); records=data.get('records',data); confirmed=[r for r in records if r.get('collection_membership')=='confirmed']
-    if len(confirmed)!=192: raise RuntimeError(f'expected 192 confirmed members, found {len(confirmed)}')
+    data=load(INPUT); records=data.get('records',data); confirmed=[r for r in records if r.get('collection_membership')=='confirmed']; confirmed_count=len(confirmed)
     dest=Path(a.dest); notes=dest/'Notes'; topics=dest/'Topics'; backups=[]; refusals=[]; rows=defaultdict(list); emitted=[]; old={p.name.split(' — ')[-1][:-3]:p for p in notes.glob('*.md')} if notes.exists() else {}
     for r in confirmed:
         sid=r['stable_id']; fn=old[sid].name if sid in old else f'{slug(title(r))} — {sid}.md'; p=notes/fn
         if write(p,render(r),backups,refusals): emitted.append(p); rows[topic(r)].append((r,fn))
-    idx='''---\ntype: index\ntitle: Saved AI Posts — Corpus Index\nauthored_by: agent\nmaintained_by: agent\nstatus: current\ncorpus: Saved AI Posts\ntags: [index, corpus/saved-ai-posts, agent-note]\nupdated: "2026-09-20"\n---\n\n# Saved AI Posts\n\nThis dry run publishes 192 confirmed Instagram AI-collection members. LinkedIn records and rejected records are out of scope and excluded.\n\n## Entry points\n\n'''+"\n".join([f"- {link('50 Knowledge/57 Corpus/Saved AI Posts/Saved AI Posts.base','Saved AI Posts.base')}",f"- {link('50 Knowledge/57 Corpus/Saved AI Posts/Needs review.md','Needs review')}",f"- {link('50 Knowledge/57 Corpus/Saved AI Posts/DM resources.md','DM resources')}"])+"\n"
+    idx='''---\ntype: index\ntitle: Saved AI Posts — Corpus Index\nauthored_by: agent\nmaintained_by: agent\nstatus: current\ncorpus: Saved AI Posts\ntags: [index, corpus/saved-ai-posts, agent-note]\nupdated: "2026-09-22"\n---\n\n# Saved AI Posts\n\nThis dry run publishes {confirmed_count} confirmed Instagram AI-collection members. LinkedIn records and rejected records are out of scope and excluded.\n\n## Entry points\n\n'''.format(confirmed_count=confirmed_count)+"\n".join([f"- {link('50 Knowledge/57 Corpus/Saved AI Posts/Saved AI Posts.base','Saved AI Posts.base')}",f"- {link('50 Knowledge/57 Corpus/Saved AI Posts/Needs review.md','Needs review')}",f"- {link('50 Knowledge/57 Corpus/Saved AI Posts/DM resources.md','DM resources')}"])+"\n"
     write(dest/'00 - Saved AI Posts Corpus Index.md',idx,backups,refusals)
     write(dest/'Needs review.md','''---\ntype: index\ntitle: Saved AI Posts — Needs review\nauthored_by: agent\nmaintained_by: agent\nstatus: current\ncorpus: Saved AI Posts\ntags: [index, corpus/saved-ai-posts, agent-note]\nupdated: "2026-09-20"\n---\n\n# Needs review\n\n'''+"\n".join(f"- {r['stable_id']}: {clean(r.get('unresolved_questions') or ['unresolved'])}" for r in confirmed if r.get('unresolved_questions'))+"\n",backups,refusals)
     dm=load(DM) if DM.exists() else {'resources':[]}
@@ -329,26 +354,9 @@ def main():
     raw_plan=raw_plan.replace('[[50 Knowledge/57 Corpus/Saved AI Posts/Topics/slug.md|slug]]', link('50 Knowledge/57 Corpus/Saved AI Posts/00 - Saved AI Posts Corpus Index.md','slug'))
     plan_text='---\ntype: note\ntitle: Continuation plan and progress map\nauthored_by: agent\nmaintained_by: agent\nstatus: current\ncorpus: Saved AI Posts\nupdated: "2026-09-20"\n---\n\n'+raw_plan
     write_generated(dest/'Continuation plan and progress map.md',plan_text,backups)
-    manifest={'input':{'path':str(INPUT),'size':INPUT.stat().st_size,'sha256':sha(INPUT)},'confirmed_members':192,'source_notes':len(emitted),'syntheses':len(rows),'backups':backups,'refusals':refusals,'excluded':{'rejected':sum(r.get('collection_membership')=='rejected' for r in records),'not_applicable':sum(r.get('collection_membership')=='not_applicable' for r in records)},'vault_write':False}
+    manifest={'input':{'path':str(INPUT),'size':INPUT.stat().st_size,'sha256':sha(INPUT)},'confirmed_members':confirmed_count,'source_notes':len(emitted),'syntheses':len(rows),'backups':backups,'refusals':refusals,'excluded':{'rejected':sum(r.get('collection_membership')=='rejected' for r in records),'not_applicable':sum(r.get('collection_membership')=='not_applicable' for r in records)},'vault_write':False}
     write_generated(dest/'run-manifest.json',json.dumps(manifest,indent=2,ensure_ascii=False),backups)
-    evidence='''# Contract evidence
-
-| # | Status | Command / real output |
-|---|---|---|
-| 1 | unproven | `builder --dest publication-dryrun`; 192 notes, 5 syntheses; official asset copy not independently proven |
-| 2 | pass | second run stable-ID scan; `source_notes=192`, no duplicate suffixes |
-| 3 | pass | wikilink scan; `BARE=0` |
-| 4 | pass | PyYAML scan; `PARSED=201` emitted markdown frontmatters (plan copy contains nested source delimiters) |
-| 5 | pass | filename suffix scan; `192` confirmed stable IDs, each once |
-| 6 | pass | link scan; `LINKS=197`, unresolved generated targets `0` after vault-relative normalization |
-| 7 | pass | fixture-contract2; one backup and one refusal reported |
-| 8 | pass | fixture judgement render; all requested keys present in frontmatter and sections |
-| 9 | pass | separate `usefulness_rating` and `usefulness_rationale` key count `192/192` |
-| 10 | pass | strict `load_json`; malformed JSON raises parser error, no repair |
-| 11 | pass | manifest records input size `1122925` and sha256 `eebc02c39af33a79dbc7302e0405d41621cacc0fd8fa9876649cff75a609e207` |
-| 12 | pass | membership gate; `confirmed=192`, `rejected=405`, `not_applicable=68`, `vault_write=false` |
-'''
-    evidence=contract_evidence(dest,manifest,records,confirmed,assignments,rows,backups,refusals)
+    evidence=f"# Contract evidence\n\nLegacy renderer output: confirmed_members={confirmed_count}; rejected={manifest['excluded']['rejected']}; not_applicable={manifest['excluded']['not_applicable']}.\n"
     write_generated(dest/'CONTRACT-EVIDENCE.md',evidence,backups); print(json.dumps(manifest,ensure_ascii=False,sort_keys=True))
 def synthesis_v3(topic,records,names):
     label=TOPIC_LABELS[topic]; total=len(records); coherent=coherence_count(topic,records); ranked=sorted(records,key=lambda r:({"high":3,"medium":2,"low":1,"unresolved":0}.get(str(r.get('usefulness_rating') or 'unresolved').lower(),0),title(r)),reverse=True)
@@ -442,14 +450,13 @@ def main_v3():
     data=load(INPUT); records=data.get('records',data)
     judgement_corrections=load_judgement_corrections()
     records, applied_judgement_corrections=apply_judgement_corrections(records, judgement_corrections)
-    confirmed=[r for r in records if r.get('collection_membership')=='confirmed']
-    if len(confirmed)!=192: raise RuntimeError(f'expected 192 confirmed members, found {len(confirmed)}')
-    judgement_by_id={}
+    confirmed=[r for r in records if r.get('collection_membership')=='confirmed']; confirmed_count=len(confirmed)
+    judgement_items=[]
     for batch_path in sorted(JUDGEMENT_DIR.glob('batch-*.json')):
         batch_data=load(batch_path)
-        for item in batch_data.get('items',[]):
-            if item.get('stable_id'): judgement_by_id[str(item['stable_id'])]=item
-    if len(judgement_by_id) != 192: raise RuntimeError(f'expected 192 judgement records, found {len(judgement_by_id)}')
+        judgement_items.extend(batch_data.get('items',[]))
+    coverage=validate_judgement_coverage(confirmed,judgement_items)
+    judgement_by_id={str(item['stable_id']):item for item in judgement_items}
     if not OVERLAY.exists(): raise RuntimeError(f'missing topic overlay: {OVERLAY}')
     overlay=load(OVERLAY)
     if not isinstance(overlay,list): raise RuntimeError(f'topic overlay must be a list: {OVERLAY}')
@@ -487,7 +494,7 @@ def main_v3():
             break
     if not IMAGE_SOURCE.exists(): raise RuntimeError(f'missing official image asset: {IMAGE_SOURCE}')
     img=dest/IMAGE_DEST_REL; img.parent.mkdir(parents=True,exist_ok=True); shutil.copy2(IMAGE_SOURCE,img)
-    idx='''---\ntype: index\ntitle: Saved AI Posts — Corpus Index\nauthored_by: agent\nmaintained_by: agent\nstatus: current\ncorpus: Saved AI Posts\nupdated: "2026-09-20"\n---\n\n# Saved AI Posts\n\nThis dry run publishes 192 confirmed Instagram AI-collection members. LinkedIn records and rejected records are out of scope.\n\nThe existing geo-grandmasters note is preserved but its post is rejected in v3 and is not a member of this AI collection: '''+link('50 Knowledge/57 Corpus/Saved AI Posts/Notes/geo_grandmasters — AI surveillance and commercial power — DZ7sxpHyfzu.md','existing geo note')+'''.\n\n''' + "\n".join(f"- {link('50 Knowledge/57 Corpus/Saved AI Posts/Topics/'+k+'.md',TOPIC_LABELS[k])}" for k in sorted(rows))+'''\n\n## Analysis layer\n\n- '''+link('50 Knowledge/57 Corpus/Saved AI Posts/Comparisons/Cross-category comparison.md','cross-category comparison')+'''\n- '''+link('50 Knowledge/57 Corpus/Saved AI Posts/Comparisons/ai-news — comparison.md','category comparisons')+'''\n- '''+link('50 Knowledge/57 Corpus/Saved AI Posts/Entities/agentic-os.md','entity notes (multi-pointer)')+'''\n- '''+link('50 Knowledge/57 Corpus/Saved AI Posts/Saved AI Posts.canvas','category and cluster canvas')+'''\n'''; write(dest/'00 - Saved AI Posts Corpus Index.md',idx,backups,refusals)
+    idx=f'''---\ntype: index\ntitle: Saved AI Posts — Corpus Index\nauthored_by: agent\nmaintained_by: agent\nstatus: current\ncorpus: Saved AI Posts\nupdated: "2026-09-22"\n---\n\n# Saved AI Posts\n\nThis dry run publishes {confirmed_count} confirmed Instagram AI-collection members. LinkedIn records and rejected records are out of scope.\n\nThe existing geo-grandmasters note is preserved but its post is rejected in v3 and is not a member of this AI collection: '''+link('50 Knowledge/57 Corpus/Saved AI Posts/Notes/geo_grandmasters — AI surveillance and commercial power — DZ7sxpHyfzu.md','existing geo note')+'''.\n\n''' + "\n".join(f"- {link('50 Knowledge/57 Corpus/Saved AI Posts/Topics/'+k+'.md',TOPIC_LABELS[k])}" for k in sorted(rows))+'''\n\n## Analysis layer\n\n- '''+link('50 Knowledge/57 Corpus/Saved AI Posts/Comparisons/Cross-category comparison.md','cross-category comparison')+'''\n- '''+link('50 Knowledge/57 Corpus/Saved AI Posts/Comparisons/ai-news — comparison.md','category comparisons')+'''\n- '''+link('50 Knowledge/57 Corpus/Saved AI Posts/Entities/agentic-os.md','entity notes (multi-pointer)')+'''\n- '''+link('50 Knowledge/57 Corpus/Saved AI Posts/Saved AI Posts.canvas','category and cluster canvas')+'''\n'''; write(dest/'00 - Saved AI Posts Corpus Index.md',idx,backups,refusals)
     ensure_corpus_index_links(dest)
     write(dest/'Needs review.md','''---\ntype: index\ntitle: Saved AI Posts — Needs review\nauthored_by: agent\nmaintained_by: agent\nstatus: current\ncorpus: Saved AI Posts\nupdated: "2026-09-20"\n---\n\n# Needs review\n\n'''+'\n'.join(f"- {r['stable_id']}: {', '.join(clean(x) for x in list_value(r,'unresolved_questions')[0])}" for r in confirmed if list_value(r,'unresolved_questions')[0])+"\n",backups,refusals)
     write(dest/'Notes/README.md',folder_readme('Saved AI Posts — Notes index','This folder holds one source note for each accepted AI and technology saved post.',[(f'50 Knowledge/57 Corpus/Saved AI Posts/Notes/{names[sid]}',title(next(r for r in confirmed if r['stable_id']==sid))) for sid in sorted(names)]),backups,refusals)
@@ -550,7 +557,7 @@ def main_v3():
     correction_files=[]
     for path in judgement_correction_paths():
         correction_files.append({'path':str(path.resolve().relative_to(ROOT.resolve())).replace('\\','/'),'size':path.stat().st_size,'sha256':sha(path)})
-    manifest={'input':{'path':'classification/catalog-records-v3.json','size':INPUT.stat().st_size,'sha256':sha(INPUT)},'topic_overlay':{'path':'classification/primary-topics-v2.json','size':OVERLAY.stat().st_size,'sha256':sha(OVERLAY)},'judgement_correction_files':correction_files,'judgement_corrections':applied_judgement_corrections,'confirmed_members':192,'source_notes':len(emitted),'syntheses':len(rows),'topic_counts':dict(sorted((k,len(v)) for k,v in rows.items())),'coherence_counts':coherence_counts,'credibility_checks':{'records':len((credibility.get('records',{}) if isinstance(credibility,dict) else {})),'distinct_members':len(credibility_by_id),'notes_with_checks':sum(bool(credibility_by_id.get(str(r['stable_id']))) for r in confirmed)},'caption_source_histogram':dict(sorted(source_hist.items())),'wikilinks_checked':link_count,'bare_wikilinks':bare_count,'media_description_rewrites':MEDIA_REWRITES,'plan_copy':True,'backups':safe_backups,'refusals':refusals,'excluded':{'rejected':sum(r.get('collection_membership')=='rejected' for r in records),'not_applicable':sum(r.get('collection_membership')=='not_applicable' for r in records)},'vault_write':False,'official_image':{'stable_id':'DbQyH2NBc7C','published_path':IMAGE_DEST_REL.as_posix(),'source':'vendor repository','instagram_media':False}}
+    manifest={'input':{'path':'classification/catalog-records-v3.json','size':INPUT.stat().st_size,'sha256':sha(INPUT)},'topic_overlay':{'path':'classification/primary-topics-v2.json','size':OVERLAY.stat().st_size,'sha256':sha(OVERLAY)},'judgement_correction_files':correction_files,'judgement_corrections':applied_judgement_corrections,'confirmed_members':confirmed_count,'judgement_records':coverage['judgements'],'source_notes':len(emitted),'syntheses':len(rows),'topic_counts':dict(sorted((k,len(v)) for k,v in rows.items())),'coherence_counts':coherence_counts,'credibility_checks':{'records':len((credibility.get('records',{}) if isinstance(credibility,dict) else {})),'distinct_members':len(credibility_by_id),'notes_with_checks':sum(bool(credibility_by_id.get(str(r['stable_id']))) for r in confirmed)},'caption_source_histogram':dict(sorted(source_hist.items())),'wikilinks_checked':link_count,'bare_wikilinks':bare_count,'media_description_rewrites':MEDIA_REWRITES,'plan_copy':True,'backups':safe_backups,'refusals':refusals,'excluded':{'rejected':sum(r.get('collection_membership')=='rejected' for r in records),'not_applicable':sum(r.get('collection_membership')=='not_applicable' for r in records)},'vault_write':False,'official_image':{'stable_id':'DbQyH2NBc7C','published_path':IMAGE_DEST_REL.as_posix(),'source':'vendor repository','instagram_media':False}}
     write_generated(dest/'run-manifest.json',json.dumps(manifest,indent=2,ensure_ascii=False),backups)
     evidence=contract_evidence(dest,manifest,records,confirmed,assignments,rows,backups,refusals); write_generated(dest/'CONTRACT-EVIDENCE.md',evidence,backups); ensure_agent_note_tags(dest); scrub_publication_paths(dest); print(json.dumps(manifest,ensure_ascii=False,sort_keys=True))
 
