@@ -134,8 +134,8 @@ class PublisherTests(unittest.TestCase):
         target = self.vault / "50 Knowledge" / "57 Corpus" / "Saved AI Posts"
         pinned = {
             "nodes": [
-                {"id": "a", "type": "text", "text": "A", "x": 0, "y": 0, "width": 200, "height": 60},
-                {"id": "b", "type": "text", "text": "B", "x": 300, "y": 0, "width": 200, "height": 60},
+                {"id": "a", "type": "text", "text": "# A", "x": 0, "y": 0, "width": 200, "height": 60},
+                {"id": "b", "type": "text", "text": "# B", "x": 300, "y": 0, "width": 200, "height": 60},
             ],
             "edges": [{"id": "e", "fromNode": "a", "toNode": "b", "label": "relates"}],
         }
@@ -151,16 +151,20 @@ class PublisherTests(unittest.TestCase):
         obsidian = {
             "edges": [{"toEnd": "arrow", "toSide": "left", "label": "relates", "id": "e", "fromEnd": "none", "fromNode": "a", "fromSide": "right", "toNode": "b"}],
             "nodes": [
-                {"height": 60, "width": 200, "y": 0, "x": 300, "text": "B", "type": "text", "id": "b"},
-                {"height": 60, "width": 200, "y": 0, "x": 0, "text": "A", "type": "text", "id": "a"},
+                {"height": 60, "width": 200, "y": 0, "x": 300, "text": "# B", "type": "text", "id": "b"},
+                {"height": 60, "width": 200, "y": 0, "x": 0, "text": "# A", "type": "text", "id": "a"},
             ],
         }
+        # The vault copy is the pinned canvas as Obsidian re-saves it on open; the source has a new revision.
         obsidian_bytes = json.dumps(obsidian, indent="\t", ensure_ascii=False).encode("utf-8")
-        write(self.source / "Map.canvas", obsidian_bytes)
+        write(target / "Map.canvas", obsidian_bytes)
+        revised = dict(pinned, nodes=[dict(node, text=node["text"] + " revised") for node in pinned["nodes"]])
+        revised_bytes = json.dumps(revised, separators=(",", ":")).encode("utf-8")
+        write(self.source / "Map.canvas", revised_bytes)
         result = run_cli(self.source, self.vault, "--apply", "--owned-pin", str(pin))
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("UPDATE Map.canvas", result.stdout)
-        self.assertEqual((target / "Map.canvas").read_bytes(), obsidian_bytes)
+        self.assertEqual((target / "Map.canvas").read_bytes(), revised_bytes)
 
         moved = dict(obsidian)
         moved["nodes"] = [dict(node) for node in obsidian["nodes"]]

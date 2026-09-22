@@ -6,7 +6,7 @@ import json
 import hashlib
 import re
 import sys
-from collections import Counter
+from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Iterable
 
@@ -117,6 +117,48 @@ def _contains(parent: tuple[float, float, float, float], child: tuple[float, flo
     return parent[0] <= child[0] and parent[1] <= child[1] and parent[2] >= child[2] and parent[3] >= child[3]
 
 
+def _side_point(rect: tuple[float, float, float, float], side: str) -> tuple[float, float] | None:
+    left, top, right, bottom = rect
+    if side == "left":
+        return left, (top + bottom) / 2
+    if side == "right":
+        return right, (top + bottom) / 2
+    if side == "top":
+        return (left + right) / 2, top
+    if side == "bottom":
+        return (left + right) / 2, bottom
+    return None
+
+
+def _orientation(a: tuple[float, float], b: tuple[float, float], c: tuple[float, float]) -> float:
+    return (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])
+
+
+def _segments_cross(left: tuple[tuple[float, float], tuple[float, float]], right: tuple[tuple[float, float], tuple[float, float]]) -> bool:
+    a, b = left
+    c, d = right
+    values = (_orientation(a, b, c), _orientation(a, b, d), _orientation(c, d, a), _orientation(c, d, b))
+    return ((values[0] > 0 > values[1]) or (values[0] < 0 < values[1])) and ((values[2] > 0 > values[3]) or (values[2] < 0 < values[3]))
+
+
+def _edge_crossings(edges: list[dict], rects: dict[str, tuple[float, float, float, float]]) -> int:
+    segments: list[tuple[dict, tuple[tuple[float, float], tuple[float, float]]]] = []
+    for edge in edges:
+        if edge.get("fromNode") not in rects or edge.get("toNode") not in rects:
+            continue
+        from_point = _side_point(rects[edge["fromNode"]], str(edge.get("fromSide", "")))
+        to_point = _side_point(rects[edge["toNode"]], str(edge.get("toSide", "")))
+        if from_point is not None and to_point is not None:
+            segments.append((edge, (from_point, to_point)))
+    crossings = 0
+    for index, (left_edge, left_segment) in enumerate(segments):
+        for right_edge, right_segment in segments[index + 1 :]:
+            if {left_edge.get("fromNode"), left_edge.get("toNode")} & {right_edge.get("fromNode"), right_edge.get("toNode")}:
+                continue
+            crossings += int(_segments_cross(left_segment, right_segment))
+    return crossings
+
+
 def _entity_filename_map(entities: list[dict]) -> dict[str, str]:
     used: dict[str, str] = {}
     filenames: dict[str, str] = {}
@@ -191,6 +233,91 @@ def _resolve_path(source: Path, target: str) -> tuple[Path | None, bool]:
     return next((candidate for candidate in candidates if candidate.is_file()), candidates[0]), False
 
 
+def _line_words(value: str) -> int:
+    return len(re.findall(r"\S+", value.strip()))
+
+
+def _looks_like_shortcode(token: str) -> bool:
+    return len(token) >= 8 and token.startswith("D") and (any(character.isdigit() for character in token) or "_" in token or sum(character.isupper() for character in token) >= 2)
+
+
+def _card_lines_violations(source: Path) -> list[str]:
+    path = source.parent / "classification" / "card-lines-v1.json"
+    if not path.is_file():
+        return []
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        return [f"{path}: invalid card-lines JSON ({error})"]
+    violations: list[str] = []
+    lines: list[tuple[str, str]] = []
+    for topic, entry in payload.get("categories", {}).items():
+        line = str(entry.get("line", ""))
+        lines.append((f"category {topic}", line))
+        if _line_words(line) > 14:
+            violations.append(f"{path}: category line {topic!r} exceeds 14 words")
+    comparisons_dir = path.parent / "comparisons"
+    source_summaries: list[str] = []
+    if comparisons_dir.is_dir():
+        for comparison in comparisons_dir.glob("*.json"):
+            if comparison.name.startswith("_"):
+                continue
+            try:
+                document = json.loads(comparison.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                continue
+            for cluster in document.get("clusters", []):
+                source_summaries.append(str(cluster.get("summary", {}).get("text", "")))
+                source_summaries.extend(str(item.get("text", "")) for item in cluster.get("comparison", []))
+            source_summaries.append(str(document.get("headline", "")))
+    for topic, clusters in payload.get("clusters", {}).items():
+        for name, entry in clusters.items():
+            line = str(entry.get("line", ""))
+            lines.append((f"cluster {topic}/{name}", line))
+            if _line_words(line) > 12:
+                violations.append(f"{path}: cluster line {topic}/{name!r} exceeds 12 words")
+    for index, relation in enumerate(payload.get("relations", [])):
+        line = str(relation.get("line", ""))
+        if relation.get("line_kind") == "data":
+            # A data label lists shared names; it must match the data exactly and is exempt from prose rules.
+            shared = relation.get("shared_entities") or []
+            expected = "shared: " + ", ".join(shared[:3]) if shared else f"{len(relation.get('shared_posts') or [])} shared posts"
+            if line != expected:
+                violations.append(f"{path}: relation {index} data label does not match its shared data")
+            continue
+        lines.append((f"relation {index}", line))
+        if _line_words(line) > 8:
+            violations.append(f"{path}: relation {index} exceeds 8 words")
+        if not relation.get("shared_entities") and not relation.get("shared_posts"):
+            violations.append(f"{path}: relation {index} has no grounded overlap")
+    first_four: dict[str, str] = {}
+    for owner, line in lines:
+        if not line.strip():
+            violations.append(f"{path}: {owner} has an empty line")
+            continue
+        if any(_looks_like_shortcode(token.strip(".,:;()[]")) for token in line.split()):
+            violations.append(f"{path}: {owner} contains a shortcode-like token")
+        prefix = " ".join(line.split()[:4]).casefold()
+        if prefix in first_four:
+            violations.append(f"{path}: {owner} shares its first four words with {first_four[prefix]}")
+        else:
+            first_four[prefix] = owner
+        lowered = line.casefold()
+        if any(lowered in summary.casefold() for summary in source_summaries if lowered):
+            violations.append(f"{path}: {owner} is a source-summary substring")
+    return violations
+
+
+def _canvas_bounds(path: Path, nodes: list[dict]) -> tuple[float, float]:
+    if not nodes:
+        return 0.0, 0.0
+    min_x = min(float(node.get("x", 0)) for node in nodes)
+    min_y = min(float(node.get("y", 0)) for node in nodes)
+    max_x = max(float(node.get("x", 0)) + float(node.get("width", 0)) for node in nodes)
+    max_y = max(float(node.get("y", 0)) + float(node.get("height", 0)) for node in nodes)
+    return max_x - min_x, max_y - min_y
+
+
 def _check_canvas(path: Path, source: Path) -> tuple[list[str], Counter]:
     violations: list[str] = []
     counts: Counter = Counter()
@@ -203,6 +330,10 @@ def _check_canvas(path: Path, source: Path) -> tuple[list[str], Counter]:
     nodes = canvas["nodes"]
     edges = canvas["edges"]
     counts.update({"nodes": len(nodes), "groups": sum(node.get("type") == "group" for node in nodes), "edges": len(edges)})
+    bound_width, bound_height = _canvas_bounds(path, nodes)
+    max_width, max_height = ((2600, 1800) if path.name.casefold() == "saved ai posts.canvas" else (3200, 2200))
+    if bound_width > max_width or bound_height > max_height:
+        violations.append(f"{path}: bounding box {bound_width:g}x{bound_height:g} exceeds {max_width}x{max_height}")
     ids = [node.get("id") for node in nodes] + [edge.get("id") for edge in edges]
     if any(not isinstance(value, str) or not value for value in ids):
         violations.append(f"{path}: every node and edge needs a non-empty id")
@@ -229,6 +360,10 @@ def _check_canvas(path: Path, source: Path) -> tuple[list[str], Counter]:
         if node_type == "text":
             if not isinstance(node.get("text"), str):
                 violations.append(f"{path}: text node {node.get('id')} missing text")
+            else:
+                first_line = next((line.strip() for line in node["text"].splitlines() if line.strip()), "")
+                if not first_line.startswith("#"):
+                    violations.append(f"{path}: text node {node.get('id')} first line is not a heading")
             if float(node.get("width", 0)) < 200 or float(node.get("height", 0)) < 60:
                 violations.append(f"{path}: text node {node.get('id')} is below 200x60")
             for token in WIKILINK_RE.findall(node.get("text", "")):
@@ -254,8 +389,31 @@ def _check_canvas(path: Path, source: Path) -> tuple[list[str], Counter]:
     for edge in edges:
         if edge.get("fromNode") not in node_ids or edge.get("toNode") not in node_ids:
             violations.append(f"{path}: edge {edge.get('id')} has missing endpoint")
-        if not edge.get("label"):
+        requires_sides = path.name.casefold() == "saved ai posts.canvas" or path.parent.name.casefold() == "canvases"
+        if requires_sides and (edge.get("fromSide") not in {"left", "right", "top", "bottom"} or edge.get("toSide") not in {"left", "right", "top", "bottom"}):
+            violations.append(f"{path}: edge {edge.get('id')} missing fromSide/toSide")
+        if not edge.get("label") and path.parent.name.casefold() != "canvases":
             violations.append(f"{path}: unlabeled edge {edge.get('id')}")
+    if path.parent.name.casefold() == "canvases":
+        group_ids = {node.get("id") for node in groups}
+        card_lines_path = source.parent / "classification" / "card-lines-v1.json"
+        hand_written = set()
+        try:
+            card_lines = json.loads(card_lines_path.read_text(encoding="utf-8"))
+            hand_written = {str(item.get("line")) for item in card_lines.get("relations", []) if item.get("line_kind") == "hand-written"}
+        except (OSError, json.JSONDecodeError):
+            pass
+        for edge in edges:
+            if edge.get("fromNode") in group_ids and edge.get("toNode") in group_ids and edge.get("label") not in hand_written:
+                violations.append(f"{path}: cluster-to-cluster edge {edge.get('id')} lacks a hand-written line")
+    for group in groups:
+        children = [node for node in nodes if node.get("type") != "group" and _contains(rects[group.get("id")], rects[node.get("id")])]
+        if not children:
+            violations.append(f"{path}: group {group.get('id')} has no children")
+            continue
+        summary = min(children, key=lambda node: (float(node.get("y", 0)), float(node.get("x", 0))))
+        if summary.get("type") != "text" or not next((line.strip() for line in str(summary.get("text", "")).splitlines() if line.strip()), "").startswith("#"):
+            violations.append(f"{path}: group {group.get('id')} top-most child is not a summary card")
     for index, left in enumerate(groups):
         for right in groups[index + 1 :]:
             if _intersects(rects[left.get("id")], rects[right.get("id")]):
@@ -275,6 +433,42 @@ def _check_canvas(path: Path, source: Path) -> tuple[list[str], Counter]:
         for right in non_groups[index + 1 :]:
             if left.get("__parent") == right.get("__parent") and _intersects(rects[left.get("id")], rects[right.get("id")]):
                 violations.append(f"{path}: sibling nodes overlap ({left.get('id')}, {right.get('id')})")
+    if path.name.casefold() == "saved ai posts.canvas":
+        classification_dir = source.parent / "classification"
+        comparison_dir = classification_dir / "comparisons"
+        category_sets: dict[str, set[str]] = {}
+        try:
+            entities = json.loads((classification_dir / "entities-v1.json").read_text(encoding="utf-8")).get("entities", [])
+            topics = json.loads((classification_dir / "primary-topics-v2.json").read_text(encoding="utf-8"))
+            ids_by_topic: dict[str, set[str]] = defaultdict(set)
+            for item in topics:
+                ids_by_topic[str(item.get("primary_topic"))].add(str(item.get("stable_id")))
+            for topic, record_ids in ids_by_topic.items():
+                category_sets[topic] = {str(entity.get("canonical")) for entity in entities if any(pointer.get("source") == "collection" and str(pointer.get("stable_id")) in record_ids for pointer in entity.get("pointers", []))}
+        except (OSError, json.JSONDecodeError, TypeError):
+            category_sets = {}
+        heading_to_topic = {}
+        for node in nodes:
+            if node.get("type") != "text":
+                continue
+            first = next((line.strip() for line in str(node.get("text", "")).splitlines() if line.strip()), "")
+            if first.startswith("## "):
+                label = first[3:].strip().casefold().replace(" ", "-")
+                heading_to_topic[node.get("id")] = label
+        ubiquitous = {name for values in category_sets.values() for name in values if sum(name in candidate for candidate in category_sets.values()) >= 5}
+        for edge in edges:
+            left_topic = heading_to_topic.get(edge.get("fromNode")); right_topic = heading_to_topic.get(edge.get("toNode"))
+            if left_topic and right_topic and left_topic in category_sets and right_topic in category_sets:
+                shared = category_sets[left_topic] & category_sets[right_topic]
+                meaningful = shared - ubiquitous
+                if len(meaningful) < 2:
+                    violations.append(f"{path}: top-canvas edge {edge.get('id')} lacks two non-ubiquitous shared entities")
+        crossings = _edge_crossings(edges, rects)
+        counts["crossings"] = crossings
+        if crossings > 3:
+            violations.append(f"{path}: top-canvas edge crossings={crossings} exceeds 3")
+    else:
+        counts["crossings"] = _edge_crossings(edges, rects)
     return violations, counts
 
 
@@ -283,6 +477,7 @@ def check_tree(source: Path) -> tuple[list[str], dict[str, int]]:
     counts: Counter = Counter()
     if not source.is_dir():
         return [f"source is not a directory: {source}"], {}
+    violations.extend(_card_lines_violations(source))
     markdown = [path for path in source.rglob("*.md") if not (set(path.relative_to(source).parts) & EXCLUDED)]
     for path in markdown:
         violations.extend(_table_violations(path))

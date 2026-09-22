@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import itertools
 import json
 import math
 import os
@@ -22,6 +23,7 @@ COMPARISON_INDEX = CLASSIFICATION / "comparisons-v1.json"
 CROSS_JSON = COMPARISONS / "_cross-category.json"
 QA_PATH = ROOT / "qa" / "compare-canvas-evidence-20260921.md"
 CONTRACT_PATH = ROOT / "plan" / "vault-publication-contract.md"
+CARD_LINES_JSON = CLASSIFICATION / "card-lines-v1.json"
 
 VAULT_ROOT = "50 Knowledge/57 Corpus/Saved AI Posts"
 TOPIC_LABELS = {
@@ -427,6 +429,179 @@ def canvas_filename(topic: str) -> str:
     return f"{TOPIC_LABELS[topic]}.canvas"
 
 
+# Judgement data: these lines are intentionally short so they remain useful at fit-to-screen zoom.
+CATEGORY_LINES = {
+    "agents-and-coding": "Build reliable agents around durable context, explicit tool boundaries, and small tests.",
+    "ai-news": "A source-check queue for launches, models, and video-generation claims.",
+    "business": "Turn capability stories into offers only after evidence, costs, and controls are visible.",
+    "cad-and-3d": "Prompted code is becoming an interactive 3D production surface; reproduce one scene first.",
+    "design-tools": "Named prompts, handoffs, and assets make AI design workflows reproducible.",
+    "hardware": "AI becomes tangible through new interfaces, dedicated machines, and physical safety boundaries.",
+    "research": "Prefer inspectable artifacts—certificates, editable code, harnesses—over opaque outputs.",
+    "security": "Automation becomes risky at irreversible, adversarial, or privacy-sensitive control boundaries.",
+    "workflows-and-productivity": "Reliability starts upstream: plans, architecture constraints, context, and visible handoffs.",
+    "unsorted": "Preserved uncertainty: a queue of unavailable guides and contextless references.",
+}
+
+CLUSTER_LINES = {
+    ("agents-and-coding", "Memory, loops, and agent coordination"): "Treat context as engineered state: memory tiers, handoffs, loops, and measured continuation.",
+    ("agents-and-coding", "Tool boundaries and multimodal controls"): "Choose the smallest agent interface: CLI, MCP, visual surface, or message thread.",
+    ("agents-and-coding", "Model and benchmark claims"): "Separate named tests and workflows from unlinked performance claims.",
+    ("agents-and-coding", "Builder resources and open repositories"): "Inspect the artifact first; distinguish a usable repository from a promotional promise.",
+    ("agents-and-coding", "Gated or underspecified recommendations"): "Treat comment gates and blurred names as leads, not implementation evidence.",
+    ("ai-news", "Roundups that compress many claims"): "Roundups are triage queues: verify each headline before carrying it forward.",
+    ("ai-news", "Video-generation launches and performance claims"): "Verify video-model news with production tests, throughput, and terms.",
+    ("ai-news", "Unnamed releases and sponsored serial teasers"): "Missing names and sponsorship make these saves follow-up prompts, not findings.",
+    ("business", "Service offers and monetization claims"): "Service promises become useful only when delivery, price, and proof are explicit.",
+    ("business", "Trading experiments and agentic finance"): "Trading demos need controls and a reproducible record before they become advice.",
+    ("business", "Growth tactics and access-risk claims"): "Growth tactics sit beside access and provenance risks that need checking.",
+    ("business", "Unresolved entrepreneurship signal"): "A lone signal is a prompt for research, not a business case.",
+    ("cad-and-3d", "Early-release 3D build showcases"): "Early showcases are compelling demonstrations, but their release claims need reproduction.",
+    ("cad-and-3d", "Code-to-3D production claims"): "Code, photos, and drawings can become 3D outputs; test one narrow path.",
+    ("cad-and-3d", "3D local-file workspace concept"): "A local-file workspace idea is promising, but its boundary is still conceptual.",
+    ("design-tools", "Generative image and motion production"): "Visual results are chains of inputs and handoffs, not magic prompts.",
+    ("design-tools", "Agent-readable design and interface generation"): "Make design intent legible so prompts, files, and components survive the handoff.",
+    ("design-tools", "Reusable interface assets and design methods"): "Reusable assets turn taste into a repeatable production method.",
+    ("design-tools", "Reference, evaluation, and exploratory design"): "References and evaluations separate a promising direction from a finished method.",
+    ("design-tools", "Comment-gated and promotional design claims"): "Gates hide inputs, outputs, and rules needed to reproduce claims.",
+    ("hardware", "Embodied and ambient interfaces"): "Sensors and realtime models make interaction tangible, but prototypes need boundaries.",
+    ("hardware", "Dedicated computers for agents"): "Dedicated machines make agent capacity concrete while concentrating cost and control.",
+    ("hardware", "Physical-device and credential boundaries"): "Agent safety is a blast-radius problem: credentials, devices, approvals, and reversibility.",
+    ("hardware", "Modular desk controls and sponsored accessories"): "Desk hardware is a workflow surface whose sponsorship claims need independent proof.",
+    ("research", "Model-behavior studies"): "Behavior studies need inspectable tasks, comparisons, and failure modes.",
+    ("research", "Formal reasoning reports"): "Formal reports offer useful constraints when their certificates and assumptions remain visible.",
+    ("research", "Experimental AI architectures"): "Inspect the boundary: executable harnesses, editable artifacts, and transfer mechanisms.",
+    ("research", "Applied AI demonstrations"): "Applied demos need repeatable workflows and visible inputs to count as evidence.",
+    ("research", "Unpublished efficiency promise"): "An efficiency promise without a paper or artifact stays unresolved.",
+    ("security", "Self-hosted OSINT dashboards"): "Named data tools are inspectable; intelligence claims still need provenance.",
+    ("security", "Authorization, ranking, and high-consequence control"): "Never let agent access outrun confirmation, reversibility, and accountable human control.",
+    ("security", "Privacy maintenance and generic security warnings"): "Privacy work needs specific data paths, deletion evidence, and a threat model.",
+    ("unsorted", "Keyword-gated offers"): "Keyword gates preserve a lead while withholding the guide, repository, or method.",
+    ("unsorted", "Contextless teasers and labels"): "Contextless labels are useful as reminders, not as evidence.",
+    ("workflows-and-productivity", "Plan-first execution and decision guardrails"): "Use stronger reasoning to resolve ambiguity, then constrain execution with recorded intent.",
+    ("workflows-and-productivity", "Context graphs and organizational memory"): "The durable product is connected, contradiction-aware context—not a larger swarm.",
+    ("workflows-and-productivity", "Client service operating systems"): "Trust comes from visible delivery artifacts that prevent scope and communication drift.",
+    ("workflows-and-productivity", "Promoted tools and underspecified workflows"): "Promoted tools need a concrete workflow, owner, and failure path before adoption.",
+}
+
+RELATION_OVERRIDES = {
+    frozenset({"agents-and-coding|Memory, loops, and agent coordination", "workflows-and-productivity|Context graphs and organizational memory"}): "Context becomes infrastructure",
+    frozenset({"agents-and-coding|Tool boundaries and multimodal controls", "design-tools|Agent-readable design and interface generation"}): "MCP carries design intent into execution",
+    frozenset({"agents-and-coding|Tool boundaries and multimodal controls", "research|Experimental AI architectures"}): "MCP exposes the execution boundary",
+    frozenset({"ai-news|Video-generation launches and performance claims", "design-tools|Generative image and motion production"}): "Models become production workflows",
+    frozenset({"agents-and-coding|Model and benchmark claims", "cad-and-3d|Early-release 3D build showcases"}): "Model claims meet build evidence",
+    frozenset({"cad-and-3d|Early-release 3D build showcases", "design-tools|Agent-readable design and interface generation"}): "Figma connects 3D and interface handoffs",
+    frozenset({"agents-and-coding|Memory, loops, and agent coordination", "security|Authorization, ranking, and high-consequence control"}): "Agent autonomy needs reversibility",
+    frozenset({"security|Authorization, ranking, and high-consequence control", "workflows-and-productivity|Plan-first execution and decision guardrails"}): "Controls come before action",
+    frozenset({"hardware|Physical-device and credential boundaries", "security|Authorization, ranking, and high-consequence control"}): "Blast radius needs explicit limits",
+    frozenset({"design-tools|Agent-readable design and interface generation", "workflows-and-productivity|Client service operating systems"}): "Visible artifacts make handoffs accountable",
+    frozenset({"research|Experimental AI architectures", "security|Self-hosted OSINT dashboards"}): "Inspect sources and mechanisms",
+}
+
+
+def _relation_token(topic: str, cluster_name: str) -> str:
+    words = re.findall(r"[A-Za-z0-9]+", cluster_name.lower())
+    return f"{topic}-{'-'.join(words[:3])}"
+
+
+def build_card_lines(topic_data: dict[str, Any]) -> dict[str, Any]:
+    relations: list[dict[str, Any]] = []
+    clusters: list[tuple[str, str, dict[str, Any]]] = []
+    for topic in TOPIC_LABELS:
+        for cluster in topic_data[topic]["clusters"]:
+            clusters.append((topic, str(cluster["name"]), cluster))
+    for (topic_a, name_a, cluster_a), (topic_b, name_b, cluster_b) in itertools.combinations(clusters, 2):
+        shared_entities = sorted(set(cluster_a.get("entities", [])) & set(cluster_b.get("entities", [])), key=str.casefold)
+        shared_posts = sorted(set(cluster_a.get("post_ids", [])) & set(cluster_b.get("post_ids", [])))
+        if not shared_entities and not shared_posts:
+            continue
+        key = frozenset({f"{topic_a}|{name_a}", f"{topic_b}|{name_b}"})
+        line = RELATION_OVERRIDES.get(key)
+        if not line:
+            # No hand-written line for this pair: label with the shared data itself, never composed prose.
+            line = "shared: " + ", ".join(shared_entities[:3]) if shared_entities else f"{len(shared_posts)} shared posts"
+        relations.append({"a": f"{topic_a}|{name_a}", "b": f"{topic_b}|{name_b}", "shared_entities": shared_entities, "shared_posts": shared_posts, "line": line, "line_kind": "hand-written" if key in RELATION_OVERRIDES else "data"})
+    return {
+        "schema_version": "card-lines-v1",
+        "categories": {topic: {"line": CATEGORY_LINES[topic]} for topic in TOPIC_LABELS},
+        "clusters": {topic: {str(cluster["name"]): {"line": CLUSTER_LINES[(topic, str(cluster["name"]))]} for cluster in topic_data[topic]["clusters"]} for topic in TOPIC_LABELS},
+        "relations": relations,
+    }
+
+
+def _force_layout(keys: list[str], sets: dict[str, set[str]], width: float, height: float, *, seed: int = 17) -> dict[str, tuple[float, float]]:
+    """Small deterministic force layout; shared-set overlap pulls nodes together."""
+    if not keys:
+        return {}
+    columns = max(1, math.ceil(math.sqrt(len(keys))))
+    rows = math.ceil(len(keys) / columns)
+    points: dict[str, list[float]] = {}
+    for index, key in enumerate(keys):
+        column, row = divmod(index, columns)
+        points[key] = [(column + 0.5 + math.sin((index + 1) * (seed + 3)) * 0.08) / columns * width, (row + 0.5 + math.cos((index + 1) * (seed + 5)) * 0.08) / rows * height]
+    for _ in range(180):
+        forces = {key: [0.0, 0.0] for key in keys}
+        for left_index, left_key in enumerate(keys):
+            for right_key in keys[left_index + 1 :]:
+                dx = points[right_key][0] - points[left_key][0]
+                dy = points[right_key][1] - points[left_key][1]
+                distance = max(1.0, math.hypot(dx, dy))
+                overlap = len(sets[left_key] & sets[right_key]) / max(1, len(sets[left_key] | sets[right_key]))
+                desired = max(180.0, min(width, height) * (0.66 - 0.42 * overlap))
+                spring = (distance - desired) * 0.004
+                repel = 12000.0 / (distance * distance)
+                ux, uy = dx / distance, dy / distance
+                fx, fy = ux * (spring + repel), uy * (spring + repel)
+                forces[left_key][0] -= fx; forces[left_key][1] -= fy
+                forces[right_key][0] += fx; forces[right_key][1] += fy
+        for key in keys:
+            points[key][0] = min(width - 20, max(20, points[key][0] + forces[key][0]))
+            points[key][1] = min(height - 20, max(20, points[key][1] + forces[key][1]))
+    min_x = min(point[0] for point in points.values()); max_x = max(point[0] for point in points.values())
+    min_y = min(point[1] for point in points.values()); max_y = max(point[1] for point in points.values())
+    span_x, span_y = max(1.0, max_x - min_x), max(1.0, max_y - min_y)
+    return {key: (40 + (point[0] - min_x) / span_x * max(1.0, width - 80), 40 + (point[1] - min_y) / span_y * max(1.0, height - 80)) for key, point in points.items()}
+
+
+def _resolve_rect_overlaps(positions: dict[str, tuple[float, float]], sizes: dict[str, tuple[float, float]], width: float, height: float, rounds: int = 80) -> dict[str, tuple[float, float]]:
+    result = {key: [float(value[0]), float(value[1])] for key, value in positions.items()}
+    keys = list(result)
+    for _ in range(rounds):
+        moved = False
+        for index, left_key in enumerate(keys):
+            for right_key in keys[index + 1 :]:
+                lx, ly = result[left_key]; lw, lh = sizes[left_key]
+                rx, ry = result[right_key]; rw, rh = sizes[right_key]
+                overlap_x = min(lx + lw, rx + rw) - max(lx, rx)
+                overlap_y = min(ly + lh, ry + rh) - max(ly, ry)
+                if overlap_x <= 0 or overlap_y <= 0:
+                    continue
+                moved = True
+                if overlap_x < overlap_y:
+                    shift = overlap_x / 2 + 8
+                    if lx <= rx: result[left_key][0] -= shift; result[right_key][0] += shift
+                    else: result[left_key][0] += shift; result[right_key][0] -= shift
+                else:
+                    shift = overlap_y / 2 + 8
+                    if ly <= ry: result[left_key][1] -= shift; result[right_key][1] += shift
+                    else: result[left_key][1] += shift; result[right_key][1] -= shift
+        for key, (w, h) in sizes.items():
+            result[key][0] = min(width - w - 10, max(10, result[key][0]))
+            result[key][1] = min(height - h - 10, max(10, result[key][1]))
+        if not moved:
+            break
+    return {key: (round(value[0]), round(value[1])) for key, value in result.items()}
+
+
+def _facing_sides(from_node: dict[str, Any], to_node: dict[str, Any]) -> tuple[str, str]:
+    from_centre = (float(from_node.get("x", 0)) + float(from_node.get("width", 0)) / 2, float(from_node.get("y", 0)) + float(from_node.get("height", 0)) / 2)
+    to_centre = (float(to_node.get("x", 0)) + float(to_node.get("width", 0)) / 2, float(to_node.get("y", 0)) + float(to_node.get("height", 0)) / 2)
+    dx, dy = to_centre[0] - from_centre[0], to_centre[1] - from_centre[1]
+    if abs(dx) >= abs(dy):
+        return ("right", "left") if dx >= 0 else ("left", "right")
+    return ("bottom", "top") if dy >= 0 else ("top", "bottom")
+
+
 def canvas_builder() -> tuple[list[dict[str, Any]], list[dict[str, Any]], Any, Any]:
     nodes: list[dict[str, Any]] = []
     edges: list[dict[str, Any]] = []
@@ -439,8 +614,12 @@ def canvas_builder() -> tuple[list[dict[str, Any]], list[dict[str, Any]], Any, A
         nodes.append(node)
         return node["id"]
 
-    def edge(from_id: str, to_id: str, label: str | None = None) -> None:
+    def edge(from_id: str, to_id: str, label: str | None = None, from_side: str | None = None, to_side: str | None = None) -> None:
+        node_by_id = {node["id"]: node for node in nodes}
+        computed_from, computed_to = _facing_sides(node_by_id[from_id], node_by_id[to_id])
         item: dict[str, Any] = {"id": f"e{len(edges) + 1:04d}", "fromNode": from_id, "toNode": to_id}
+        item["fromSide"] = from_side or computed_from
+        item["toSide"] = to_side or computed_to
         if label:
             item["label"] = label
         edges.append(item)
@@ -482,98 +661,359 @@ def cluster_biggest_entities(cluster: dict[str, Any], by_name: dict[str, dict[st
     return ", ".join(names) if names else "No named entities"
 
 
-def overview_canvas(topic_data: dict[str, Any], entities: list[dict[str, Any]]) -> dict[str, Any]:
-    """Legible category overview: ten cards plus a single preview row."""
-    nodes, edges, add, _edge = canvas_builder()
-    add({"type": "file", "file": f"{VAULT_ROOT}/00 - Saved AI Posts Corpus Index.md", "x": 20, "y": 20, "width": 420, "height": 300})
-    add({"type": "file", "file": f"{VAULT_ROOT}/Comparisons/Cross-category comparison.md", "x": 500, "y": 20, "width": 420, "height": 300})
-    for index, topic in enumerate(TOPIC_LABELS):
-        column, row = index % 5, index // 5
-        x, y = 20 + column * 460, 400 + row * 340
+def _jaccard(left: set[str], right: set[str]) -> float:
+    union = left | right
+    return len(left & right) / len(union) if union else 0.0
+
+
+def _greedy_ring_order(keys: list[str], sets: dict[str, set[str]]) -> list[str]:
+    if len(keys) < 2:
+        return list(keys)
+    start = max(keys, key=lambda key: (sum(_jaccard(sets[key], sets[other]) for other in keys if other != key), key.casefold()))
+    ordered = [start]
+    remaining = set(keys) - {start}
+    while remaining:
+        previous = ordered[-1]
+        next_key = max(remaining, key=lambda key: (_jaccard(sets[previous], sets[key]), key.casefold()))
+        ordered.append(next_key)
+        remaining.remove(next_key)
+    return ordered
+
+
+def overview_canvas(topic_data: dict[str, Any], entities: list[dict[str, Any]], card_lines: dict[str, Any]) -> dict[str, Any]:
+    """Hub-and-ring category map whose distance and edges encode meaningful relatedness."""
+    nodes, edges, add, edge = canvas_builder()
+    add({"type": "file", "file": f"{VAULT_ROOT}/00 - Saved AI Posts Corpus Index.md", "x": 1660, "y": 20, "width": 420, "height": 300})
+    add({"type": "file", "file": f"{VAULT_ROOT}/Comparisons/Cross-category comparison.md", "x": 2110, "y": 20, "width": 430, "height": 300})
+    keys = list(TOPIC_LABELS)
+    entity_sets = {topic: {str(entity["canonical"]) for entity in topic_data[topic]["entities"]} for topic in keys}
+    ubiquitous = sorted((name for name in set().union(*entity_sets.values()) if sum(name in values for values in entity_sets.values()) >= 5), key=str.casefold)
+    meaningful_sets = {topic: values - set(ubiquitous) for topic, values in entity_sets.items()}
+    centre_topic = max(keys, key=lambda key: (len(topic_data[key]["records"]), -keys.index(key)))
+    ring_topics = _greedy_ring_order([key for key in keys if key != centre_topic], meaningful_sets)
+    sizes = {topic: (min(520, max(380, 330 + len(topic_data[topic]["records"]) * 2)), 184) for topic in keys}
+    centre = (1300.0, 1000.0)
+    positions: dict[str, tuple[float, float]] = {centre_topic: (centre[0] - sizes[centre_topic][0] / 2, centre[1] - sizes[centre_topic][1] / 2)}
+    for index, topic in enumerate(ring_topics):
+        similarity = _jaccard(meaningful_sets[centre_topic], meaningful_sets[topic])
+        radius = min(780.0, 700.0 + min(400.0, max(0.0, 1.0 - similarity) * 400.0))
+        angle = -math.pi / 2 + index * (2 * math.pi / max(1, len(ring_topics)))
+        cx, cy = centre[0] + radius * math.cos(angle), centre[1] + radius * 0.70 * math.sin(angle)
+        width, height = sizes[topic]
+        positions[topic] = (cx - width / 2, cy - height / 2)
+    positions = _resolve_rect_overlaps(positions, sizes, 2600, 1800, rounds=60)
+    legend_text = "\n".join([
+        "## Canvas legend",
+        "centre = largest category",
+        "distance from centre = how little it shares with the centre",
+        "neighbours on the ring = most related",
+        "edges = named shared tools",
+        "Everywhere: " + (", ".join(ubiquitous) if ubiquitous else "none"),
+    ])
+    add({"type": "text", "text": legend_text, "x": 20, "y": 20, "width": 900, "height": 250})
+    node_ids: dict[str, str] = {}
+    for index, topic in enumerate(keys):
         category = topic_data[topic]
-        top_entities = sorted(category["entities"], key=lambda item: (-int(item.get("pointer_count", 0)), str(item["canonical"]).casefold()))[:5]
+        width, height = sizes[topic]
         text_lines = [
-            f"# {TOPIC_LABELS[topic]}",
-            f"Posts: {len(category['records'])}",
-            f"Entities: {len(category['entities'])}",
-            "",
-            "Top entities:",
-        ]
-        text_lines.extend(f"- {entity_link(entity, {str(item['canonical']): entity_filename_map(entities)[0][str(item['canonical'])] for item in entities})}" for entity in top_entities)
-        text_lines.extend([
-            "",
+            f"## {TOPIC_LABELS[topic]}", card_lines["categories"][topic]["line"],
+            f"{len(category['records'])} posts · {len(category['entities'])} entities",
             f"{vault_link('Comparisons/' + slug(TOPIC_LABELS[topic]) + ' — comparison.md', 'Comparison note')}",
             f"{vault_link('Canvases/' + canvas_filename(topic), 'Detail canvas')}",
-        ])
-        add({"type": "text", "text": "\n".join(text_lines), "x": x, "y": y, "width": 360, "height": 240, "color": str(index % 6 + 1)})
+        ]
+        x, y = positions[topic]
+        node_ids[topic] = add({"type": "text", "text": "\n".join(text_lines), "x": x, "y": y, "width": width, "height": height, "color": str(index % 6 + 1)})
+    candidates: list[tuple[int, float, str, str, list[str]]] = []
+    for left_index, left_topic in enumerate(keys):
+        for right_topic in keys[left_index + 1 :]:
+            shared = sorted(meaningful_sets[left_topic] & meaningful_sets[right_topic], key=str.casefold)
+            if len(shared) >= 2:
+                candidates.append((len(shared), _jaccard(meaningful_sets[left_topic], meaningful_sets[right_topic]), left_topic, right_topic, shared))
+    candidates.sort(key=lambda item: (-item[0], -item[1], item[2], item[3]))
+    degrees: defaultdict[str, int] = defaultdict(int)
+    for _count, _similarity, left_topic, right_topic, shared in candidates:
+        if degrees[left_topic] >= 2 or degrees[right_topic] >= 2:
+            continue
+        degrees[left_topic] += 1
+        degrees[right_topic] += 1
+        edge(node_ids[left_topic], node_ids[right_topic], "shared: " + ", ".join(shared[:3]))
     return {"nodes": nodes, "edges": edges}
 
 
-def detail_canvas(topic: str, data: dict[str, Any], entities: list[dict[str, Any]], filenames: dict[str, str], homes: dict[str, tuple[str, str, str | None]]) -> dict[str, Any]:
-    """Lay out only this category's entities as square-ish cluster groups."""
-    nodes, edges, add, _edge = canvas_builder()
-    add({"type": "file", "file": f"{VAULT_ROOT}/Comparisons/{slug(TOPIC_LABELS[topic])} — comparison.md", "x": 20, "y": 20, "width": 420, "height": 300})
+def detail_canvas(topic: str, data: dict[str, Any], entities: list[dict[str, Any]], filenames: dict[str, str], homes: dict[str, tuple[str, str, str | None]], card_lines: dict[str, Any], topic_data: dict[str, Any]) -> dict[str, Any]:
+    """Cluster map with summary-first groups and shared entity hubs between them."""
+    nodes, edges, add, edge = canvas_builder()
+    category_color = str(list(TOPIC_LABELS).index(topic) % 6 + 1)
+    header_text = "\n".join([
+        f"# {TOPIC_LABELS[topic]}", card_lines["categories"][topic]["line"],
+        f"{len(data['records'])} posts · {len(data['entities'])} entities",
+        f"{vault_link('Saved AI Posts.canvas', 'Back to overview canvas')}",
+    ])
+    add({"type": "text", "text": header_text, "x": 20, "y": 20, "width": 980, "height": 220, "color": category_color})
+    add({"type": "file", "file": f"{VAULT_ROOT}/Comparisons/{slug(TOPIC_LABELS[topic])} — comparison.md", "x": 1040, "y": 20, "width": 420, "height": 300})
     category_record_ids = set(data["record_ids"])
     all_by_name = {
-        str(entity["canonical"]): entity
-        for entity in entities
-        if any(
-            pointer.get("source") == "collection"
-            and str(pointer.get("stable_id")) in category_record_ids
-            for pointer in entity.get("pointers", [])
-        )
+        str(entity["canonical"]): entity for entity in entities
+        if any(pointer.get("source") == "collection" and str(pointer.get("stable_id")) in category_record_ids for pointer in entity.get("pointers", []))
     }
-    groups: list[tuple[str, list[str]]] = []
-    clustered: set[str] = set()
-    assigned_to_cluster: set[str] = set()
+    memberships: dict[str, list[str]] = defaultdict(list)
+    cluster_rows: list[dict[str, Any]] = []
     for cluster in data["clusters"]:
-        candidate_names = {
-            str(name) for name in cluster.get("entities", []) if str(name) in all_by_name
-        }
-        clustered.update(candidate_names)
-        names = sorted(
-            candidate_names - assigned_to_cluster,
-            key=lambda name: (-int(all_by_name[name].get("pointer_count", 0)), name.casefold()),
-        )
-        assigned_to_cluster.update(names)
-        if names:
-            groups.append((f"{cluster['name']} ({len(cluster['post_ids'])} posts)", names))
-    other = sorted(set(all_by_name) - clustered, key=lambda name: (-int(all_by_name[name].get("pointer_count", 0)), name.casefold()))
-    if other:
-        groups.append(("Other entities", other))
-    card_width, card_height, card_gap = 260, 90, 40
-    group_padding, label_clear, group_gap = 60, 50, 80
-    group_specs: list[tuple[str, list[str], int, int, int]] = []
-    for label, names in groups:
-        card_columns = min(6, max(1, math.ceil(math.sqrt(len(names)))))
-        rows = max(1, math.ceil(len(names) / card_columns))
-        width = group_padding * 2 + card_columns * card_width + (card_columns - 1) * card_gap
-        height = label_clear + group_padding + rows * card_height + (rows - 1) * card_gap + group_padding
-        group_specs.append((label, names, width, height, card_columns))
-    row_group_columns = 2
-    column_widths = [
-        max((spec[2] for index, spec in enumerate(group_specs) if index % row_group_columns == column), default=0)
-        for column in range(row_group_columns)
-    ]
-    row_heights = [
-        max((spec[3] for index, spec in enumerate(group_specs) if index // row_group_columns == row), default=0)
-        for row in range(math.ceil(len(group_specs) / row_group_columns))
-    ]
-    specs: list[tuple[int, int, str, list[str], int, int, int]] = []
-    for index, (label, names, width, height, card_columns) in enumerate(group_specs):
-        row, column = divmod(index, row_group_columns)
-        x = 20 + sum(column_widths[:column]) + group_gap * column
-        y = 400 + sum(row_heights[:row]) + group_gap * row
-        specs.append((x, y, label, names, width, height, card_columns))
-    category_color = str(list(TOPIC_LABELS).index(topic) % 6 + 1)
-    for x, y, label, names, width, height, card_columns in specs:
-        add({"type": "group", "label": label, "x": x, "y": y, "width": width, "height": height, "color": category_color})
+        name = str(cluster["name"])
+        names = [str(item) for item in cluster.get("entities", []) if str(item) in all_by_name]
+        for name_item in names:
+            memberships[name_item].append(name)
+        cluster_rows.append({"name": name, "posts": len(cluster.get("post_ids", [])), "names": names})
+    shared_names = {name for name, cluster_names in memberships.items() if len(cluster_names) >= 2}
+    clustered_names = set(memberships)
+    other_names = sorted(set(all_by_name) - clustered_names, key=lambda name: (-int(all_by_name[name].get("pointer_count", 0)), name.casefold()))
+    if other_names:
+        cluster_rows.append({"name": "Other entities", "posts": 0, "names": other_names, "other": True})
+    group_sizes: dict[str, tuple[int, int]] = {}
+    group_names: dict[str, list[str]] = {}
+    for row in cluster_rows:
+        names = row["names"] if row.get("other") else [name for name in row["names"] if name not in shared_names]
+        names = sorted(names, key=lambda name: (-int(all_by_name[name].get("pointer_count", 0)), name.casefold()))
+        group_names[row["name"]] = names
+        columns = min(6 if row.get("other") else 5, max(1, math.ceil(math.sqrt(max(1, len(names))))))
+        rows = max(1, math.ceil(len(names) / columns))
+        card_width = 200 if row.get("other") else 220
+        card_height = 60 if row.get("other") else 84
+        width = max(460, 48 + columns * 232)
+        height = 24 + 24 + 100 + 12 + rows * card_height + (rows - 1) * 12 + 108
+        group_sizes[row["name"]] = (width, height)
+    group_keys = [row["name"] for row in cluster_rows]
+    group_sets = {row["name"]: set(row["names"]) for row in cluster_rows}
+    force_positions = _force_layout(group_keys, group_sets, 2940, 1600, seed=31)
+    ordered_groups = sorted(group_keys, key=lambda name: (force_positions[name][1], force_positions[name][0]))
+    column_widths = [max((group_sizes[name][0] for index, name in enumerate(ordered_groups) if index % 2 == column), default=0) for column in range(2)]
+    row_heights = [max((group_sizes[name][1] for index, name in enumerate(ordered_groups) if index // 2 == row), default=0) for row in range(math.ceil(len(ordered_groups) / 2))]
+    group_positions: dict[str, tuple[int, int]] = {}
+    for index, name in enumerate(ordered_groups):
+        row_index, column = divmod(index, 2)
+        group_positions[name] = (20 + (column_widths[0] + 60 if column else 0), 340 + sum(row_heights[:row_index]) + row_index * 20)
+    group_ids: dict[str, str] = {}
+    for row in cluster_rows:
+        label = row["name"]
+        x, y = group_positions[label]
+        width, height = group_sizes[label]
+        group_ids[label] = add({"type": "group", "label": label, "x": x, "y": y, "width": width, "height": height, "color": category_color})
+    entity_topics = {str(entity["canonical"]): [candidate for candidate in TOPIC_LABELS if str(entity["canonical"]) in {str(item["canonical"]) for item in topic_data[candidate]["entities"]}] for entity in entities}
+    for row in cluster_rows:
+        label = row["name"]
+        x, y = group_positions[label]
+        width, _height = group_sizes[label]
+        names = group_names[label]
+        summary_line = card_lines["clusters"].get(topic, {}).get(label, {}).get("line", "")
+        add({"type": "text", "text": f"## {label}\n{summary_line}\n{row['posts']} posts", "x": x + 24, "y": y + 24, "width": max(420, width - 48), "height": 100, "color": category_color})
+        columns = min(6 if row.get("other") else 5, max(1, math.ceil(math.sqrt(max(1, len(names))))))
+        max_posts = max([category_pointer_count(all_by_name[name], topic, category_record_ids) for name in names] or [1])
         for index, canonical in enumerate(names):
-            column, row = index % card_columns, index // card_columns
+            column, row_index = divmod(index, columns)
             entity = all_by_name[canonical]
             posts = category_pointer_count(entity, topic, category_record_ids)
-            text = f"{vault_link('Entities/' + filenames[canonical], canonical)}\n{posts} post{'s' if posts != 1 else ''}"
-            add({"type": "text", "text": text, "x": x + group_padding + column * (card_width + card_gap), "y": y + label_clear + group_padding + row * (card_height + card_gap), "width": card_width, "height": card_height, "color": category_color})
+            scale = math.sqrt(posts / max_posts) if max_posts else 1
+            card_width = round(200 if row.get("other") else 200 + 20 * scale)
+            card_height = round(60 if row.get("other") else 60 + 24 * scale)
+            lines = [f"## {canonical}", f"{posts} post{'s' if posts != 1 else ''}"]
+            other_topics = [candidate for candidate in entity_topics.get(canonical, []) if candidate != topic]
+            if other_topics:
+                lines.append("↗ also in: " + ", ".join(vault_link("Canvases/" + canvas_filename(candidate), TOPIC_LABELS[candidate]) for candidate in other_topics))
+            add({"type": "text", "text": "\n".join(lines), "x": x + 24 + column * 232, "y": y + 144 + row_index * 96, "width": card_width, "height": card_height, "color": category_color})
+    for index, canonical in enumerate(sorted(shared_names, key=str.casefold)):
+        names = memberships[canonical]
+        entity = all_by_name[canonical]
+        posts = category_pointer_count(entity, topic, category_record_ids)
+        lines = [f"## {canonical}", f"{posts} post{'s' if posts != 1 else ''}"]
+        other_topics = [candidate for candidate in entity_topics.get(canonical, []) if candidate != topic]
+        if other_topics:
+            lines.append("↗ also in: " + ", ".join(vault_link("Canvases/" + canvas_filename(candidate), TOPIC_LABELS[candidate]) for candidate in other_topics))
+        # Keep shared hubs in the clear strip between the header and groups.
+        entity_id = add({"type": "text", "text": "\n".join(lines), "x": 1500 + (index % 6) * 230, "y": 245, "width": 220, "height": 90, "color": category_color})
+        for cluster_name in names:
+            edge(entity_id, group_ids[cluster_name], cluster_name)
+    relation_lookup = {frozenset({item["a"], item["b"]}): item for item in card_lines.get("relations", [])}
+    for left_index, left in enumerate(cluster_rows):
+        if left.get("other"):
+            continue
+        for right in cluster_rows[left_index + 1 :]:
+            if right.get("other"):
+                continue
+            relation = relation_lookup.get(frozenset({f"{topic}|{left['name']}", f"{topic}|{right['name']}"}))
+            if relation:
+                edge(group_ids[left["name"]], group_ids[right["name"]], relation["line"])
+    return {"nodes": nodes, "edges": edges}
+
+
+def detail_canvas(topic: str, data: dict[str, Any], entities: list[dict[str, Any]], filenames: dict[str, str], homes: dict[str, tuple[str, str, str | None]], card_lines: dict[str, Any], topic_data: dict[str, Any]) -> dict[str, Any]:
+    """Shared-core and ring layout for one category's clusters."""
+    nodes, edges, add, edge = canvas_builder()
+    category_color = str(list(TOPIC_LABELS).index(topic) % 6 + 1)
+    header_text = "\n".join([
+        f"# {TOPIC_LABELS[topic]}", card_lines["categories"][topic]["line"],
+        f"{len(data['records'])} posts · {len(data['entities'])} entities",
+        f"{vault_link('Saved AI Posts.canvas', 'Back to overview canvas')}",
+    ])
+    add({"type": "text", "text": header_text, "x": 20, "y": 20, "width": 980, "height": 220, "color": category_color})
+    add({"type": "file", "file": f"{VAULT_ROOT}/Comparisons/{slug(TOPIC_LABELS[topic])} — comparison.md", "x": 1040, "y": 20, "width": 420, "height": 300})
+    category_record_ids = set(data["record_ids"])
+    all_by_name = {str(entity["canonical"]): entity for entity in entities if any(pointer.get("source") == "collection" and str(pointer.get("stable_id")) in category_record_ids for pointer in entity.get("pointers", []))}
+    memberships: dict[str, list[str]] = defaultdict(list)
+    cluster_rows: list[dict[str, Any]] = []
+    for cluster in data["clusters"]:
+        label = str(cluster["name"])
+        names = [str(item) for item in cluster.get("entities", []) if str(item) in all_by_name]
+        for name in names:
+            memberships[name].append(label)
+        cluster_rows.append({"name": label, "posts": len(cluster.get("post_ids", [])), "raw_names": names})
+    shared_names = {name for name, cluster_names in memberships.items() if len(cluster_names) >= 2}
+    clustered_names = set(memberships)
+    other_names = sorted(set(all_by_name) - clustered_names, key=lambda name: (-int(all_by_name[name].get("pointer_count", 0)), name.casefold()))
+    if other_names:
+        cluster_rows.append({"name": "Other entities", "posts": 0, "raw_names": other_names, "other": True})
+    posts_for = lambda name: category_pointer_count(all_by_name[name], topic, category_record_ids)
+    group_names: dict[str, list[str]] = {}
+    collapsed_mentions: dict[str, list[str]] = {}
+    group_sizes: dict[str, tuple[int, int]] = {}
+    for row in cluster_rows:
+        label = row["name"]
+        names = row["raw_names"] if row.get("other") else [name for name in row["raw_names"] if name not in shared_names]
+        names = sorted(names, key=lambda name: (-posts_for(name), name.casefold()))
+        singletons = [name for name in names if posts_for(name) <= 1]
+        columns = min(4 if not row.get("other") else 5, max(1, math.ceil(math.sqrt(max(1, len(names))))))
+        raw_width = max(720, 48 + columns * 252)
+        raw_height = 150 + max(1, math.ceil(len(names) / columns)) * 104
+        display_names = [name for name in names if name not in singletons] if raw_width > 900 or raw_height > 700 else names
+        collapsed_mentions[label] = singletons if display_names != names else []
+        group_names[label] = display_names
+        display_count = len(display_names) + (1 if collapsed_mentions[label] else 0)
+        columns = min(4 if not row.get("other") else 5, max(1, math.ceil(math.sqrt(max(1, display_count)))))
+        group_sizes[label] = (max(720, 48 + columns * 252), min(780, 150 + max(1, math.ceil(display_count / columns)) * 104))
+    ring_names = [row["name"] for row in cluster_rows if not row.get("other")]
+    ring_sets = {row["name"]: set(row["raw_names"]) for row in cluster_rows if not row.get("other")}
+    ordered_ring = _greedy_ring_order(ring_names, ring_sets)
+    core_width = 820
+    core_height = max(430, min(880, 170 + max(1, len(shared_names)) * 112))
+    core_center = (1600.0, 1200.0)
+    group_positions: dict[str, tuple[int, int]] = {}
+    group_sizes["Shared across clusters"] = (core_width, core_height)
+    for index, label in enumerate(ordered_ring):
+        similarity = _jaccard(ring_sets[label], set().union(*(ring_sets[other] for other in ring_names if other != label)))
+        radius = 1200.0 + min(100.0, max(0.0, 1.0 - similarity) * 100.0)
+        angle = -math.pi / 2 + index * (2 * math.pi / max(1, len(ordered_ring)))
+        width, height = group_sizes[label]
+        group_positions[label] = (round(core_center[0] + radius * math.cos(angle) - width / 2), round(core_center[1] + radius * 0.62 * math.sin(angle) - height / 2))
+    if other_names:
+        width, height = group_sizes["Other entities"]
+        group_positions["Other entities"] = (round(core_center[0] - width / 2), 2200 - height)
+    ring_position_map = {label: (float(x), float(y)) for label, (x, y) in group_positions.items() if label != "Other entities"}
+    ring_position_map = _resolve_rect_overlaps(ring_position_map, {label: group_sizes[label] for label in ring_position_map}, 3200, 1840, rounds=120)
+    for label, (x, y) in ring_position_map.items():
+        group_positions[label] = (x, max(340, y))
+    core_rect = (round(core_center[0] - core_width / 2), round(core_center[1] - core_height / 2), core_width, core_height)
+    for label in ordered_ring:
+        x, y = group_positions[label]
+        width, height = group_sizes[label]
+        for _ in range(4):
+            overlap_x = min(x + width, core_rect[0] + core_rect[2]) - max(x, core_rect[0])
+            overlap_y = min(y + height, core_rect[1] + core_rect[3]) - max(y, core_rect[1])
+            if overlap_x <= 0 or overlap_y <= 0:
+                break
+            if x + width / 2 < core_center[0]:
+                x -= overlap_x + 24
+            else:
+                x += overlap_x + 24
+            x = min(3200 - width, max(10, x))
+        group_positions[label] = (round(x), round(y))
+    if other_names:
+        other_x, other_y = group_positions["Other entities"]
+        other_width, other_height = group_sizes["Other entities"]
+        other_rect = (other_x, other_y, other_width, other_height)
+        for label in ordered_ring:
+            x, y = group_positions[label]
+            width, height = group_sizes[label]
+            overlap_x = min(x + width, other_rect[0] + other_rect[2]) - max(x, other_rect[0])
+            overlap_y = min(y + height, other_rect[1] + other_rect[3]) - max(y, other_rect[1])
+            if overlap_x > 0 and overlap_y > 0:
+                group_positions[label] = (x, max(340, y - overlap_y - 24))
+    group_ids: dict[str, str] = {}
+    group_order = ["Shared across clusters", *ordered_ring] + (["Other entities"] if other_names else [])
+    for label in group_order:
+        if label == "Shared across clusters":
+            x, y = round(core_center[0] - core_width / 2), round(core_center[1] - core_height / 2)
+            group_positions[label] = (x, y)
+        else:
+            x, y = group_positions[label]
+        width, height = group_sizes[label]
+        group_ids[label] = add({"type": "group", "label": label, "x": x, "y": y, "width": width, "height": height, "color": category_color})
+    entity_topics = {str(entity["canonical"]): [candidate for candidate in TOPIC_LABELS if str(entity["canonical"]) in {str(item["canonical"]) for item in topic_data[candidate]["entities"]}] for entity in entities}
+    for row in cluster_rows:
+        label = row["name"]
+        x, y = group_positions[label]
+        width, _height = group_sizes[label]
+        names = group_names[label]
+        if row.get("other"):
+            summary_text = f"## {label}\n{len(row['raw_names'])} entities"
+        else:
+            summary_line = card_lines["clusters"].get(topic, {}).get(label, {}).get("line", "")
+            summary_text = f"## {label}\n{summary_line}\n{row['posts']} posts · {len(row['raw_names'])} entities"
+        add({"type": "text", "text": summary_text, "x": x + 24, "y": y + 24, "width": max(420, width - 48), "height": 110, "color": category_color})
+        display_entries: list[tuple[str, str]] = [(name, "entity") for name in names]
+        if collapsed_mentions.get(label):
+            links = [vault_link(f"Entities/{filenames[name]}", name) for name in collapsed_mentions[label]]
+            display_entries.append(("Also mentioned\n" + ", ".join(links), "collapsed"))
+        columns = min(4 if not row.get("other") else 5, max(1, math.ceil(math.sqrt(max(1, len(display_entries))))))
+        max_posts = max([posts_for(name) for name in names] or [1])
+        for index, (entry, entry_type) in enumerate(display_entries):
+            row_index, column = divmod(index, columns)
+            card_x = x + 24 + column * 252
+            card_y = y + 150 + row_index * 104
+            if entry_type == "collapsed":
+                add({"type": "text", "text": "## " + entry, "x": card_x, "y": card_y, "width": 232, "height": 92, "color": category_color})
+                continue
+            entity = all_by_name[entry]
+            posts = posts_for(entry)
+            scale = math.sqrt(posts / max_posts) if max_posts else 1
+            card_width = round(216 + 16 * scale)
+            card_height = round(78 + 12 * scale)
+            lines = [f"## {entry}", f"{posts} post{'s' if posts != 1 else ''}"]
+            other_topics = [candidate for candidate in entity_topics.get(entry, []) if candidate != topic]
+            if other_topics:
+                lines.append("↗ also in: " + ", ".join(vault_link("Canvases/" + canvas_filename(candidate), TOPIC_LABELS[candidate]) for candidate in other_topics))
+            add({"type": "text", "text": "\n".join(lines), "x": card_x, "y": card_y, "width": card_width, "height": card_height, "color": category_color})
+    core_x, core_y = group_positions["Shared across clusters"]
+    hub_positions: dict[str, tuple[float, float]] = {}
+    for canonical in sorted(shared_names, key=lambda name: (-len(memberships[name]), -posts_for(name), name.casefold())):
+        angles = []
+        for cluster_name in memberships[canonical]:
+            gx, gy = group_positions[cluster_name]
+            angles.append(math.atan2(gy + group_sizes[cluster_name][1] / 2 - core_center[1], gx + group_sizes[cluster_name][0] / 2 - core_center[0]))
+        vx, vy = sum(math.cos(angle) for angle in angles), sum(math.sin(angle) for angle in angles)
+        mean_angle = math.atan2(vy, vx) if vx or vy else 0.0
+        hub_positions[canonical] = (math.cos(mean_angle) * 250 + core_width / 2 - 112, math.sin(mean_angle) * 250 + core_height / 2 - 44)
+    hub_positions = _resolve_rect_overlaps(hub_positions, {name: (224, 88) for name in hub_positions}, core_width - 40, core_height - 170, rounds=80)
+    for canonical, (hx, hy) in hub_positions.items():
+        entity = all_by_name[canonical]
+        posts = posts_for(canonical)
+        lines = [f"## {canonical}", f"{posts} post{'s' if posts != 1 else ''}"]
+        other_topics = [candidate for candidate in entity_topics.get(canonical, []) if candidate != topic]
+        if other_topics:
+            lines.append("↗ also in: " + ", ".join(vault_link("Canvases/" + canvas_filename(candidate), TOPIC_LABELS[candidate]) for candidate in other_topics))
+        entity_id = add({"type": "text", "text": "\n".join(lines), "x": round(core_x + 20 + hx), "y": round(core_y + 150 + hy), "width": 224, "height": 88, "color": category_color})
+        for cluster_name in memberships[canonical]:
+            label = cluster_name if len(cluster_name.split()) <= 4 else None
+            edge(entity_id, group_ids[cluster_name], label)
+    relation_lookup = {frozenset({item["a"], item["b"]}): item for item in card_lines.get("relations", []) if item.get("line_kind") == "hand-written"}
+    for left_index, left in enumerate(cluster_rows):
+        if left.get("other"):
+            continue
+        for right in cluster_rows[left_index + 1 :]:
+            if right.get("other"):
+                continue
+            relation = relation_lookup.get(frozenset({f"{topic}|{left['name']}", f"{topic}|{right['name']}"}))
+            if relation:
+                edge(group_ids[left["name"]], group_ids[right["name"]], relation["line"])
+    add({"type": "text", "text": f"## Shared across clusters\n{len(shared_names)} entities point to multiple clusters", "x": core_x + 24, "y": core_y + 24, "width": core_width - 48, "height": 110, "color": category_color})
     return {"nodes": nodes, "edges": edges}
 
 
@@ -713,7 +1153,9 @@ def build() -> dict[str, Any]:
     except PermissionError:
         if not cross_target.exists():
             raise
-    canvas = overview_canvas(topic_data, entities)
+    card_lines = build_card_lines(topic_data)
+    write_json(CARD_LINES_JSON, card_lines)
+    canvas = overview_canvas(topic_data, entities, card_lines)
     canvas_target = PUBLICATION / "Saved AI Posts.canvas"
     try:
         canvas_target.write_text(json.dumps(canvas, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
@@ -724,7 +1166,7 @@ def build() -> dict[str, Any]:
     canvases_dir.mkdir(parents=True, exist_ok=True)
     detail_canvases: dict[str, dict[str, Any]] = {}
     for topic in TOPIC_LABELS:
-        detail = detail_canvas(topic, topic_data[topic], entities, filenames, {})
+        detail = detail_canvas(topic, topic_data[topic], entities, filenames, {}, card_lines, topic_data)
         detail_canvases[topic] = detail
         target = canvases_dir / canvas_filename(topic)
         try:
