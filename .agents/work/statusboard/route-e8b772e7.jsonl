@@ -1,0 +1,5 @@
+{"last_step":"registered","state":"starting","heartbeat_at":"2026-09-20T06:22:40.7314259Z","surface":"route","agent_id":"route-e8b772e7"}
+{"agent_id":"route-e8b772e7","state":"starting","surface":"codex","heartbeat_at":"2026-09-20T06:22:46.2771085Z","last_step":"selected"}
+{"agent_id":"route-e8b772e7","surface":"codex","heartbeat_at":"2026-09-20T06:22:48.5864391Z","state":"working","last_step":"starting"}
+{"state":"working","heartbeat_at":"2026-09-20T06:22:48.8342088Z","surface":"codex","last_step":"starting","agent_id":"route-e8b772e7","progress":false}
+{"heartbeat_at":"2026-09-20T06:22:49.8922527Z","surface":"codex","last_step":"nonzero-exit-and-empty-worktree","state":"failed","agent_id":"route-e8b772e7"}

@@ -1,0 +1,25 @@
+{"state":"starting","last_step":"registered","heartbeat_at":"2026-09-20T11:11:29.0055166Z","agent_id":"route-3921fc89","surface":"route"}
+{"surface":"codex","last_step":"selected","state":"starting","heartbeat_at":"2026-09-20T11:11:34.3102157Z","agent_id":"route-3921fc89"}
+{"agent_id":"route-3921fc89","last_step":"starting","surface":"codex","heartbeat_at":"2026-09-20T11:11:36.6621734Z","state":"working"}
+{"agent_id":"route-3921fc89","state":"working","heartbeat_at":"2026-09-20T11:11:36.9144796Z","surface":"codex","progress":false,"last_step":"starting"}
+{"heartbeat_at":"2026-09-20T11:12:38.3921205Z","state":"working","last_step":"working 2026-09-20T11:12:37.7586128Z","surface":"codex","agent_id":"route-3921fc89"}
+{"agent_id":"route-3921fc89","state":"working","heartbeat_at":"2026-09-20T11:12:38.6429310Z","surface":"codex","progress":true,"last_step":"working 2026-09-20T11:12:37.7586128Z"}
+{"surface":"codex","last_step":"working 2026-09-20T11:13:39.2140790Z","state":"working","agent_id":"route-3921fc89","heartbeat_at":"2026-09-20T11:13:39.7282028Z"}
+{"agent_id":"route-3921fc89","state":"working","heartbeat_at":"2026-09-20T11:13:39.9510715Z","surface":"codex","progress":true,"last_step":"working 2026-09-20T11:13:39.2140790Z"}
+{"state":"working","heartbeat_at":"2026-09-20T11:14:41.0616015Z","last_step":"working 2026-09-20T11:14:40.5390258Z","agent_id":"route-3921fc89","surface":"codex"}
+{"agent_id":"route-3921fc89","state":"working","heartbeat_at":"2026-09-20T11:14:41.3096484Z","surface":"codex","progress":true,"last_step":"working 2026-09-20T11:14:40.5390258Z"}
+{"heartbeat_at":"2026-09-20T11:15:42.2831094Z","state":"working","agent_id":"route-3921fc89","last_step":"working 2026-09-20T11:15:41.7834986Z","surface":"codex"}
+{"agent_id":"route-3921fc89","state":"working","heartbeat_at":"2026-09-20T11:15:42.4489398Z","surface":"codex","progress":true,"last_step":"working 2026-09-20T11:15:41.7834986Z"}
+{"state":"working","last_step":"working 2026-09-20T11:16:42.9468143Z","heartbeat_at":"2026-09-20T11:16:43.4587735Z","surface":"codex","agent_id":"route-3921fc89"}
+{"agent_id":"route-3921fc89","state":"working","heartbeat_at":"2026-09-20T11:16:43.6670872Z","surface":"codex","progress":true,"last_step":"working 2026-09-20T11:16:42.9468143Z"}
+{"state":"working","heartbeat_at":"2026-09-20T11:17:44.7859223Z","agent_id":"route-3921fc89","last_step":"working 2026-09-20T11:17:44.2086693Z","surface":"codex"}
+{"agent_id":"route-3921fc89","state":"working","heartbeat_at":"2026-09-20T11:17:45.0689421Z","surface":"codex","progress":true,"last_step":"working 2026-09-20T11:17:44.2086693Z"}
+{"last_step":"working 2026-09-20T11:18:45.5967529Z","state":"working","surface":"codex","heartbeat_at":"2026-09-20T11:18:46.2751706Z","agent_id":"route-3921fc89"}
+{"agent_id":"route-3921fc89","state":"working","heartbeat_at":"2026-09-20T11:18:46.5635939Z","surface":"codex","progress":true,"last_step":"working 2026-09-20T11:18:45.5967529Z"}
+{"agent_id":"route-3921fc89","last_step":"working 2026-09-20T11:19:47.1314973Z","surface":"codex","state":"working","heartbeat_at":"2026-09-20T11:19:47.7404640Z"}
+{"agent_id":"route-3921fc89","state":"working","heartbeat_at":"2026-09-20T11:19:48.0213342Z","surface":"codex","progress":true,"last_step":"working 2026-09-20T11:19:47.1314973Z"}
+{"state":"working","last_step":"working 2026-09-20T11:20:48.5113436Z","heartbeat_at":"2026-09-20T11:20:49.0307121Z","surface":"codex","agent_id":"route-3921fc89"}
+{"agent_id":"route-3921fc89","state":"working","heartbeat_at":"2026-09-20T11:20:49.2538918Z","surface":"codex","progress":true,"last_step":"working 2026-09-20T11:20:48.5113436Z"}
+{"surface":"codex","heartbeat_at":"2026-09-20T11:21:05.4938618Z","state":"working","last_step":"completed exit=0","agent_id":"route-3921fc89"}
+{"agent_id":"route-3921fc89","state":"working","heartbeat_at":"2026-09-20T11:21:05.6929231Z","surface":"codex","progress":true,"last_step":"completed exit=0"}
+{"state":"finished","last_step":"exit-zero-clean","surface":"codex","heartbeat_at":"2026-09-20T11:21:21.5788814Z","agent_id":"route-3921fc89"}

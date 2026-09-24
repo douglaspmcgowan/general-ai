@@ -1,0 +1,2 @@
+{"heartbeat_at":"2026-09-20T06:45:50.7080484Z","last_step":"registered","surface":"route","state":"starting","agent_id":"route-00803e58"}
+{"surface":"route","heartbeat_at":"2026-09-20T06:45:55.5938395Z","agent_id":"route-00803e58","state":"blocked","last_step":"named-model-unavailable: model 'gpt-6-astra' offers remote-desktop but none is eligible (remote-desktop: not-qualified-for-role)"}

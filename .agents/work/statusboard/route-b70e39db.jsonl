@@ -1,0 +1,2 @@
+{"agent_id":"route-b70e39db","surface":"route","state":"starting","last_step":"registered","heartbeat_at":"2026-09-20T08:44:51.5277985Z"}
+{"state":"blocked","heartbeat_at":"2026-09-20T08:44:55.6562601Z","agent_id":"route-b70e39db","last_step":"router-refused: named-model-unavailable: model 'gpt-5.6-luna' is not-qualified-for-role for role 'reviewer'","surface":"route"}
