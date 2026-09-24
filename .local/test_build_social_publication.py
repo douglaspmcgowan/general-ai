@@ -1,5 +1,6 @@
 import unittest
 
+import build_social_entities as entity_builder
 import build_social_publication as builder
 
 
@@ -38,6 +39,19 @@ class PublicationGateTests(unittest.TestCase):
         )
         self.assertEqual(detail["resources"], ["/hdreal"])
         self.assertNotIn("type", " ".join(detail["resources"]))
+
+
+class EntityAdmissionTests(unittest.TestCase):
+    def test_media_entity_normalization_rejects_incidental_names(self):
+        self.assertIsNone(entity_builder.normalize_entity_name("@lostandlucky"))
+        self.assertEqual(entity_builder.normalize_entity_name("- Three.js -"), "Three.js")
+        self.assertIsNone(entity_builder.normalize_entity_name("https://example.com/tool"))
+        self.assertIsNone(entity_builder.normalize_entity_name("order.svg"))
+        self.assertIsNone(entity_builder.normalize_entity_name("---"))
+
+    def test_media_entity_normalization_merges_case_and_possessive_aliases(self):
+        self.assertEqual(entity_builder.entity_key("claude code"), entity_builder.entity_key("Claude Code"))
+        self.assertEqual(entity_builder.entity_key("Anthropic's"), entity_builder.entity_key("Anthropic"))
 
 
 if __name__ == "__main__":

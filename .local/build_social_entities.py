@@ -27,6 +27,30 @@ CARD_LINES_JSON = CLASSIFICATION / "card-lines-v1.json"
 SLIDES_DIR = CLASSIFICATION / "slides"
 AUDIO_DIR = CLASSIFICATION / "audio"
 SC24_CARD_LINES = CLASSIFICATION / "sc24-card-lines-proposed.json"
+PRE_SC26_PUBLICATION = ROOT / "publication-dryrun-pre-sc26"
+
+# SC26 media captures contain both named products and incidental resources.  The
+# comparison layer is hand-written and therefore supplies the small set of
+# additional names it explicitly discusses; this allowlist covers the ten
+# other media resources that are unambiguously adoptable products/services.
+MEDIA_ENTITY_ALLOWLIST = frozenset({
+    "Evolving AI",
+    "Hyperframes",
+    "Notion",
+    "Remotion",
+    "Slack",
+    "Alibaba",
+    "Discord",
+    "Hugging Face",
+    "Gmail",
+    "Google Drive",
+})
+FILE_SUFFIXES = frozenset({
+    ".css", ".html", ".jpeg", ".jpg", ".json", ".md", ".png", ".py",
+    ".svg", ".txt", ".yaml", ".yml",
+})
+KNOWN_JS_LIBRARIES = frozenset({"Next.js", "Node.js", "p5.js", "Three.js"})
+NAME_STRIP_CHARS = " \t\r\n-–—.,;:!?()[]{}<>\"'`~_/\\|"
 
 VAULT_ROOT = "50 Knowledge/57 Corpus/Saved AI Posts"
 TOPIC_LABELS = {
@@ -61,6 +85,93 @@ def write_json(path: Path, value: Any) -> None:
 
 def clean(value: Any) -> str:
     return re.sub(r"\s+", " ", str(value if value is not None else "")).strip()
+
+
+def normalize_entity_name(value: Any, *, allow_file_name: bool = False) -> str | None:
+    """Return a safe display name, or ``None`` for incidental media text."""
+    name = clean(value)
+    if not name or name.startswith(("@", "#")):
+        return None
+    if re.match(r"(?i)^https?\b", name) or "://" in name:
+        return None
+    if "/" in name or "\\" in name:
+        return None
+    name = name.strip(NAME_STRIP_CHARS)
+    if not name or re.match(r"(?i)^https?\b", name):
+        return None
+    suffix = Path(name).suffix.casefold()
+    if suffix in FILE_SUFFIXES and not allow_file_name:
+        return None
+    if suffix == ".js" and name not in KNOWN_JS_LIBRARIES and not allow_file_name:
+        return None
+    return name
+
+
+def entity_key(value: Any, *, allow_file_name: bool = False) -> str:
+    """Case-fold names and merge the common possessive alias form."""
+    name = normalize_entity_name(value, allow_file_name=allow_file_name)
+    if not name:
+        return ""
+    name = re.sub(r"(?i)(?:['’]s)$", "", name).strip()
+    return re.sub(r"\s+", " ", name).casefold()
+
+
+def _existing_entity_key(value: Any) -> str:
+    return entity_key(value) or entity_key(value, allow_file_name=True) or _reference_entity_key(value)
+
+
+def _reference_entity_key(value: Any) -> str:
+    """Key an already-reviewed baseline row without re-admitting raw URLs."""
+    name = clean(value)
+    if not name:
+        return ""
+    name = re.sub(r"(?i)(?:['’]s)$", "", name).strip()
+    return re.sub(r"\s+", " ", name).casefold()
+
+
+def _baseline_entity_names() -> dict[str, str]:
+    """Read the pre-SC26 publication as the immutable reference set."""
+    names: dict[str, str] = {}
+    entity_dir = PRE_SC26_PUBLICATION / "Entities"
+    if not entity_dir.exists():
+        return names
+    for path in sorted(entity_dir.glob("*.md")):
+        if path.name in {"README.md", "Entity map.md"}:
+            continue
+        match = re.search(r"(?m)^# (.+)$", path.read_text(encoding="utf-8"))
+        canonical = clean(match.group(1)) if match else clean(path.stem)
+        if canonical:
+            names[_existing_entity_key(canonical)] = canonical
+    return names
+
+
+def _comparison_entity_names() -> dict[str, str]:
+    """Return names used by the hand-written comparison layer."""
+    names: dict[str, str] = {}
+    for path in sorted(COMPARISONS.glob("*.json")):
+        if path.name == "_cross-category.json" or ".pre-" in path.name:
+            continue
+        payload = read_json(path)
+        for cluster in payload.get("clusters", []):
+            for raw in cluster.get("entities", []):
+                canonical = normalize_entity_name(raw)
+                if canonical:
+                    names.setdefault(entity_key(canonical), canonical)
+    return names
+
+
+def _admitted_media_name(raw: Any, baseline: dict[str, str], comparisons: dict[str, str]) -> str | None:
+    """Map a captured resource to a baseline, comparison, or approved entity."""
+    canonical = normalize_entity_name(raw)
+    if not canonical:
+        return None
+    key = entity_key(canonical)
+    if key in baseline:
+        return baseline[key]
+    if key in comparisons:
+        return comparisons[key]
+    allowlist = {entity_key(name): name for name in MEDIA_ENTITY_ALLOWLIST}
+    return allowlist.get(key)
 
 
 def resource_label(value: Any) -> str:
@@ -155,14 +266,44 @@ def _resource_kind(name: str) -> str:
 
 def merge_media_entities(entity_doc: dict[str, Any], records: dict[str, dict[str, Any]]) -> tuple[dict[str, Any], int]:
     """Add slide/audio resources as collection pointers, preserving existing entity rulings."""
-    entities = entity_doc.setdefault("entities", [])
-    # Remove malformed rows from an earlier integration pass; the source capture is re-read below.
-    entities[:] = [entity for entity in entities if resource_label(entity.get("canonical")) and not str(entity.get("canonical")).startswith("{'type':")]
+    original_entities = entity_doc.setdefault("entities", [])
+    baseline = _baseline_entity_names()
+    comparisons = _comparison_entity_names()
+    # The current JSON may be the rejected SC26 explosion.  Start from the
+    # pre-SC26 reference set, plus names explicitly used by comparisons, then
+    # admit only the small reviewed media allowlist below.
+    if baseline:
+        retained: list[dict[str, Any]] = []
+        by_key: dict[str, dict[str, Any]] = {}
+        for source in original_entities:
+            raw = resource_label(source.get("canonical"))
+            if not raw or raw.startswith("{'type':"):
+                continue
+            raw_key = _existing_entity_key(raw)
+            canonical = baseline.get(raw_key) or comparisons.get(raw_key)
+            if canonical is None:
+                canonical = {entity_key(name): name for name in MEDIA_ENTITY_ALLOWLIST}.get(raw_key)
+            if canonical is None:
+                continue
+            key = _existing_entity_key(canonical)
+            source["canonical"] = canonical
+            existing = by_key.get(key)
+            if existing is None:
+                by_key[key] = source
+                retained.append(source)
+                continue
+            existing.setdefault("aliases", []).extend(source.get("aliases") or [])
+            existing.setdefault("pointers", []).extend(source.get("pointers") or [])
+        entities = retained
+    else:
+        entities = [entity for entity in original_entities if resource_label(entity.get("canonical")) and not str(entity.get("canonical")).startswith("{'type':")]
+    entity_doc["entities"] = entities
     aliases: dict[str, dict[str, Any]] = {}
     for entity in entities:
         for value in [entity.get("canonical"), *(entity.get("aliases") or [])]:
-            if clean(value):
-                aliases[clean(value).casefold()] = entity
+            key = _existing_entity_key(value)
+            if key:
+                aliases[key] = entity
     added = 0
     for sid, rows in _media_resource_rows().items():
         record = records.get(str(sid))
@@ -171,14 +312,17 @@ def merge_media_entities(entity_doc: dict[str, Any], records: dict[str, dict[str
         topic = clean(record.get("primary_topic") or "unsorted")
         seen: set[str] = set()
         for resource, span in rows:
-            key = resource.casefold()
+            canonical = _admitted_media_name(resource, baseline, comparisons)
+            if canonical is None:
+                continue
+            key = entity_key(canonical)
             if key in seen:
                 continue
             seen.add(key)
             entity = aliases.get(key)
             if entity is None:
                 entity = {
-                    "aliases": [], "canonical": resource, "canonical_url": resource if resource.startswith(("http://", "https://")) else None,
+                    "aliases": [], "canonical": canonical, "canonical_url": None,
                     "category_histogram": {}, "collection_pointer_count": 0, "dm_pointer_count": 0,
                     "family": None, "kind": _resource_kind(resource), "pointer_count": 0, "pointers": [],
                     "primary_category": topic, "subfamily": None, "subject_count": 0, "unverified_claim": True,
@@ -186,6 +330,8 @@ def merge_media_entities(entity_doc: dict[str, Any], records: dict[str, dict[str
                 entities.append(entity)
                 aliases[key] = entity
                 added += 1
+            elif clean(resource) and entity_key(resource) != key and clean(resource) not in entity.get("aliases", []):
+                entity.setdefault("aliases", []).append(clean(resource))
             if any(p.get("source") == "collection" and str(p.get("stable_id")) == str(sid) for p in entity.get("pointers", [])):
                 continue
             entity.setdefault("pointers", []).append({"evidence_span": span or f"Captured media names {resource}.", "role": "mentioned", "source": "collection", "stable_id": str(sid), "media_source": "slides-or-audio"})
@@ -195,6 +341,21 @@ def merge_media_entities(entity_doc: dict[str, Any], records: dict[str, dict[str
             histogram = entity.setdefault("category_histogram", {})
             histogram[topic] = sum(1 for p in entity["pointers"] if p.get("source") == "collection" and records.get(str(p.get("stable_id")), {}).get("primary_topic") == topic)
             entity["primary_category"] = max(histogram, key=histogram.get) if histogram else topic
+    for entity in entities:
+        pointers = entity.get("pointers", [])
+        entity["pointer_count"] = len(pointers)
+        entity["collection_pointer_count"] = sum(1 for pointer in pointers if pointer.get("source") == "collection")
+        entity["dm_pointer_count"] = sum(1 for pointer in pointers if pointer.get("source") == "dm")
+        entity["aliases"] = sorted(set(str(alias) for alias in entity.get("aliases", []) if clean(alias)), key=str.casefold)
+        histogram: dict[str, int] = defaultdict(int)
+        for pointer in pointers:
+            if pointer.get("source") != "collection":
+                continue
+            pointer_topic = clean(records.get(str(pointer.get("stable_id")), {}).get("primary_topic") or "unsorted")
+            histogram[pointer_topic] += 1
+        if histogram:
+            entity["category_histogram"] = dict(sorted(histogram.items()))
+            entity["primary_category"] = max(histogram, key=histogram.get)
     entity_doc["entity_count"] = len(entities)
     entity_doc["multi_pointer_entity_count"] = sum(int(e.get("pointer_count", 0)) >= 2 for e in entities)
     entity_doc["singleton_entity_count"] = sum(int(e.get("pointer_count", 0)) == 1 for e in entities)
@@ -419,7 +580,7 @@ def rewrite_entity_links(filenames: dict[str, str]) -> None:
 
 
 def append_source_entity_links(entities: list[dict[str, Any]], records: dict[str, dict[str, Any]], filenames: dict[str, str]) -> None:
-    """Add a deterministic entity section to each source note that mentions one."""
+    """Replace the entity section so stale SC26 links cannot survive a rebuild."""
     by_id: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for entity in entities:
         for pointer in entity.get("pointers", []):
@@ -429,11 +590,20 @@ def append_source_entity_links(entities: list[dict[str, Any]], records: dict[str
         path = PUBLICATION / "Notes" / source_filename(record)
         if not path.exists():
             continue
+        text = path.read_text(encoding="utf-8")
+        marker = "\n## Entities\n"
+        if marker in text:
+            start = text.index(marker)
+            remainder = text[start + len(marker):]
+            next_heading = re.search(r"\n## (?!Entities\b)", remainder)
+            if next_heading:
+                text = text[:start] + remainder[next_heading.start():]
+            else:
+                text = text[:start].rstrip() + "\n"
         linked = sorted(by_id.get(str(stable_id), []), key=lambda row: str(row["canonical"]).casefold())
         if not linked:
-            continue
-        text = path.read_text(encoding="utf-8")
-        if "\n## Entities\n" in text:
+            if text != path.read_text(encoding="utf-8"):
+                path.write_text(text, encoding="utf-8", newline="\n")
             continue
         section = "\n## Entities\n\n" + "\n".join(
             f"- {entity_link(entity, filenames)}" for entity in linked

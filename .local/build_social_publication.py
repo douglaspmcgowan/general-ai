@@ -104,6 +104,12 @@ def primary_topic(r):
     p=clean(r.get("primary_topic")).lower()
     if p not in FIXED_TOPICS: raise RuntimeError(f"confirmed record {r.get('stable_id')} has invalid primary_topic: {p!r}")
     return p
+def entity_filename(canonical):
+    """Mirror the entity builder's filesystem-safe filename rule for cross-layer links."""
+    canonical=clean(canonical)
+    stem=canonical if canonical.casefold().endswith('.md') else canonical+'.md'
+    safe=re.sub(r'[<>:"/\\|?*\x00-\x1f]', ' - ', stem).rstrip(' .')
+    return safe or 'unnamed-entity.md'
 def link(path,label,table=False):
     separator = "\\|" if table else "|"
     return f"[[{path}{separator}{label}]]"
@@ -694,7 +700,7 @@ def main_v3():
             break
     if not IMAGE_SOURCE.exists(): raise RuntimeError(f'missing official image asset: {IMAGE_SOURCE}')
     img=dest/IMAGE_DEST_REL; img.parent.mkdir(parents=True,exist_ok=True); shutil.copy2(IMAGE_SOURCE,img)
-    idx=f'''---\ntype: index\ntitle: Saved AI Posts — Corpus Index\nauthored_by: agent\nmaintained_by: agent\nstatus: current\ncorpus: Saved AI Posts\nupdated: "2026-09-22"\n---\n\n# Saved AI Posts\n\nThis dry run publishes {confirmed_count} confirmed Instagram AI-collection members. LinkedIn records and rejected records are out of scope.\n\nThe existing geo-grandmasters note is preserved but its post is rejected in v3 and is not a member of this AI collection: '''+link('50 Knowledge/57 Corpus/Saved AI Posts/Notes/geo_grandmasters — AI surveillance and commercial power — DZ7sxpHyfzu.md','existing geo note')+'''.\n\n''' + "\n".join(f"- {link('50 Knowledge/57 Corpus/Saved AI Posts/Topics/'+k+'.md',TOPIC_LABELS[k])}" for k in sorted(rows))+'''\n\n## Analysis layer\n\n- '''+link('50 Knowledge/57 Corpus/Saved AI Posts/Comparisons/Cross-category comparison.md','cross-category comparison')+'''\n- '''+link('50 Knowledge/57 Corpus/Saved AI Posts/Comparisons/ai-news — comparison.md','category comparisons')+'''\n- '''+link('50 Knowledge/57 Corpus/Saved AI Posts/Entities/agentic-os.md','entity notes (multi-pointer)')+'''\n- '''+link('50 Knowledge/57 Corpus/Saved AI Posts/Saved AI Posts.canvas','category and cluster canvas')+'''\n'''; write(dest/'00 - Saved AI Posts Corpus Index.md',idx,backups,refusals)
+    idx=f'''---\ntype: index\ntitle: Saved AI Posts — Corpus Index\nauthored_by: agent\nmaintained_by: agent\nstatus: current\ncorpus: Saved AI Posts\nupdated: "2026-09-22"\n---\n\n# Saved AI Posts\n\nThis dry run publishes {confirmed_count} confirmed Instagram AI-collection members. LinkedIn records and rejected records are out of scope.\n\nThe existing geo-grandmasters note is preserved but its post is rejected in v3 and is not a member of this AI collection: '''+link('50 Knowledge/57 Corpus/Saved AI Posts/Notes/geo_grandmasters — AI surveillance and commercial power — DZ7sxpHyfzu.md','existing geo note')+'''.\n\n''' + "\n".join(f"- {link('50 Knowledge/57 Corpus/Saved AI Posts/Topics/'+k+'.md',TOPIC_LABELS[k])}" for k in sorted(rows))+'''\n\n## Analysis layer\n\n- '''+link('50 Knowledge/57 Corpus/Saved AI Posts/Comparisons/Cross-category comparison.md','cross-category comparison')+'''\n- '''+link('50 Knowledge/57 Corpus/Saved AI Posts/Comparisons/ai-news — comparison.md','category comparisons')+'''\n- '''+link('50 Knowledge/57 Corpus/Saved AI Posts/Entities/README.md','entity notes')+'''\n- '''+link('50 Knowledge/57 Corpus/Saved AI Posts/Saved AI Posts.canvas','category and cluster canvas')+'''\n'''; write(dest/'00 - Saved AI Posts Corpus Index.md',idx,backups,refusals)
     ensure_corpus_index_links(dest)
     write(dest/'Needs review.md','''---\ntype: index\ntitle: Saved AI Posts — Needs review\nauthored_by: agent\nmaintained_by: agent\nstatus: current\ncorpus: Saved AI Posts\nupdated: "2026-09-20"\n---\n\n# Needs review\n\n'''+'\n'.join(f"- {r['stable_id']}: {', '.join(clean(x) for x in list_value(r,'unresolved_questions')[0])}" for r in confirmed if list_value(r,'unresolved_questions')[0])+"\n",backups,refusals)
     write(dest/'Notes/README.md',folder_readme('Saved AI Posts — Notes index','This folder holds one source note for each accepted AI and technology saved post.',[(f'50 Knowledge/57 Corpus/Saved AI Posts/Notes/{names[sid]}',title(next(r for r in confirmed if r['stable_id']==sid))) for sid in sorted(names)]),backups,refusals)
@@ -736,7 +742,7 @@ def main_v3():
     for _r in dm_rows:
         _n=clean(_r.get('name')) or clean(_r.get('url')) or clean(_r.get('shortcode')) or 'public resource'
         _k=clean(_r.get('kind')) or 'unknown'; _u=clean(_r.get('url'))
-        _e=_entity_for_dm(_r); _label=link('50 Knowledge/57 Corpus/Saved AI Posts/Entities/'+slug(_e.get('canonical'))+'.md',_n) if _e else _n
+        _e=_entity_for_dm(_r); _label=link('50 Knowledge/57 Corpus/Saved AI Posts/Entities/'+entity_filename(_e.get('canonical')),_n) if _e else _n
         _rows.append('- '+_label+' ('+_k+')'+((' — '+_u) if _u else ''))
     dmtext=_hdr+chr(10).join(_rows)+chr(10)
     write(dest/'DM resources.md',dmtext,backups,refusals)
