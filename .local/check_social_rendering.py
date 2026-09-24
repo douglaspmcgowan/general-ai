@@ -27,6 +27,7 @@ DETAIL_TOPICS = {
     "unsorted.canvas": "unsorted",
 }
 TABLE_SEPARATOR_RE = re.compile(r"^\s*\|?\s*:?-{3,}:?\s*(?:\|\s*:?-{3,}:?\s*)+\|?\s*$")
+MARKDOWN_LINK_RE = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)")
 
 
 def _split_link(token: str) -> tuple[str, str | None]:
@@ -97,6 +98,58 @@ def _table_violations(path: Path) -> list[str]:
             index = row_index
         else:
             index += 1
+    return violations
+
+
+def _frontmatter_fields(text: str) -> dict[str, str | None]:
+    if not text.startswith("---\n"):
+        return {}
+    end = text.find("\n---", 4)
+    if end < 0:
+        return {}
+    fields: dict[str, str | None] = {}
+    for line in text[4:end].splitlines():
+        if ":" not in line:
+            continue
+        key, raw = line.split(":", 1)
+        key = key.strip()
+        value = raw.strip()
+        if value.lower() in {"", "null", "~"}:
+            fields[key] = None
+            continue
+        try:
+            parsed = json.loads(value)
+        except json.JSONDecodeError:
+            parsed = value.strip("'\"")
+        fields[key] = None if parsed is None else str(parsed)
+    return fields
+
+
+def _source_note_permalink_violations(source: Path) -> list[str]:
+    notes = source / "Notes"
+    if not notes.is_dir():
+        return []
+    violations: list[str] = []
+    for path in sorted(notes.glob("*.md")):
+        if path.name == "README.md":
+            continue
+        text = path.read_text(encoding="utf-8", errors="replace")
+        fields = _frontmatter_fields(text)
+        if fields.get("subtype") != "source":
+            continue
+        permalink = fields.get("permalink")
+        if permalink is None:
+            continue
+        destinations = []
+        for match in MARKDOWN_LINK_RE.finditer(text):
+            destination = match.group(1).strip()
+            if destination.startswith("<") and ">" in destination:
+                destination = destination[1:destination.index(">")]
+            else:
+                destination = destination.split(None, 1)[0]
+            destinations.append(destination)
+        if permalink not in destinations:
+            violations.append(f"{path}: permalink {permalink!r} is missing from the body as a markdown link")
     return violations
 
 
@@ -478,6 +531,7 @@ def check_tree(source: Path) -> tuple[list[str], dict[str, int]]:
     if not source.is_dir():
         return [f"source is not a directory: {source}"], {}
     violations.extend(_card_lines_violations(source))
+    violations.extend(_source_note_permalink_violations(source))
     markdown = [path for path in source.rglob("*.md") if not (set(path.relative_to(source).parts) & EXCLUDED)]
     for path in markdown:
         violations.extend(_table_violations(path))

@@ -239,7 +239,7 @@ def render(r):
     if image: lines += [f"![Official project image — not Instagram media]({image})","*Official project image obtained from the vendor's own site or repository; this is not media from the Instagram post.*",""]
     return "\n".join(lines)+"\n"
 def render_v3(r, assignment, credibility_records):
-    sid=str(r.get("stable_id")); t=title(r); plat=clean(r.get("source_platform") or "Instagram").lower(); raw_ver=r.get("independent_verification"); ver=raw_ver if isinstance(raw_ver,dict) else raw_ver; image=IMAGE_DEST_REL.as_posix() if sid=="DbQyH2NBc7C" else None
+    sid=str(r.get("stable_id")); t=title(r); plat=clean(r.get("source_platform") or "Instagram").lower(); raw_ver=r.get("independent_verification"); ver=raw_ver if isinstance(raw_ver,dict) else raw_ver; image=IMAGE_DEST_REL.as_posix() if sid=="DbQyH2NBc7C" else None; permalink=scalar(r.get("permalink_url"))
     topic=clean(assignment.get("primary_topic")).lower(); rationale=assignment["justification"]; topic_confidence=assignment["confidence"]
     caption_file=scalar(r.get("caption_source") or r.get("source_file")); metadata_file=scalar(r.get("source_file"))
     lines=["---","type: thing","subtype: source",f"title: {ys(t)}","authored_by: agent","maintained_by: agent","status: current","corpus: Saved AI Posts",f"platform: {ys(plat)}",f"author_handle: {ys(scalar(r.get('author_handle')))}",f"author_display_name: {ys(scalar(r.get('author_display_name')))}",f"author_profile: {ys(scalar(r.get('author_profile')))}",f"permalink: {ys(scalar(r.get('permalink_url')))}",f"screenshot: {ys(scalar(r.get('screenshot') or 'missing'))}",f"work_link: {ys(scalar(r.get('work_link')))}",'tags: ["source", "corpus/saved-ai-posts", "agent-note"]','updated: "2026-09-20"',f"stable_id: {ys(sid)}",f"source_file: {ys(caption_file)}",f"metadata_source_file: {ys(metadata_file)}",f"collection_membership: {ys(scalar(r.get('collection_membership')))}",f"primary_topic: {ys(topic)}",f"primary_topic_rationale: {ys(rationale)}",f"primary_topic_confidence: {ys(topic_confidence)}"]
@@ -252,7 +252,10 @@ def render_v3(r, assignment, credibility_records):
         else:
             value=judgement_value(r,field); vals_by_field[field]=value; lines += [f"{field}: {ys(value)}",f"{field}_status: {ys(scalar_status(value))}"]
     verification_status=scalar(r.get('verification_status') or (ver.get('status') if isinstance(ver,dict) else None))
-    lines += [f"verification_status: {ys(verification_status)}",f"source_type: {ys(plat)}",f"enrichment_state: {ys(scalar(r.get('state')))}",f"image: {ys(image)}",f"image_status: {ys('resolved' if image else 'unresolved')}","---","",f"# {t}","","## Source metadata","",f"- Platform: {plat}",f"- Author: {clean(r.get('author_handle')) or 'unresolved'}",f"- Taken at: {clean(r.get('taken_at_utc')) or 'unresolved'}",f"- Membership: {clean(r.get('collection_membership')) or 'unresolved'}",f"- Primary topic: {topic}",f"- Topic rationale: {rationale}",f"- Topic confidence: {topic_confidence}",f"- Caption source file: {clean(caption_file) or 'unresolved'}",f"- Metadata source file: {clean(metadata_file) or 'unresolved'}",""]
+    lines += [f"verification_status: {ys(verification_status)}",f"source_type: {ys(plat)}",f"enrichment_state: {ys(scalar(r.get('state')))}",f"image: {ys(image)}",f"image_status: {ys('resolved' if image else 'unresolved')}","---","",f"# {t}",""]
+    if permalink not in (None, ""):
+        lines += [f"[Open on Instagram]({permalink})", ""]
+    lines += ["## Source metadata","",f"- Platform: {plat}",f"- Author: {clean(r.get('author_handle')) or 'unresolved'}",f"- Taken at: {clean(r.get('taken_at_utc')) or 'unresolved'}",f"- Membership: {clean(r.get('collection_membership')) or 'unresolved'}",f"- Primary topic: {topic}",f"- Topic rationale: {rationale}",f"- Topic confidence: {topic_confidence}",f"- Caption source file: {clean(caption_file) or 'unresolved'}",f"- Metadata source file: {clean(metadata_file) or 'unresolved'}",""]
     body=lambda field: vals_by_field.get(field)
     display=lambda field: body(field)
     sections=[("Content summary",[human(display("content_summary"))]),("Post claims",[human(x) for x in (display("post_claims") or [])] or ["unresolved"]),("Independent verification",[f"Status: {human(ver.get('status') if isinstance(ver,dict) else None)}",f"Detail: {human(ver.get('detail') if isinstance(ver,dict) else None)}",f"Evidence: {json.dumps(ver.get('evidence'),ensure_ascii=False) if isinstance(ver,dict) and ver.get('evidence') is not None else 'unresolved'}"]),("Usefulness rating",[human(display("usefulness_rating"))]),("Usefulness rationale",[human(display("usefulness_rationale"))]),("Why this matters",[human(display("why_this_matters"))]),("What to do with it",[human(display("what_to_do_with_it"))]),("Hype assessment",[human(display("hype_assessment"))]),("Hype evidence",[human(display("hype_evidence"))]),("Scam markers",[human(x) for x in (display("scam_markers") or [])] or ["None captured; marker list is unresolved."]),("Scam assessment",[human(display("scam_assessment"))]),("Unresolved questions",[human(x) for x in (display("unresolved_questions") or [])] or ["None captured; question list is unresolved."]),("Evidence used",[json.dumps(body("evidence_used"),ensure_ascii=False) if body("evidence_used") else "unresolved"]),("Confidence",[human(display("confidence"))])]
@@ -471,7 +474,7 @@ def main_v3():
     credibility_by_id=defaultdict(list)
     for check in (credibility.get('records',{}) if isinstance(credibility,dict) else {}).values():
         if isinstance(check,dict) and check.get('stable_id'): credibility_by_id[str(check['stable_id'])].append(check)
-    dest=Path(a.dest); guard_destination(dest,a.publish); notes=dest/'Notes'; topics_dir=dest/'Topics'; backups=[]; refusals=[]; rows=defaultdict(list); emitted=[]; names={}; old={}
+    dest=Path(a.dest); guard_destination(dest,a.publish); notes=dest/'Notes'; topics_dir=dest/'Topics'; backups=[]; refusals=[]; rows=defaultdict(list); emitted=[]; names={}; old={}; missing_permalinks=[]
     if notes.exists():
         for p in notes.glob('*.md'):
             m=re.search(r' — ([^.]+)\.md$',p.name)
@@ -483,6 +486,8 @@ def main_v3():
         assignment=assignments[sid]
         rendered_record=dict(r)
         rendered_record.update({field:r[field] for field in JUDGEMENT_FIELDS if field in r})
+        if scalar(r.get('permalink_url')) in (None, ''):
+            missing_permalinks.append({'stable_id':str(sid),'title':title(r)})
         if write(p,render_v3(rendered_record,assignment,credibility_by_id.get(sid,[])),backups,refusals): emitted.append(p); names[sid]=p.name; rows[clean(assignment['primary_topic']).lower()].append(rendered_record)
     # Preserve the pre-existing agent-authored geo note referenced by the corpus index.
     geo_name='geo_grandmasters — AI surveillance and commercial power — DZ7sxpHyfzu.md'
@@ -557,8 +562,13 @@ def main_v3():
     correction_files=[]
     for path in judgement_correction_paths():
         correction_files.append({'path':str(path.resolve().relative_to(ROOT.resolve())).replace('\\','/'),'size':path.stat().st_size,'sha256':sha(path)})
-    manifest={'input':{'path':'classification/catalog-records-v3.json','size':INPUT.stat().st_size,'sha256':sha(INPUT)},'topic_overlay':{'path':'classification/primary-topics-v2.json','size':OVERLAY.stat().st_size,'sha256':sha(OVERLAY)},'judgement_correction_files':correction_files,'judgement_corrections':applied_judgement_corrections,'confirmed_members':confirmed_count,'judgement_records':coverage['judgements'],'source_notes':len(emitted),'syntheses':len(rows),'topic_counts':dict(sorted((k,len(v)) for k,v in rows.items())),'coherence_counts':coherence_counts,'credibility_checks':{'records':len((credibility.get('records',{}) if isinstance(credibility,dict) else {})),'distinct_members':len(credibility_by_id),'notes_with_checks':sum(bool(credibility_by_id.get(str(r['stable_id']))) for r in confirmed)},'caption_source_histogram':dict(sorted(source_hist.items())),'wikilinks_checked':link_count,'bare_wikilinks':bare_count,'media_description_rewrites':MEDIA_REWRITES,'plan_copy':True,'backups':safe_backups,'refusals':refusals,'excluded':{'rejected':sum(r.get('collection_membership')=='rejected' for r in records),'not_applicable':sum(r.get('collection_membership')=='not_applicable' for r in records)},'vault_write':False,'official_image':{'stable_id':'DbQyH2NBc7C','published_path':IMAGE_DEST_REL.as_posix(),'source':'vendor repository','instagram_media':False}}
+    manifest={'input':{'path':'classification/catalog-records-v3.json','size':INPUT.stat().st_size,'sha256':sha(INPUT)},'topic_overlay':{'path':'classification/primary-topics-v2.json','size':OVERLAY.stat().st_size,'sha256':sha(OVERLAY)},'judgement_correction_files':correction_files,'judgement_corrections':applied_judgement_corrections,'confirmed_members':confirmed_count,'judgement_records':coverage['judgements'],'source_notes':len(emitted),'syntheses':len(rows),'topic_counts':dict(sorted((k,len(v)) for k,v in rows.items())),'coherence_counts':coherence_counts,'credibility_checks':{'records':len((credibility.get('records',{}) if isinstance(credibility,dict) else {})),'distinct_members':len(credibility_by_id),'notes_with_checks':sum(bool(credibility_by_id.get(str(r['stable_id']))) for r in confirmed)},'caption_source_histogram':dict(sorted(source_hist.items())),'wikilinks_checked':link_count,'bare_wikilinks':bare_count,'media_description_rewrites':MEDIA_REWRITES,'plan_copy':True,'backups':safe_backups,'refusals':refusals,'missing_permalinks':missing_permalinks,'excluded':{'rejected':sum(r.get('collection_membership')=='rejected' for r in records),'not_applicable':sum(r.get('collection_membership')=='not_applicable' for r in records)},'vault_write':False,'official_image':{'stable_id':'DbQyH2NBc7C','published_path':IMAGE_DEST_REL.as_posix(),'source':'vendor repository','instagram_media':False}}
     write_generated(dest/'run-manifest.json',json.dumps(manifest,indent=2,ensure_ascii=False),backups)
+    if missing_permalinks:
+        for item in missing_permalinks:
+            print(f"NO_PERMALINK stable_id={item['stable_id']} title={item['title']}", file=sys.stderr)
+    else:
+        print("NO_PERMALINK_NOTES=0", file=sys.stderr)
     evidence=contract_evidence(dest,manifest,records,confirmed,assignments,rows,backups,refusals); write_generated(dest/'CONTRACT-EVIDENCE.md',evidence,backups); ensure_agent_note_tags(dest); scrub_publication_paths(dest); print(json.dumps(manifest,ensure_ascii=False,sort_keys=True))
 
 if __name__=='__main__':

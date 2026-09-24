@@ -7,6 +7,21 @@ import check_social_rendering as checker
 
 
 class RenderingGateTests(unittest.TestCase):
+    def test_source_note_permalink_body_link_gate(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            notes = root / "Notes"
+            notes.mkdir()
+            frontmatter = "---\ntype: thing\nsubtype: source\npermalink: \"https://www.instagram.com/p/abc123/\"\n---\n"
+            note = notes / "note.md"
+            note.write_text(frontmatter + "\n# Note\n\n[Open on Instagram](https://www.instagram.com/p/abc123/)\n", encoding="utf-8")
+            violations, _counts = checker.check_tree(root)
+            self.assertFalse(any("permalink" in item for item in violations))
+
+            note.write_text(frontmatter + "\n# Note\n", encoding="utf-8")
+            violations, _counts = checker.check_tree(root)
+            self.assertTrue(any("permalink" in item and "missing from the body" in item for item in violations))
+
     def test_valid_tree_passes(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
