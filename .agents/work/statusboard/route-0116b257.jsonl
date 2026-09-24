@@ -1,0 +1,2 @@
+{"last_step":"registered","agent_id":"route-0116b257","heartbeat_at":"2026-09-20T06:45:28.2137498Z","surface":"route","state":"starting"}
+{"last_step":"router-refused: named-model-unavailable: model 'claude-sonnet-5' is mode-excluded-for-role:claude-pilots-codex for role 'builder'","heartbeat_at":"2026-09-20T06:45:33.3966446Z","surface":"route","agent_id":"route-0116b257","state":"blocked"}

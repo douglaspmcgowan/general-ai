@@ -1,0 +1,2 @@
+{"surface":"route","heartbeat_at":"2026-09-22T05:23:16.1120145Z","state":"starting","agent_id":"route-dec2d2dd","last_step":"registered"}
+{"heartbeat_at":"2026-09-22T05:23:19.7459803Z","surface":"route","agent_id":"route-dec2d2dd","state":"failed","last_step":"router-refused: Invoke-FleetRoute: brief is missing owned paths; it must state both the paths the lane owns and the verification that decides it is done. Missing: owned paths."}

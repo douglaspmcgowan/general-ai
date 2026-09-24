@@ -1,0 +1,2 @@
+{"surface":"route","state":"starting","agent_id":"route-3982141a","last_step":"registered","heartbeat_at":"2026-09-22T04:22:40.1647917Z"}
+{"agent_id":"route-3982141a","heartbeat_at":"2026-09-22T04:22:45.7661744Z","last_step":"named-model-unavailable: model 'gpt-5.6-luna' offers codex but none is eligible (codex: excluded-by-locality)","surface":"route","state":"blocked"}

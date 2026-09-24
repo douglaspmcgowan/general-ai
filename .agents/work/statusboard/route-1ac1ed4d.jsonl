@@ -1,0 +1,13 @@
+{"heartbeat_at":"2026-09-20T06:23:57.6416487Z","state":"starting","agent_id":"route-1ac1ed4d","surface":"route","last_step":"registered"}
+{"agent_id":"route-1ac1ed4d","heartbeat_at":"2026-09-20T06:24:02.2760825Z","last_step":"selected","state":"starting","surface":"codex"}
+{"state":"working","surface":"codex","heartbeat_at":"2026-09-20T06:24:04.1899838Z","agent_id":"route-1ac1ed4d","last_step":"starting"}
+{"last_step":"starting","progress":false,"heartbeat_at":"2026-09-20T06:24:04.3706074Z","state":"working","agent_id":"route-1ac1ed4d","surface":"codex"}
+{"state":"working","agent_id":"route-1ac1ed4d","heartbeat_at":"2026-09-20T06:25:05.4616314Z","surface":"codex","last_step":"working 2026-09-20T06:25:04.8706502Z"}
+{"last_step":"working 2026-09-20T06:25:04.8706502Z","progress":true,"heartbeat_at":"2026-09-20T06:25:05.7560960Z","state":"working","agent_id":"route-1ac1ed4d","surface":"codex"}
+{"surface":"codex","last_step":"working 2026-09-20T06:26:06.2234122Z","heartbeat_at":"2026-09-20T06:26:06.7822072Z","state":"working","agent_id":"route-1ac1ed4d"}
+{"last_step":"working 2026-09-20T06:26:06.2234122Z","progress":true,"heartbeat_at":"2026-09-20T06:26:07.0457084Z","state":"working","agent_id":"route-1ac1ed4d","surface":"codex"}
+{"heartbeat_at":"2026-09-20T06:27:08.1488992Z","agent_id":"route-1ac1ed4d","last_step":"working 2026-09-20T06:27:07.5485577Z","surface":"codex","state":"working"}
+{"last_step":"working 2026-09-20T06:27:07.5485577Z","progress":true,"heartbeat_at":"2026-09-20T06:27:08.3934674Z","state":"working","agent_id":"route-1ac1ed4d","surface":"codex"}
+{"surface":"codex","agent_id":"route-1ac1ed4d","heartbeat_at":"2026-09-20T06:27:58.3231411Z","state":"working","last_step":"completed exit=0"}
+{"last_step":"completed exit=0","progress":true,"heartbeat_at":"2026-09-20T06:27:58.5228286Z","state":"working","agent_id":"route-1ac1ed4d","surface":"codex"}
+{"agent_id":"route-1ac1ed4d","heartbeat_at":"2026-09-20T06:28:17.2224324Z","last_step":"exit-zero-clean","state":"finished","surface":"codex"}
