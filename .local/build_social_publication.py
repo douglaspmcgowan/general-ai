@@ -6,7 +6,8 @@ from pathlib import Path
 
 ROOT=Path(r"C:\Users\dougl\Projects\general-ai\.local\social-catalog-20260919")
 ARCHIVE_DIR=ROOT/"archive"/"pre-lintfix-20260921"
-INPUT=ROOT/"classification"/"catalog-records-v3.json"; OVERLAY=ROOT/"classification"/"primary-topics-v2.json"; JUDGEMENT_DIR=ROOT/"classification"/"judgement"; CREDIBILITY=ROOT/"credibility"/"batch-005.json"; DM=ROOT/"browser"/"dm-resource-index.json"; DM_SCAN=ROOT/"browser"/"dm-scan-002.json"; ENTITY_LAYER=ROOT/"classification"/"entities-v1.json"; PLAN=ROOT/"plan"/"Continuation plan and progress map.md"
+INPUT=ROOT/"classification"/"catalog-records-v3.json"; OVERLAY=ROOT/"classification"/"primary-topics-v2.json"; JUDGEMENT_DIR=ROOT/"classification"/"judgement"; CREDIBILITY=ROOT/"credibility"/"batch-005.json"; DM=ROOT/"browser"/"dm-resource-index.json"; DM_SCAN=ROOT/"browser"/"dm-scan-002.json"; DM_RAW=ROOT/"browser"/"instagram-dm-ai-resources.json"; ENTITY_LAYER=ROOT/"classification"/"entities-v1.json"; PLAN=ROOT/"plan"/"Continuation plan and progress map.md"
+SLIDES_DIR=ROOT/"classification"/"slides"; AUDIO_DIR=ROOT/"classification"/"audio"; SC24_CARD_LINES=ROOT/"classification"/"sc24-card-lines-proposed.json"; COVERAGE_JSON=ROOT/"qa"/"coverage-20260923.json"; COVERAGE_MD=ROOT/"qa"/"coverage-20260923.md"
 TOPICS={"ai news":"AI news","ai design":"Design tools","ai/cad":"CAD and 3D","agents":"Agents and coding","ai research":"Research","models and methods":"Research","product and workflow":"Workflows and productivity","business":"Business","robotics and hardware":"Hardware","security":"Security"}
 IMAGE_SOURCE=ROOT/"credibility"/"images"/"crucix-dashboard.png"; IMAGE_DEST_REL=Path("Images")/"crucix-dashboard.png"
 FIXED_TOPICS={"ai-news","design-tools","cad-and-3d","agents-and-coding","research","workflows-and-productivity","business","hardware","security","unsorted"}
@@ -14,6 +15,10 @@ TOPIC_LABELS={"ai-news":"AI news","design-tools":"Design tools","cad-and-3d":"CA
 JUDGEMENT_FIELDS=["content_summary","post_claims","independent_verification","usefulness_rating","usefulness_rationale","why_this_matters","what_to_do_with_it","hype_assessment","hype_evidence","scam_markers","scam_assessment","unresolved_questions","evidence_used","confidence"]
 LIST_FIELDS={"topics","post_claims","scam_markers","unresolved_questions","evidence_used","risk_flags"}
 def clean(v): return re.sub(r"\s+"," ",str(v if v is not None else "")).strip()
+def resource_label(v):
+    if isinstance(v,dict): return clean(v.get("name") or v.get("url") or v.get("description"))
+    if v is None: return ""
+    return clean(v)
 def scalar(v): return v
 def scalar_status(v): return "resolved" if v not in (None,"",{}) else "unresolved"
 def ys(v): return json.dumps(v,ensure_ascii=False)
@@ -184,8 +189,187 @@ def judgement_value(r, field):
     return r.get(field)
 def human(v, fallback="unresolved"):
     if v is None or v=="" or v=={}: return fallback
-    if isinstance(v,(list,dict)): return json.dumps(v,ensure_ascii=False)
-    return clean(v)
+    if isinstance(v,(list,dict)): text=json.dumps(v,ensure_ascii=False)
+    else: text=clean(v)
+    return text.replace("[[", r"\[\[").replace("]]", r"\]\]")
+
+def media_inputs():
+    """Load the signed-in capture outputs without treating them as independent verification."""
+    slides={}; audio={}
+    for path in sorted(SLIDES_DIR.glob("*.json")) if SLIDES_DIR.exists() else []:
+        if ".pre" in path.name or path.name.startswith("_"): continue
+        payload=load(path); sid=str(payload.get("sc") or path.stem); slides[sid]=payload
+    for path in sorted(AUDIO_DIR.glob("*.json")) if AUDIO_DIR.exists() else []:
+        if ".pre" in path.name or path.name.startswith("_"): continue
+        payload=load(path); sid=str(payload.get("sc") or path.stem); audio[sid]=payload
+    return slides,audio
+
+def media_details(sid, slides, audio):
+    slide=slides.get(str(sid),{}); audio_doc=audio.get(str(sid),{})
+    slide_rows=slide.get("slides") or []
+    tracks=audio_doc.get("tracks") or []
+    resources=[]
+    for row in slide_rows:
+        resources.extend(resource_label(x) for x in (row.get("resources") or []) if resource_label(x))
+    for track in tracks:
+        resources.extend(resource_label(x) for x in (track.get("resources") or []) if resource_label(x))
+    unique=[]; seen=set()
+    for resource in resources:
+        key=resource.casefold()
+        if key not in seen:
+            seen.add(key); unique.append(resource)
+    speech=[track for track in tracks if track.get("kind") in {"speech","mixed"}]
+    transcripts=[track for track in speech if str(track.get("transcript") or "").strip()]
+    non_speech=[track for track in tracks if track.get("kind") not in {"speech","mixed"}]
+    kinds=Counter(str(track.get("kind") or "unknown") for track in tracks)
+    return {
+        "slides": slide_rows,
+        "images_expected": int(slide.get("images_expected") or 0),
+        "images_read": int(slide.get("images_read") or 0),
+        "adds_beyond_caption": clean(slide.get("adds_beyond_caption")),
+        "tracks": tracks,
+        "speech_tracks": speech,
+        "transcripts": transcripts,
+        "non_speech": non_speech,
+        "kinds": dict(sorted(kinds.items())),
+        "resources": unique,
+        "useful_commentary": any(bool(track.get("useful_commentary")) for track in tracks),
+    }
+
+def merge_card_line(sid, record, proposed):
+    line=(proposed.get("posts") or {}).get(str(sid)) if isinstance(proposed,dict) else None
+    if line:
+        return clean(line).replace("Caption-only", "Media-enriched")
+    summary=clean(record.get("content_summary"))
+    return summary[:220] + ("…" if len(summary)>220 else "") if summary else "Media evidence captured; inspect the source note."
+
+def enrich_record(record, detail, sid, card_line):
+    """Fold source media into the rendered judgement while preserving the original claim boundary."""
+    r=dict(record)
+    adds=detail.get("adds_beyond_caption")
+    transcripts=detail.get("transcripts") or []
+    useful=detail.get("useful_commentary")
+    media_sources=[]
+    if detail.get("slides"):
+        media_sources.append(f"classification/slides/{sid}.json")
+    if detail.get("tracks"):
+        media_sources.append(f"classification/audio/{sid}.json")
+    evidence=list(r.get("evidence_used") or [])
+    for source in media_sources:
+        if source not in evidence: evidence.append(source)
+    r["evidence_used"]=evidence
+    if detail.get("slides") or detail.get("tracks"):
+        r["capture_completeness"]="slides-and-audio"
+    if adds and adds.lower() != "nothing":
+        r["content_summary"]=(clean(r.get("content_summary")) + " Captured slides add: " + adds).strip()
+        claims=list(r.get("post_claims") or [])
+        claims.append("Captured slide evidence: " + adds)
+        r["post_claims"]=claims
+    if useful and transcripts:
+        reasons=[clean(t.get("why")) for t in transcripts if clean(t.get("why"))]
+        if reasons:
+            r["content_summary"]=(clean(r.get("content_summary")) + " Captured audio adds: " + reasons[0]).strip()
+        claims=list(r.get("post_claims") or [])
+        claims.append("Captured audio evidence: " + (clean(transcripts[0].get("transcript"))[:280] or reasons[0] if reasons else "spoken commentary was transcribed"))
+        r["post_claims"]=claims
+    rationale=clean(r.get("usefulness_rationale"))
+    if rationale.startswith("Caption-only intake"):
+        rationale=rationale.replace("Caption-only intake", "Media-enriched intake", 1)
+    if adds and adds.lower() != "nothing":
+        rationale=(rationale.rstrip(".") + "; captured slides provide source-level detail beyond the caption.").strip()
+    if useful and transcripts:
+        rationale=(rationale.rstrip(".") + " Spoken commentary was transcribed from the post audio.").strip()
+    r["usefulness_rationale"]=rationale
+    matter=clean(r.get("why_this_matters"))
+    if adds and adds.lower() != "nothing": matter=(matter.rstrip(".") + "; the slides make the named workflow or claim inspectable.").strip()
+    r["why_this_matters"]=matter
+    action=clean(r.get("what_to_do_with_it"))
+    if action.lower().startswith("review the captured slides") or action.lower().startswith("review the uncaptured"):
+        r["what_to_do_with_it"]="Verify the named media claims against a primary source before relying on them."
+    ver=r.get("independent_verification")
+    if isinstance(ver,dict):
+        ver=dict(ver)
+        detail_text=clean(ver.get("detail"))
+        detail_text=re.sub(r"No independent check was run in SC24; slide text and transcripts are deferred to later lanes\.", "Slides and transcripts are captured source evidence; no independent check was run.", detail_text)
+        detail_text=re.sub(r"No independent check has been run\.", "Slides and transcripts are captured source evidence; no independent check was run.", detail_text)
+        ver["detail"]=detail_text or "Captured media is source evidence; no independent check was run."
+        r["independent_verification"]=ver
+    unresolved=[x for x in (r.get("unresolved_questions") or []) if "uncaptured slides" not in clean(x).lower()]
+    if (adds and adds.lower() != "nothing") or useful:
+        if "Which named media claims survive an independent check?" not in unresolved:
+            unresolved.append("Which named media claims survive an independent check?")
+    r["unresolved_questions"]=unresolved
+    r["card_line"]=card_line
+    r["media_detail"]=detail
+    return r
+
+def media_sections(detail):
+    lines=[]
+    if detail.get("slides"):
+        lines += ["## Slides", ""]
+        for slide in detail["slides"]:
+            text=clean(slide.get("text")).replace("[[", r"\[\[").replace("]]", r"\]\]")
+            visual=clean(slide.get("visual")).replace("[[", r"\[\[").replace("]]", r"\]\]")
+            line=text or visual or "No legible text or visual description was captured."
+            lines.append(f"- Slide {slide.get('n','?')}: {line}")
+        lines += [""]
+    speech=detail.get("speech_tracks") or []
+    non_speech=detail.get("non_speech") or []
+    if speech or non_speech:
+        lines += ["## Transcript", ""]
+        for track in speech:
+            transcript=(clean(track.get("transcript")) or "Transcript unavailable.").replace("[[", r"\[\[").replace("]]", r"\]\]")
+            lines.append(f"- {track.get('file','audio')}: {transcript}")
+        if non_speech:
+            counts=Counter(str(t.get("kind") or "unknown") for t in non_speech)
+            prefix="- Non-speech tracks" if speech else "- No speech/mixed transcript captured; non-speech tracks"
+            lines.append(prefix + ": " + ", ".join(f"{k}={v}" for k,v in sorted(counts.items())) + ".")
+        lines += [""]
+    return lines
+
+def coverage_rows(records, slides, audio):
+    pinned={"DdmPss_DQ8S","Ddl6O0jjTI3","DdlpXTLDwdG","DdHPBuLGJWA","Ddd9mmFDd1d","DbaX4PPq2uZ","DbD_eQ2EhbF"}
+    rows=[]
+    for record in sorted(records,key=lambda r:str(r.get("stable_id"))):
+        sid=str(record.get("stable_id")); detail=media_details(sid,slides,audio); gaps=[]
+        caption_present=bool(clean(record.get("caption")))
+        if not caption_present: gaps.append("caption missing")
+        if detail["images_expected"] != detail["images_read"]: gaps.append(f"slides read {detail['images_read']} of {detail['images_expected']}")
+        for track in detail["speech_tracks"]:
+            if not clean(track.get("transcript")): gaps.append(f"untranscribed {track.get('file','audio')}")
+        row={"stable_id":sid,"caption_present":caption_present,"slides_expected":detail["images_expected"],"slides_read":detail["images_read"],"audio_tracks":len(detail["tracks"]),"audio_transcribed_count":len(detail["transcripts"]),"audio_kind":detail["kinds"] or "none","resources_count":len(detail["resources"]),"pinned_comment_status":"not reachable: web session returns no comments" if sid in pinned else "not recorded","gap":"; ".join(gaps)}
+        rows.append(row)
+    return rows
+
+def validate_coverage_rows(rows):
+    gaps=[row for row in rows if clean(row.get("gap"))]
+    if gaps:
+        raise RuntimeError("coverage contains unexplained gaps: " + ", ".join(str(row.get("stable_id")) for row in gaps))
+    totals={
+        "posts": len(rows),
+        "slides_expected": sum(int(row.get("slides_expected") or 0) for row in rows),
+        "slides_read": sum(int(row.get("slides_read") or 0) for row in rows),
+        "audio_tracks": sum(int(row.get("audio_tracks") or 0) for row in rows),
+        "audio_transcribed": sum(int(row.get("audio_transcribed_count") or 0) for row in rows),
+    }
+    if len(rows) == 221:
+        expected={"posts":221,"slides_expected":1060,"slides_read":1060,"audio_tracks":247,"audio_transcribed":83}
+        mismatches={key:(totals[key], value) for key,value in expected.items() if totals[key] != value}
+        if mismatches:
+            raise RuntimeError(f"media coverage totals do not match accepted capture: {mismatches}")
+    return {"rows":len(rows),"gaps":len(gaps)}
+
+def write_coverage(records, slides, audio):
+    rows=coverage_rows(records,slides,audio)
+    validate_coverage_rows(rows)
+    COVERAGE_JSON.parent.mkdir(parents=True,exist_ok=True)
+    COVERAGE_JSON.write_text(json.dumps({"schema_version":"coverage-v1","generated_at":"2026-09-23","post_count":len(rows),"rows":rows},ensure_ascii=False,indent=2)+"\n",encoding="utf-8",newline="\n")
+    lines=["# SC26 coverage — 2026-09-23","",f"Rows: {len(rows)} posts.","","| Stable ID | Caption | Slides | Audio | Resources | Pinned comment | Gap |","| --- | --- | ---: | --- | ---: | --- | --- |"]
+    for row in rows:
+        audio="none" if row["audio_kind"]=="none" else ", ".join(f"{k}={v}" for k,v in row["audio_kind"].items()) + f"; transcribed={row['audio_transcribed_count']}"
+        lines.append(f"| {row['stable_id']} | {'yes' if row['caption_present'] else 'no'} | {row['slides_read']}/{row['slides_expected']} | {audio} | {row['resources_count']} | {row['pinned_comment_status']} | {row['gap']} |")
+    COVERAGE_MD.write_text("\n".join(lines)+"\n",encoding="utf-8",newline="\n")
+    return rows
 
 CROSS_LINKS={
     "ai-news":["50 Knowledge/58 Reference/AI-in-Design Monitoring.md","50 Knowledge/57 Corpus/AI for CAD/Notes/AI for CAD.md"],
@@ -238,7 +422,7 @@ def render(r):
     lines += [f"- {clean(x)}" for x in (r.get('scam_markers') or ['unresolved'])]+["","## Scam assessment","",clean(r.get('scam_assessment')) or 'unresolved',"","## Unresolved questions",""]+[f"- {clean(x)}" for x in (r.get('unresolved_questions') or ['unresolved'])]+["","## Evidence used","",json.dumps(evidence,ensure_ascii=False) if evidence else 'unresolved',"",f"Confidence: {clean(r.get('confidence')) or 'unresolved'}",""]
     if image: lines += [f"![Official project image — not Instagram media]({image})","*Official project image obtained from the vendor's own site or repository; this is not media from the Instagram post.*",""]
     return "\n".join(lines)+"\n"
-def render_v3(r, assignment, credibility_records):
+def render_v3(r, assignment, credibility_records, detail=None, card_line=None):
     sid=str(r.get("stable_id")); t=title(r); plat=clean(r.get("source_platform") or "Instagram").lower(); raw_ver=r.get("independent_verification"); ver=raw_ver if isinstance(raw_ver,dict) else raw_ver; image=IMAGE_DEST_REL.as_posix() if sid=="DbQyH2NBc7C" else None; permalink=scalar(r.get("permalink_url"))
     topic=clean(assignment.get("primary_topic")).lower(); rationale=assignment["justification"]; topic_confidence=assignment["confidence"]
     caption_file=scalar(r.get("caption_source") or r.get("source_file")); metadata_file=scalar(r.get("source_file"))
@@ -256,16 +440,23 @@ def render_v3(r, assignment, credibility_records):
     if permalink not in (None, ""):
         lines += [f"[Open on Instagram]({permalink})", ""]
     lines += ["## Source metadata","",f"- Platform: {plat}",f"- Author: {clean(r.get('author_handle')) or 'unresolved'}",f"- Taken at: {clean(r.get('taken_at_utc')) or 'unresolved'}",f"- Membership: {clean(r.get('collection_membership')) or 'unresolved'}",f"- Primary topic: {topic}",f"- Topic rationale: {rationale}",f"- Topic confidence: {topic_confidence}",f"- Caption source file: {clean(caption_file) or 'unresolved'}",f"- Metadata source file: {clean(metadata_file) or 'unresolved'}",""]
+    if card_line:
+        lines += ["## Card line", "", f"- {clean(card_line)}", ""]
     body=lambda field: vals_by_field.get(field)
     display=lambda field: body(field)
     sections=[("Content summary",[human(display("content_summary"))]),("Post claims",[human(x) for x in (display("post_claims") or [])] or ["unresolved"]),("Independent verification",[f"Status: {human(ver.get('status') if isinstance(ver,dict) else None)}",f"Detail: {human(ver.get('detail') if isinstance(ver,dict) else None)}",f"Evidence: {json.dumps(ver.get('evidence'),ensure_ascii=False) if isinstance(ver,dict) and ver.get('evidence') is not None else 'unresolved'}"]),("Usefulness rating",[human(display("usefulness_rating"))]),("Usefulness rationale",[human(display("usefulness_rationale"))]),("Why this matters",[human(display("why_this_matters"))]),("What to do with it",[human(display("what_to_do_with_it"))]),("Hype assessment",[human(display("hype_assessment"))]),("Hype evidence",[human(display("hype_evidence"))]),("Scam markers",[human(x) for x in (display("scam_markers") or [])] or ["None captured; marker list is unresolved."]),("Scam assessment",[human(display("scam_assessment"))]),("Unresolved questions",[human(x) for x in (display("unresolved_questions") or [])] or ["None captured; question list is unresolved."]),("Evidence used",[json.dumps(body("evidence_used"),ensure_ascii=False) if body("evidence_used") else "unresolved"]),("Confidence",[human(display("confidence"))])]
     for heading,body in sections:
         lines += [f"## {heading}",""]+[f"- {item}" for item in body]+[""]
+    if detail:
+        lines += media_sections(detail)
     if credibility_records:
         lines += ["## Independent credibility checks","","These checks were performed separately from the post's own claims and usefulness judgement.",""]
         for check in credibility_records:
             lines += [f"### {clean(check.get('resource_name')) or 'Named resource'}","",f"- Resolves: {clean(check.get('resolves')) or 'unresolved'}",f"- Exists as described: {clean(check.get('exists_as_described')) or 'unresolved'}",f"- Gated: {clean(check.get('gated')) or 'unresolved'}",f"- Claim vs reality: {clean(check.get('claim_vs_reality')) or 'unresolved'}",f"- Evidence: {clean(check.get('evidence_url')) or 'unresolved'}",""]
-    lines += ["## Media capture","","- No image or video from the Instagram post was captured.",""]
+    if detail and (detail.get("slides") or detail.get("tracks")):
+        lines += ["## Media capture","","- Captured slide and/or audio material is reproduced above from the accepted SC26 capture; no additional Instagram media was fetched.",""]
+    else:
+        lines += ["## Media capture","","- No image or video from the Instagram post was captured.",""]
     if image: lines += [f"![Official project image — not Instagram media]({image})","","*Official project image from the vendor's own repository; this is not media from the Instagram post.*",""]
     return "\n".join(lines)+"\n"
 
@@ -451,6 +642,8 @@ def main_v3():
     global MEDIA_REWRITES
     MEDIA_REWRITES=[]
     data=load(INPUT); records=data.get('records',data)
+    slides,audio=media_inputs()
+    proposed_cards=load(SC24_CARD_LINES) if SC24_CARD_LINES.exists() else {}
     judgement_corrections=load_judgement_corrections()
     records, applied_judgement_corrections=apply_judgement_corrections(records, judgement_corrections)
     confirmed=[r for r in records if r.get('collection_membership')=='confirmed']; confirmed_count=len(confirmed)
@@ -486,9 +679,11 @@ def main_v3():
         assignment=assignments[sid]
         rendered_record=dict(r)
         rendered_record.update({field:r[field] for field in JUDGEMENT_FIELDS if field in r})
+        detail=media_details(sid,slides,audio)
+        rendered_record=enrich_record(rendered_record,detail,sid,merge_card_line(sid,rendered_record,proposed_cards))
         if scalar(r.get('permalink_url')) in (None, ''):
             missing_permalinks.append({'stable_id':str(sid),'title':title(r)})
-        if write(p,render_v3(rendered_record,assignment,credibility_by_id.get(sid,[])),backups,refusals): emitted.append(p); names[sid]=p.name; rows[clean(assignment['primary_topic']).lower()].append(rendered_record)
+        if write(p,render_v3(rendered_record,assignment,credibility_by_id.get(sid,[]),detail,rendered_record.get('card_line')),backups,refusals): emitted.append(p); names[sid]=p.name; rows[clean(assignment['primary_topic']).lower()].append(rendered_record)
     # Preserve the pre-existing agent-authored geo note referenced by the corpus index.
     geo_name='geo_grandmasters — AI surveillance and commercial power — DZ7sxpHyfzu.md'
     for geo_source in (ROOT/'publication'/'Notes'/geo_name, ROOT/'publication-dryrun-pre-canvasfix'/'Notes'/geo_name):
@@ -504,12 +699,28 @@ def main_v3():
     write(dest/'Needs review.md','''---\ntype: index\ntitle: Saved AI Posts — Needs review\nauthored_by: agent\nmaintained_by: agent\nstatus: current\ncorpus: Saved AI Posts\nupdated: "2026-09-20"\n---\n\n# Needs review\n\n'''+'\n'.join(f"- {r['stable_id']}: {', '.join(clean(x) for x in list_value(r,'unresolved_questions')[0])}" for r in confirmed if list_value(r,'unresolved_questions')[0])+"\n",backups,refusals)
     write(dest/'Notes/README.md',folder_readme('Saved AI Posts — Notes index','This folder holds one source note for each accepted AI and technology saved post.',[(f'50 Knowledge/57 Corpus/Saved AI Posts/Notes/{names[sid]}',title(next(r for r in confirmed if r['stable_id']==sid))) for sid in sorted(names)]),backups,refusals)
     write(dest/'Topics/README.md',folder_readme('Saved AI Posts — Topics index','This folder holds the topic-level syntheses for the accepted saved-post corpus.',[(f'50 Knowledge/57 Corpus/Saved AI Posts/Topics/{slug(k)}.md',TOPIC_LABELS[k]) for k in sorted(rows)]),backups,refusals)
+    coverage_rows_written=write_coverage(confirmed,slides,audio)
     dm=load(DM) if DM.exists() else {'resources':[]}
     dm_scan=load(DM_SCAN) if DM_SCAN.exists() else {'ai_or_tech_items':[],'coverage':{},'limits':[]}
+    dm_raw=load(DM_RAW) if DM_RAW.exists() else {'dm_resources':{'shared_posts':[],'tech_links':[]}}
     dm_rows=[]; dm_seen=set()
     for _r in list(dm.get('resources',[]))+[{k:v for k,v in _x.items() if k!='author_handle'} for _x in dm_scan.get('ai_or_tech_items',[])]:
         _url=clean(_r.get('url')); _short=clean(_r.get('shortcode')); _key=('url',_url.lower()) if _url else (('shortcode',_short) if _short else ('row',len(dm_rows)))
+        if _short: _key=('shortcode',_short.casefold())
         if _key in dm_seen: continue
+        dm_seen.add(_key); dm_rows.append(_r)
+    _packet=dm_raw.get('dm_resources') or {}
+    _packet_rows=[]
+    for _r in _packet.get('shared_posts') or []:
+        _packet_rows.append({'name':clean(_r.get('shortcode')) or 'public shared post','kind':'shared_post','url':clean(_r.get('permalink')),'source':'sc24-dm-resource-packet'})
+    for _r in _packet.get('tech_links') or []:
+        _packet_rows.append({'name':clean(_r.get('tool_or_product')) or clean(_r.get('url')) or 'public tech link','kind':'tech_link','url':clean(_r.get('url')),'source':'sc24-dm-resource-packet'})
+    _packet_shortcodes={clean(_r.get('name')).casefold() for _r in _packet_rows if _r.get('kind') == 'shared_post'}
+    _packet_urls={clean(_r.get('url')).casefold() for _r in _packet_rows if clean(_r.get('url'))}
+    dm_rows=[_r for _r in dm_rows if not (clean(_r.get('shortcode')).casefold() in _packet_shortcodes or clean(_r.get('url')).casefold() in _packet_urls)]
+    dm_seen={('shortcode',clean(_r.get('shortcode')).casefold()) if clean(_r.get('shortcode')) else ('url',clean(_r.get('url')).casefold()) for _r in dm_rows}
+    for _r in _packet_rows:
+        _key=('shortcode',clean(_r.get('name')).casefold()) if _r.get('kind') == 'shared_post' else (('url',clean(_r.get('url')).lower()) if clean(_r.get('url')) else ('name',clean(_r.get('name')).casefold()))
         dm_seen.add(_key); dm_rows.append(_r)
     _entities=load(ENTITY_LAYER) if ENTITY_LAYER.exists() else {'entities':[]}
     _entity_rows=[_e for _e in _entities.get('entities',[]) if _e.get('pointer_count',0)>=2]
@@ -520,7 +731,7 @@ def main_v3():
             if (_e.get('canonical_url') and clean(_e.get('canonical_url')).casefold()==_url) or (_name and any(_a and _a in _name for _a in _aliases)):
                 return _e
         return None
-    _hdr='---\ntype: note\ntitle: Saved AI Posts — DM resources\nauthored_by: agent\nmaintained_by: agent\nstatus: current\ncorpus: Saved AI Posts\nupdated: "2026-09-21"\n---\n\n# Saved AI Posts — DM resources\n\nThis index carries public AI and technology resources only. Private conversation metadata and message contents are omitted. The second scan read '''+str(dm_scan.get('coverage',{}).get('threads_read','unknown'))+''' threads to completion; it found '''+str(dm_scan.get('coverage',{}).get('shared_items_seen','unknown'))+''' shared items and '''+str(dm_scan.get('reconciliation_with_dm_resource_index',{}).get('net_new','unknown'))+''' net-new resources.\n\nLimits:\n\n'''+"\n".join('- '+clean(_x) for _x in dm_scan.get('limits',[]))+'''\n\n'''
+    _hdr='---\ntype: note\ntitle: Saved AI Posts — DM resources\nauthored_by: agent\nmaintained_by: agent\nstatus: current\ncorpus: Saved AI Posts\nupdated: "2026-09-23"\n---\n\n# Saved AI Posts — DM resources\n\nThis index carries public AI and technology resources only. Private conversation metadata and message contents are omitted. The SC24 packet contributes '''+str(len(_packet.get('shared_posts') or []))+''' shared posts and '''+str(len(_packet.get('tech_links') or []))+''' technology links; only public shortcode, title, and URL fields are retained.\n\nLimits:\n\n'''+"\n".join('- '+clean(_x) for _x in dm_scan.get('limits',[]))+'''\n\n'''
     _rows=[]
     for _r in dm_rows:
         _n=clean(_r.get('name')) or clean(_r.get('url')) or clean(_r.get('shortcode')) or 'public resource'
@@ -562,7 +773,7 @@ def main_v3():
     correction_files=[]
     for path in judgement_correction_paths():
         correction_files.append({'path':str(path.resolve().relative_to(ROOT.resolve())).replace('\\','/'),'size':path.stat().st_size,'sha256':sha(path)})
-    manifest={'input':{'path':'classification/catalog-records-v3.json','size':INPUT.stat().st_size,'sha256':sha(INPUT)},'topic_overlay':{'path':'classification/primary-topics-v2.json','size':OVERLAY.stat().st_size,'sha256':sha(OVERLAY)},'judgement_correction_files':correction_files,'judgement_corrections':applied_judgement_corrections,'confirmed_members':confirmed_count,'judgement_records':coverage['judgements'],'source_notes':len(emitted),'syntheses':len(rows),'topic_counts':dict(sorted((k,len(v)) for k,v in rows.items())),'coherence_counts':coherence_counts,'credibility_checks':{'records':len((credibility.get('records',{}) if isinstance(credibility,dict) else {})),'distinct_members':len(credibility_by_id),'notes_with_checks':sum(bool(credibility_by_id.get(str(r['stable_id']))) for r in confirmed)},'caption_source_histogram':dict(sorted(source_hist.items())),'wikilinks_checked':link_count,'bare_wikilinks':bare_count,'media_description_rewrites':MEDIA_REWRITES,'plan_copy':True,'backups':safe_backups,'refusals':refusals,'missing_permalinks':missing_permalinks,'excluded':{'rejected':sum(r.get('collection_membership')=='rejected' for r in records),'not_applicable':sum(r.get('collection_membership')=='not_applicable' for r in records)},'vault_write':False,'official_image':{'stable_id':'DbQyH2NBc7C','published_path':IMAGE_DEST_REL.as_posix(),'source':'vendor repository','instagram_media':False}}
+    manifest={'input':{'path':'classification/catalog-records-v3.json','size':INPUT.stat().st_size,'sha256':sha(INPUT)},'topic_overlay':{'path':'classification/primary-topics-v2.json','size':OVERLAY.stat().st_size,'sha256':sha(OVERLAY)},'judgement_correction_files':correction_files,'judgement_corrections':applied_judgement_corrections,'confirmed_members':confirmed_count,'judgement_records':coverage['judgements'],'source_notes':len(emitted),'syntheses':len(rows),'topic_counts':dict(sorted((k,len(v)) for k,v in rows.items())),'coherence_counts':coherence_counts,'credibility_checks':{'records':len((credibility.get('records',{}) if isinstance(credibility,dict) else {})),'distinct_members':len(credibility_by_id),'notes_with_checks':sum(bool(credibility_by_id.get(str(r['stable_id']))) for r in confirmed)},'caption_source_histogram':dict(sorted(source_hist.items())),'wikilinks_checked':link_count,'bare_wikilinks':bare_count,'media_description_rewrites':MEDIA_REWRITES,'media_integration':{'slide_posts':len(slides),'audio_posts':len(audio),'transcript_posts':sum(bool(media_details(str(r['stable_id']),slides,audio)['transcripts']) for r in confirmed),'useful_commentary_posts':sum(media_details(str(r['stable_id']),slides,audio)['useful_commentary'] for r in confirmed),'coverage_rows':len(coverage_rows_written),'coverage_gaps':sum(bool(row['gap']) for row in coverage_rows_written)},'plan_copy':True,'backups':safe_backups,'refusals':refusals,'missing_permalinks':missing_permalinks,'excluded':{'rejected':sum(r.get('collection_membership')=='rejected' for r in records),'not_applicable':sum(r.get('collection_membership')=='not_applicable' for r in records)},'vault_write':False,'official_image':{'stable_id':'DbQyH2NBc7C','published_path':IMAGE_DEST_REL.as_posix(),'source':'vendor repository','instagram_media':False}}
     write_generated(dest/'run-manifest.json',json.dumps(manifest,indent=2,ensure_ascii=False),backups)
     if missing_permalinks:
         for item in missing_permalinks:

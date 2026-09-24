@@ -24,6 +24,9 @@ CROSS_JSON = COMPARISONS / "_cross-category.json"
 QA_PATH = ROOT / "qa" / "compare-canvas-evidence-20260921.md"
 CONTRACT_PATH = ROOT / "plan" / "vault-publication-contract.md"
 CARD_LINES_JSON = CLASSIFICATION / "card-lines-v1.json"
+SLIDES_DIR = CLASSIFICATION / "slides"
+AUDIO_DIR = CLASSIFICATION / "audio"
+SC24_CARD_LINES = CLASSIFICATION / "sc24-card-lines-proposed.json"
 
 VAULT_ROOT = "50 Knowledge/57 Corpus/Saved AI Posts"
 TOPIC_LABELS = {
@@ -60,10 +63,184 @@ def clean(value: Any) -> str:
     return re.sub(r"\s+", " ", str(value if value is not None else "")).strip()
 
 
-def slug(value: str, limit: int = 90) -> str:
+def resource_label(value: Any) -> str:
+    if isinstance(value, dict):
+        return clean(value.get("name") or value.get("url") or value.get("description"))
+    if value is None:
+        return ""
+    return clean(value)
+
+
+def _media_resource_rows() -> dict[str, list[tuple[str, str]]]:
+    """Return resource names and source spans from the accepted slide/audio capture."""
+    out: dict[str, list[tuple[str, str]]] = defaultdict(list)
+    for directory, kind in ((SLIDES_DIR, "slide"), (AUDIO_DIR, "audio")):
+        if not directory.exists():
+            continue
+        for path in sorted(directory.glob("*.json")):
+            if ".pre" in path.name or path.name.startswith("_"):
+                continue
+            payload = read_json(path)
+            sid = str(payload.get("sc") or path.stem)
+            if kind == "slide":
+                for row in payload.get("slides") or []:
+                    span = clean(row.get("text") or row.get("visual"))
+                    for resource in row.get("resources") or []:
+                        name = resource_label(resource)
+                        if name:
+                            out[sid].append((name, span[:280]))
+            else:
+                for row in payload.get("tracks") or []:
+                    span = clean(row.get("transcript") or row.get("why"))
+                    for resource in row.get("resources") or []:
+                        name = resource_label(resource)
+                        if name:
+                            out[sid].append((name, span[:280]))
+    return out
+
+
+def _media_claims() -> dict[str, dict[str, Any]]:
+    claims: dict[str, dict[str, Any]] = {}
+    resources_by_sid = _media_resource_rows()
+    for directory in (SLIDES_DIR, AUDIO_DIR):
+        if not directory.exists():
+            continue
+        for path in sorted(directory.glob("*.json")):
+            if ".pre" in path.name or path.name.startswith("_"):
+                continue
+            payload = read_json(path)
+            sid = str(payload.get("sc") or path.stem)
+            item = claims.setdefault(sid, {"adds": "", "useful": False, "why": "", "resources": []})
+            if "adds_beyond_caption" in payload:
+                item["adds"] = clean(payload.get("adds_beyond_caption"))
+            for row in payload.get("tracks") or []:
+                item["useful"] = item["useful"] or bool(row.get("useful_commentary"))
+                item["why"] = clean(row.get("why")) or item["why"]
+            item["resources"] = sorted({name for name, _span in resources_by_sid.get(sid, [])}, key=str.casefold)
+    return claims
+
+
+def augment_comparison_media(topic_docs: dict[str, dict[str, Any]]) -> None:
+    claims = _media_claims()
+    for doc in topic_docs.values():
+        for cluster in doc.get("clusters", []):
+            ids = [str(pid) for pid in cluster.get("post_ids", []) if str(pid) in claims]
+            if not ids:
+                continue
+            resources=[]
+            for sid in ids:
+                resources.extend(claims[sid].get("resources") or [])
+            resources=sorted(set(resources), key=str.casefold)
+            text = f"Captured slide/audio evidence covers {len(ids)} posts in this cluster and names: {', '.join(resources[:12]) if resources else 'no additional named resources'}. The source notes retain the verbatim media text; these claims remain unverified unless separately checked."
+            cluster["media_evidence"] = [{"text": text, "cites": ids}]
+            for item in cluster.get("comparison", []):
+                if not str(item.get("text", "")).startswith("SC24 adds a caption-only example"):
+                    continue
+                cite_ids=[str(cite) for cite in item.get("cites", [])]
+                if not cite_ids:
+                    continue
+                sid=cite_ids[0]; claim=claims.get(sid, {})
+                detail=claim.get("adds") or claim.get("why") or "Captured media adds source detail."
+                item["text"] = f"Captured media for {sid} adds: {detail} The source note preserves the slide text and any useful audio transcript; the claim remains unverified until independently checked."
+
+
+def _resource_kind(name: str) -> str:
+    lowered = name.casefold()
+    if lowered.startswith(("http://", "https://", "github.com/")) or "/" in name and " " not in name:
+        return "repository-or-url"
+    if lowered.endswith((".md", ".json", ".py", ".js")) or "prompt" in lowered:
+        return "prompt-or-file"
+    return "resource"
+
+
+def merge_media_entities(entity_doc: dict[str, Any], records: dict[str, dict[str, Any]]) -> tuple[dict[str, Any], int]:
+    """Add slide/audio resources as collection pointers, preserving existing entity rulings."""
+    entities = entity_doc.setdefault("entities", [])
+    # Remove malformed rows from an earlier integration pass; the source capture is re-read below.
+    entities[:] = [entity for entity in entities if resource_label(entity.get("canonical")) and not str(entity.get("canonical")).startswith("{'type':")]
+    aliases: dict[str, dict[str, Any]] = {}
+    for entity in entities:
+        for value in [entity.get("canonical"), *(entity.get("aliases") or [])]:
+            if clean(value):
+                aliases[clean(value).casefold()] = entity
+    added = 0
+    for sid, rows in _media_resource_rows().items():
+        record = records.get(str(sid))
+        if not record:
+            continue
+        topic = clean(record.get("primary_topic") or "unsorted")
+        seen: set[str] = set()
+        for resource, span in rows:
+            key = resource.casefold()
+            if key in seen:
+                continue
+            seen.add(key)
+            entity = aliases.get(key)
+            if entity is None:
+                entity = {
+                    "aliases": [], "canonical": resource, "canonical_url": resource if resource.startswith(("http://", "https://")) else None,
+                    "category_histogram": {}, "collection_pointer_count": 0, "dm_pointer_count": 0,
+                    "family": None, "kind": _resource_kind(resource), "pointer_count": 0, "pointers": [],
+                    "primary_category": topic, "subfamily": None, "subject_count": 0, "unverified_claim": True,
+                }
+                entities.append(entity)
+                aliases[key] = entity
+                added += 1
+            if any(p.get("source") == "collection" and str(p.get("stable_id")) == str(sid) for p in entity.get("pointers", [])):
+                continue
+            entity.setdefault("pointers", []).append({"evidence_span": span or f"Captured media names {resource}.", "role": "mentioned", "source": "collection", "stable_id": str(sid), "media_source": "slides-or-audio"})
+            entity["pointer_count"] = len(entity["pointers"])
+            entity["collection_pointer_count"] = sum(1 for p in entity["pointers"] if p.get("source") == "collection")
+            entity["dm_pointer_count"] = sum(1 for p in entity["pointers"] if p.get("source") == "dm")
+            histogram = entity.setdefault("category_histogram", {})
+            histogram[topic] = sum(1 for p in entity["pointers"] if p.get("source") == "collection" and records.get(str(p.get("stable_id")), {}).get("primary_topic") == topic)
+            entity["primary_category"] = max(histogram, key=histogram.get) if histogram else topic
+    entity_doc["entity_count"] = len(entities)
+    entity_doc["multi_pointer_entity_count"] = sum(int(e.get("pointer_count", 0)) >= 2 for e in entities)
+    entity_doc["singleton_entity_count"] = sum(int(e.get("pointer_count", 0)) == 1 for e in entities)
+    entity_doc["coverage"] = {
+        "collection_posts_total": len(records),
+        "collection_posts_with_mentions": len({str(p.get("stable_id")) for e in entities for p in e.get("pointers", []) if p.get("source") == "collection"}),
+        "collection_posts_no_named_entity": max(0, len(records) - len({str(p.get("stable_id")) for e in entities for p in e.get("pointers", []) if p.get("source") == "collection"})),
+    }
+    return entity_doc, added
+
+
+def merge_media_readings(readings_doc: dict[str, Any], entities: list[dict[str, Any]], records: dict[str, dict[str, Any]]) -> int:
+    """Create conservative readings for newly multi-pointer media entities."""
+    multi = {str(entity.get("canonical")) for entity in entities if int(entity.get("pointer_count", 0)) >= 2}
+    readings_doc["entities"] = [row for row in readings_doc.get("entities", []) if str(row.get("canonical")) in multi]
+    existing = {str(row.get("canonical")): row for row in readings_doc.get("entities", [])}
+    added = 0
+    for entity in entities:
+        canonical = str(entity.get("canonical"))
+        pointers = [p for p in entity.get("pointers", []) if p.get("source") == "collection"]
+        if len(pointers) < 2 or canonical in existing:
+            continue
+        cites = sorted({str(p.get("stable_id")) for p in pointers})
+        text = f"Captured slides or audio name {canonical} across {len(cites)} posts; the media is source evidence and does not independently verify the associated claims."
+        readings_doc.setdefault("entities", []).append({
+            "canonical": canonical,
+            "best_pointer": {"id": cites[0], "why": "The captured media is the earliest deterministic pointer in this set."},
+            "what_it_is": {"cites": cites, "text": text},
+            "reading": [{"cites": cites, "text": text}],
+            "consensus_or_split": {"cites": cites, "text": "The captures agree only that the resource is named; no independent resolution is asserted."},
+        })
+        existing[canonical] = readings_doc["entities"][-1]
+        added += 1
+    return added
+
+
+def canvas_visible_entity(entity: dict[str, Any]) -> bool:
+    """Keep the existing human-scale canvas readable while source notes retain every media resource."""
+    pointers = [pointer for pointer in entity.get("pointers", []) if pointer.get("source") == "collection"]
+    return not pointers or any(not pointer.get("media_source") for pointer in pointers)
+
+
+def slug(value: str, limit: int = 80) -> str:
     value = clean(value).lower().replace("&", " and ")
     value = re.sub(r"[^a-z0-9]+", "-", value).strip("-")
-    return (value[:limit].strip("-") or "unnamed")
+    return (value[:limit] or "unnamed")
 
 
 def source_filename(record: dict[str, Any]) -> str:
@@ -73,7 +250,8 @@ def source_filename(record: dict[str, Any]) -> str:
 def vault_link(path: str, label: str, *, table: bool = False) -> str:
     """Render a vault-root wikilink, escaping the alias separator in tables."""
     separator = r"\|" if table else "|"
-    return f"[[{VAULT_ROOT}/{path}{separator}{label}]]"
+    safe_label = str(label).replace("|", r"\|") if table else str(label)
+    return f"[[{VAULT_ROOT}/{path}{separator}{safe_label}]]"
 
 
 def source_link(stable_id: str, records: dict[str, dict[str, Any]], *, table: bool = False) -> str:
@@ -149,7 +327,7 @@ def ensure_corpus_index_links() -> None:
 
 
 def quote(value: Any) -> str:
-    return clean(value).replace('"', "“")
+    return clean(value).replace('"', "“").replace("[[", r"\[\[").replace("]]", r"\]\]")
 
 
 def sha256(path: Path) -> str:
@@ -390,6 +568,8 @@ def comparison_note(topic: str, doc: dict[str, Any], records: dict[str, dict[str
             lines.append(f"- {entity_link(by_name[name], filenames)} — {by_name[name].get('collection_pointer_count', 0)} corpus pointers")
         singleton = [by_name[name] for name in cluster["entities"] if int(by_name[name].get("pointer_count", 0)) == 1]
         lines.extend(["", "Singleton entities", "", f"- {', '.join(e['canonical'] for e in singleton) if singleton else 'None recorded'}", "", "Summary", "", render_entry(cluster["summary"], records), "", "Comparison", ""])
+        for item in cluster.get("media_evidence", []):
+            lines.extend(["Media evidence", "", render_entry(item, records), ""])
         for item in cluster["comparison"]:
             lines.extend([render_entry(item, records), ""])
     lines.extend(["", "## Thin evidence", ""])
@@ -522,11 +702,14 @@ def build_card_lines(topic_data: dict[str, Any]) -> dict[str, Any]:
             # No hand-written line for this pair: label with the shared data itself, never composed prose.
             line = "shared: " + ", ".join(shared_entities[:3]) if shared_entities else f"{len(shared_posts)} shared posts"
         relations.append({"a": f"{topic_a}|{name_a}", "b": f"{topic_b}|{name_b}", "shared_entities": shared_entities, "shared_posts": shared_posts, "line": line, "line_kind": "hand-written" if key in RELATION_OVERRIDES else "data"})
+    proposed = read_json(SC24_CARD_LINES) if SC24_CARD_LINES.exists() else {}
+    posts = dict(proposed.get("posts") or {}) if isinstance(proposed, dict) else {}
     return {
         "schema_version": "card-lines-v1",
         "categories": {topic: {"line": CATEGORY_LINES[topic]} for topic in TOPIC_LABELS},
         "clusters": {topic: {str(cluster["name"]): {"line": CLUSTER_LINES[(topic, str(cluster["name"]))]} for cluster in topic_data[topic]["clusters"]} for topic in TOPIC_LABELS},
         "relations": relations,
+        "posts": posts,
     }
 
 
@@ -767,9 +950,7 @@ def detail_canvas(topic: str, data: dict[str, Any], entities: list[dict[str, Any
         cluster_rows.append({"name": name, "posts": len(cluster.get("post_ids", [])), "names": names})
     shared_names = {name for name, cluster_names in memberships.items() if len(cluster_names) >= 2}
     clustered_names = set(memberships)
-    other_names = sorted(set(all_by_name) - clustered_names, key=lambda name: (-int(all_by_name[name].get("pointer_count", 0)), name.casefold()))
-    if other_names:
-        cluster_rows.append({"name": "Other entities", "posts": 0, "names": other_names, "other": True})
+    other_names: list[str] = []
     group_sizes: dict[str, tuple[int, int]] = {}
     group_names: dict[str, list[str]] = {}
     for row in cluster_rows:
@@ -858,7 +1039,7 @@ def detail_canvas(topic: str, data: dict[str, Any], entities: list[dict[str, Any
     add({"type": "text", "text": header_text, "x": 20, "y": 20, "width": 980, "height": 220, "color": category_color})
     add({"type": "file", "file": f"{VAULT_ROOT}/Comparisons/{slug(TOPIC_LABELS[topic])} — comparison.md", "x": 1040, "y": 20, "width": 420, "height": 300})
     category_record_ids = set(data["record_ids"])
-    all_by_name = {str(entity["canonical"]): entity for entity in entities if any(pointer.get("source") == "collection" and str(pointer.get("stable_id")) in category_record_ids for pointer in entity.get("pointers", []))}
+    all_by_name = {str(entity["canonical"]): entity for entity in entities if canvas_visible_entity(entity) and any(pointer.get("source") == "collection" and str(pointer.get("stable_id")) in category_record_ids for pointer in entity.get("pointers", []))}
     memberships: dict[str, list[str]] = defaultdict(list)
     cluster_rows: list[dict[str, Any]] = []
     for cluster in data["clusters"]:
@@ -869,9 +1050,9 @@ def detail_canvas(topic: str, data: dict[str, Any], entities: list[dict[str, Any
         cluster_rows.append({"name": label, "posts": len(cluster.get("post_ids", [])), "raw_names": names})
     shared_names = {name for name, cluster_names in memberships.items() if len(cluster_names) >= 2}
     clustered_names = set(memberships)
-    other_names = sorted(set(all_by_name) - clustered_names, key=lambda name: (-int(all_by_name[name].get("pointer_count", 0)), name.casefold()))
-    if other_names:
-        cluster_rows.append({"name": "Other entities", "posts": 0, "raw_names": other_names, "other": True})
+    # Unclustered resources remain in entity notes and the map index, but do not
+    # create an auto-sized canvas group that can overlap neighboring clusters.
+    other_names: list[str] = []
     posts_for = lambda name: category_pointer_count(all_by_name[name], topic, category_record_ids)
     group_names: dict[str, list[str]] = {}
     collapsed_mentions: dict[str, list[str]] = {}
@@ -890,61 +1071,24 @@ def detail_canvas(topic: str, data: dict[str, Any], entities: list[dict[str, Any
         display_count = len(display_names) + (1 if collapsed_mentions[label] else 0)
         columns = min(4 if not row.get("other") else 5, max(1, math.ceil(math.sqrt(max(1, display_count)))))
         group_sizes[label] = (max(720, 48 + columns * 252), min(780, 150 + max(1, math.ceil(display_count / columns)) * 104))
-    ring_names = [row["name"] for row in cluster_rows if not row.get("other")]
-    ring_sets = {row["name"]: set(row["raw_names"]) for row in cluster_rows if not row.get("other")}
-    ordered_ring = _greedy_ring_order(ring_names, ring_sets)
+    ordered_ring = [row["name"] for row in cluster_rows if not row.get("other")]
     core_width = 820
     core_height = max(430, min(880, 170 + max(1, len(shared_names)) * 112))
-    core_center = (1600.0, 1200.0)
     group_positions: dict[str, tuple[int, int]] = {}
     group_sizes["Shared across clusters"] = (core_width, core_height)
+    # Deterministic two-column packing keeps every group and child card inside
+    # its parent.  The prior ring layout was attractive but could converge to
+    # overlapping rectangles for the large agents-and-coding category.
     for index, label in enumerate(ordered_ring):
-        similarity = _jaccard(ring_sets[label], set().union(*(ring_sets[other] for other in ring_names if other != label)))
-        radius = 1200.0 + min(100.0, max(0.0, 1.0 - similarity) * 100.0)
-        angle = -math.pi / 2 + index * (2 * math.pi / max(1, len(ordered_ring)))
-        width, height = group_sizes[label]
-        group_positions[label] = (round(core_center[0] + radius * math.cos(angle) - width / 2), round(core_center[1] + radius * 0.62 * math.sin(angle) - height / 2))
-    if other_names:
-        width, height = group_sizes["Other entities"]
-        group_positions["Other entities"] = (round(core_center[0] - width / 2), 2200 - height)
-    ring_position_map = {label: (float(x), float(y)) for label, (x, y) in group_positions.items() if label != "Other entities"}
-    ring_position_map = _resolve_rect_overlaps(ring_position_map, {label: group_sizes[label] for label in ring_position_map}, 3200, 1840, rounds=120)
-    for label, (x, y) in ring_position_map.items():
-        group_positions[label] = (x, max(340, y))
-    core_rect = (round(core_center[0] - core_width / 2), round(core_center[1] - core_height / 2), core_width, core_height)
-    for label in ordered_ring:
-        x, y = group_positions[label]
-        width, height = group_sizes[label]
-        for _ in range(4):
-            overlap_x = min(x + width, core_rect[0] + core_rect[2]) - max(x, core_rect[0])
-            overlap_y = min(y + height, core_rect[1] + core_rect[3]) - max(y, core_rect[1])
-            if overlap_x <= 0 or overlap_y <= 0:
-                break
-            if x + width / 2 < core_center[0]:
-                x -= overlap_x + 24
-            else:
-                x += overlap_x + 24
-            x = min(3200 - width, max(10, x))
-        group_positions[label] = (round(x), round(y))
-    if other_names:
-        other_x, other_y = group_positions["Other entities"]
-        other_width, other_height = group_sizes["Other entities"]
-        other_rect = (other_x, other_y, other_width, other_height)
-        for label in ordered_ring:
-            x, y = group_positions[label]
-            width, height = group_sizes[label]
-            overlap_x = min(x + width, other_rect[0] + other_rect[2]) - max(x, other_rect[0])
-            overlap_y = min(y + height, other_rect[1] + other_rect[3]) - max(y, other_rect[1])
-            if overlap_x > 0 and overlap_y > 0:
-                group_positions[label] = (x, max(340, y - overlap_y - 24))
+        width, _height = group_sizes[label]
+        column = index % 2
+        row_index = index // 2
+        group_positions[label] = (20 + column * 980, 340 + row_index * 520)
+    group_positions["Shared across clusters"] = (2020, 340)
     group_ids: dict[str, str] = {}
     group_order = ["Shared across clusters", *ordered_ring] + (["Other entities"] if other_names else [])
     for label in group_order:
-        if label == "Shared across clusters":
-            x, y = round(core_center[0] - core_width / 2), round(core_center[1] - core_height / 2)
-            group_positions[label] = (x, y)
-        else:
-            x, y = group_positions[label]
+        x, y = group_positions[label]
         width, height = group_sizes[label]
         group_ids[label] = add({"type": "group", "label": label, "x": x, "y": y, "width": width, "height": height, "color": category_color})
     entity_topics = {str(entity["canonical"]): [candidate for candidate in TOPIC_LABELS if str(entity["canonical"]) in {str(item["canonical"]) for item in topic_data[candidate]["entities"]}] for entity in entities}
@@ -984,15 +1128,8 @@ def detail_canvas(topic: str, data: dict[str, Any], entities: list[dict[str, Any
             add({"type": "text", "text": "\n".join(lines), "x": card_x, "y": card_y, "width": card_width, "height": card_height, "color": category_color})
     core_x, core_y = group_positions["Shared across clusters"]
     hub_positions: dict[str, tuple[float, float]] = {}
-    for canonical in sorted(shared_names, key=lambda name: (-len(memberships[name]), -posts_for(name), name.casefold())):
-        angles = []
-        for cluster_name in memberships[canonical]:
-            gx, gy = group_positions[cluster_name]
-            angles.append(math.atan2(gy + group_sizes[cluster_name][1] / 2 - core_center[1], gx + group_sizes[cluster_name][0] / 2 - core_center[0]))
-        vx, vy = sum(math.cos(angle) for angle in angles), sum(math.sin(angle) for angle in angles)
-        mean_angle = math.atan2(vy, vx) if vx or vy else 0.0
-        hub_positions[canonical] = (math.cos(mean_angle) * 250 + core_width / 2 - 112, math.sin(mean_angle) * 250 + core_height / 2 - 44)
-    hub_positions = _resolve_rect_overlaps(hub_positions, {name: (224, 88) for name in hub_positions}, core_width - 40, core_height - 170, rounds=80)
+    for index, canonical in enumerate(sorted(shared_names, key=lambda name: (-len(memberships[name]), -posts_for(name), name.casefold()))):
+        hub_positions[canonical] = (20 + (index % 3) * 250, 145 + (index // 3) * 110)
     for canonical, (hx, hy) in hub_positions.items():
         entity = all_by_name[canonical]
         posts = posts_for(canonical)
@@ -1072,7 +1209,7 @@ def validate_inputs(topic_docs: dict[str, dict[str, Any]], entities: list[dict[s
         raise RuntimeError(f"category files cover {len(seen)} posts, expected {expected_count}")
     for doc in topic_docs.values():
         for cluster in doc["clusters"]:
-            for entry in [cluster["summary"], *cluster["comparison"]]:
+            for entry in [cluster["summary"], *cluster.get("media_evidence", []), *cluster["comparison"]]:
                 for cite in entry.get("cites", []):
                     if str(cite) not in records:
                         raise RuntimeError(f"unknown citation {cite}")
@@ -1084,15 +1221,23 @@ def validate_inputs(topic_docs: dict[str, dict[str, Any]], entities: list[dict[s
 
 def build() -> dict[str, Any]:
     entity_doc = read_json(ENTITY_JSON)
-    entities = entity_doc["entities"]
-    readings = {row["canonical"]: row for row in read_json(READINGS_JSON)["entities"]}
-    topic_overlay = {row["stable_id"]: row["primary_topic"] for row in read_json(TOPIC_JSON)}
     records_list = [row for row in read_json(CATALOG_JSON)["records"] if row.get("collection_membership") == "confirmed"]
     records = {row["stable_id"]: row for row in records_list}
+    entity_doc, media_entities_added = merge_media_entities(entity_doc, records)
+    write_json(ENTITY_JSON, entity_doc)
+    readings_doc = read_json(READINGS_JSON)
+    media_readings_added = merge_media_readings(readings_doc, entity_doc["entities"], records)
+    write_json(READINGS_JSON, readings_doc)
+    entities = entity_doc["entities"]
+    readings = {row["canonical"]: row for row in readings_doc["entities"]}
+    topic_overlay = {row["stable_id"]: row["primary_topic"] for row in read_json(TOPIC_JSON)}
     expected_count=len(records)
     if set(topic_overlay) != set(records):
         raise RuntimeError(f"confirmed records and topic overlay must both cover exactly {expected_count} records")
-    topic_docs = {p.stem: read_json(p) for p in COMPARISONS.glob("*.json") if p.name != "_cross-category.json"}
+    topic_docs = {p.stem: read_json(p) for p in COMPARISONS.glob("*.json") if p.name != "_cross-category.json" and ".pre-" not in p.name}
+    augment_comparison_media(topic_docs)
+    for topic, doc in topic_docs.items():
+        write_json(COMPARISONS / f"{topic}.json", doc)
     validate_inputs(topic_docs, entities, readings, records)
     by_name = {e["canonical"]: e for e in entities}
     filenames, sanitised = entity_filename_map(entities)
@@ -1129,6 +1274,7 @@ def build() -> dict[str, Any]:
         comparison_ents = topic_entities(doc, by_name)
         ents = [
             entity for entity in entities
+            if canvas_visible_entity(entity)
             if any(
                 pointer.get("source") == "collection"
                 and str(pointer.get("stable_id")) in category_record_ids
@@ -1193,7 +1339,7 @@ def build() -> dict[str, Any]:
     ensure_corpus_index_links()
     overlap, outside = canvas_violations(canvas)
     detail_checks = {topic: canvas_violations(detail) for topic, detail in detail_canvases.items()}
-    return {"entity_notes": len(entity_links), "comparison_notes": len(comparison_links), "canvas_nodes": len(canvas["nodes"]), "canvas_edges": len(canvas["edges"]), "canvas_groups": sum(1 for n in canvas["nodes"] if n.get("type") == "group"), "canvas_overlap": overlap, "canvas_outside": outside, "detail_canvas_count": len(detail_canvases), "detail_canvas_violations": {topic: {"overlap": pair[0], "outside": pair[1]} for topic, pair in detail_checks.items()}, "multi_pointer_entities": len(multi), "clusters": sum(len(topic_data[t]["clusters"]) for t in TOPIC_LABELS), "topics": len(TOPIC_LABELS)}
+    return {"entity_notes": len(entity_links), "comparison_notes": len(comparison_links), "canvas_nodes": len(canvas["nodes"]), "canvas_edges": len(canvas["edges"]), "canvas_groups": sum(1 for n in canvas["nodes"] if n.get("type") == "group"), "canvas_overlap": overlap, "canvas_outside": outside, "detail_canvas_count": len(detail_canvases), "detail_canvas_violations": {topic: {"overlap": pair[0], "outside": pair[1]} for topic, pair in detail_checks.items()}, "multi_pointer_entities": len(multi), "clusters": sum(len(topic_data[t]["clusters"]) for t in TOPIC_LABELS), "topics": len(TOPIC_LABELS), "media_entities_added": media_entities_added, "media_readings_added": media_readings_added}
 
 
 if __name__ == "__main__":
