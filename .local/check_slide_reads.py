@@ -13,7 +13,8 @@ import shutil
 import sys
 
 PLACEHOLDER = re.compile(r"(transcription (remains|is) (incomplete|partial)|no transcription recorded|remains to be completed|"
-                         r"^(image|slide image|viewed image|inspected slide image)[^.]{0,40}(reviewed|opened|viewed)[;.])", re.I)
+                         r"^(image|slide image|viewed image|inspected slide image)[^.]{0,40}(reviewed|opened|viewed)[;.]|"
+                         r"machine-readable text layer|a downloaded instagram slide|^post [\w-]{8,}, slide \d+)", re.I)
 
 
 def expected_images(post):
