@@ -1,0 +1,56 @@
+[
+  {
+    "key": "[\"todoist-migration-tasks-59c150\",\"security-checks-fast.js#checksecretdump\",\"a bare no-argument newline-printing builtin in a compound command was classified as printing a secret variable; no variable was passed to it. the token was only used inside a curl authorization header.\"]",
+    "project": "todoist-migration-tasks-59c150",
+    "hook": "security-checks-fast.js#checkSecretDump",
+    "reason": "A bare no-argument newline-printing builtin in a compound command was classified as printing a secret variable; no variable was passed to it. The token was only used inside a curl Authorization header.",
+    "count": 1,
+    "escalated": false,
+    "first_seen": "2026-09-09T19:12:04.236Z",
+    "last_seen": "2026-09-09T19:12:04.236Z",
+    "entry_ids": [
+      "misfire-083f02f1-9fa4-4a91-bb07-6a5fe1abe1ef"
+    ],
+    "dispositions": [
+      {
+        "entry_id": "misfire-083f02f1-9fa4-4a91-bb07-6a5fe1abe1ef",
+        "status": "open"
+      }
+    ],
+    "last_session_id": "",
+    "disposition": {
+      "entry_id": "misfire-083f02f1-9fa4-4a91-bb07-6a5fe1abe1ef",
+      "status": "open"
+    }
+  },
+  {
+    "key": "[\"todoist-migration-tasks-59c150\",\"reviewer-dispatch\",\"cursor failed\"]",
+    "project": "todoist-migration-tasks-59c150",
+    "hook": "reviewer-dispatch",
+    "reason": "cursor failed",
+    "count": 2,
+    "escalated": true,
+    "first_seen": "2026-09-09T19:30:19.265Z",
+    "last_seen": "2026-09-09T19:40:13.776Z",
+    "entry_ids": [
+      "misfire-25a7260d-a55c-4637-ae1a-a31fd48a5549",
+      "misfire-beaeadfb-4e86-49a8-90ed-637a89e76c90"
+    ],
+    "dispositions": [
+      {
+        "entry_id": "misfire-25a7260d-a55c-4637-ae1a-a31fd48a5549",
+        "status": "open"
+      },
+      {
+        "entry_id": "misfire-beaeadfb-4e86-49a8-90ed-637a89e76c90",
+        "status": "open"
+      }
+    ],
+    "last_session_id": "7ac0b59a-e5de-4030-abeb-7c544b7390db",
+    "escalated_at": "2026-09-09T19:40:13.776Z",
+    "disposition": {
+      "entry_id": "misfire-beaeadfb-4e86-49a8-90ed-637a89e76c90",
+      "status": "open"
+    }
+  }
+]
