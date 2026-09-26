@@ -1,0 +1,74 @@
+[
+  {
+    "key": "[\"plant-care-routine-todoist-3361a1\",\"protect-ai-reference.js\",\"find used -iname 'ai reference' with -prune, which excludes the folder (standard find exclusion idiom); the hook recognises -not/! forms but not -prune. the misfire report command itself was then also blocked because its --command text contained the phrase.\"]",
+    "project": "plant-care-routine-todoist-3361a1",
+    "hook": "protect-ai-reference.js",
+    "reason": "find used -iname 'AI Reference' with -prune, which EXCLUDES the folder (standard find exclusion idiom); the hook recognises -not/! forms but not -prune. The misfire report command itself was then also blocked because its --command text contained the phrase.",
+    "count": 1,
+    "escalated": false,
+    "first_seen": "2026-09-21T02:51:27.583Z",
+    "last_seen": "2026-09-21T02:51:27.583Z",
+    "entry_ids": [
+      "misfire-09acbd76-00be-4e0a-8e5d-fcf7f432d7f2"
+    ],
+    "dispositions": [
+      {
+        "entry_id": "misfire-09acbd76-00be-4e0a-8e5d-fcf7f432d7f2",
+        "status": "open"
+      }
+    ],
+    "last_session_id": "",
+    "disposition": {
+      "entry_id": "misfire-09acbd76-00be-4e0a-8e5d-fcf7f432d7f2",
+      "status": "open"
+    }
+  },
+  {
+    "key": "[\"plant-care-routine-todoist-3361a1\",\"protect-ai-reference.js\",\"used the hook's own recommended -not -path exclusion form; refused with 'an exclusion or negation flag reaches a protected root'. the [redacted]'s core rule requires find over the drive root, which contains actual documents/identity, so the [redacted]'s documented search is unrunnable under this guard with any exclusion form.\"]",
+    "project": "plant-care-routine-todoist-3361a1",
+    "hook": "protect-ai-reference.js",
+    "reason": "Used the hook's own recommended -not -path exclusion form; refused with 'an exclusion or negation flag reaches a protected root'. The [REDACTED]'s Core Rule requires find over the Drive root, which contains Actual Documents/Identity, so the [REDACTED]'s documented search is unrunnable under this guard with any exclusion form.",
+    "count": 1,
+    "escalated": false,
+    "first_seen": "2026-09-21T02:51:43.120Z",
+    "last_seen": "2026-09-21T02:51:43.120Z",
+    "entry_ids": [
+      "misfire-d59709b1-18fb-4a8b-a526-2c9a6b25ccab"
+    ],
+    "dispositions": [
+      {
+        "entry_id": "misfire-d59709b1-18fb-4a8b-a526-2c9a6b25ccab",
+        "status": "open"
+      }
+    ],
+    "last_session_id": "",
+    "disposition": {
+      "entry_id": "misfire-d59709b1-18fb-4a8b-a526-2c9a6b25ccab",
+      "status": "open"
+    }
+  },
+  {
+    "key": "[\"plant-care-routine-todoist-3361a1\",\"security-checks-fast.js#checksecretdump\",\"the command only listed staged file names and grepped them for the literal '.env' to confirm no secret file was staged; it never read any file's contents.\"]",
+    "project": "plant-care-routine-todoist-3361a1",
+    "hook": "security-checks-fast.js#checkSecretDump",
+    "reason": "The command only listed staged file NAMES and grepped them for the literal '.env' to confirm no secret file was staged; it never read any file's contents.",
+    "count": 1,
+    "escalated": false,
+    "first_seen": "2026-09-21T03:43:27.828Z",
+    "last_seen": "2026-09-21T03:43:27.828Z",
+    "entry_ids": [
+      "misfire-2cc9b8e4-2c31-40e2-80a8-13aa42b394b0"
+    ],
+    "dispositions": [
+      {
+        "entry_id": "misfire-2cc9b8e4-2c31-40e2-80a8-13aa42b394b0",
+        "status": "open"
+      }
+    ],
+    "last_session_id": "",
+    "disposition": {
+      "entry_id": "misfire-2cc9b8e4-2c31-40e2-80a8-13aa42b394b0",
+      "status": "open"
+    }
+  }
+]
