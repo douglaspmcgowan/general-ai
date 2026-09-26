@@ -1,0 +1,50 @@
+[
+  {
+    "key": "[\"group-calendar-availability-13cece\",\"security-checks-fast.js#checksecretdump\",\"two curl calls each passing the todoist key env var only in an authorization header, output piped to python printing task fields; the key itself is never printed.\"]",
+    "project": "group-calendar-availability-13cece",
+    "hook": "security-checks-fast.js#checkSecretDump",
+    "reason": "Two curl calls each passing the Todoist key env var only in an Authorization header, output piped to python printing task fields; the key itself is never printed.",
+    "count": 1,
+    "escalated": false,
+    "first_seen": "2026-09-21T22:47:14.627Z",
+    "last_seen": "2026-09-21T22:47:14.627Z",
+    "entry_ids": [
+      "misfire-1ff9e790-4c75-428d-9b6d-eb24eecc7ae2"
+    ],
+    "dispositions": [
+      {
+        "entry_id": "misfire-1ff9e790-4c75-428d-9b6d-eb24eecc7ae2",
+        "status": "open"
+      }
+    ],
+    "last_session_id": "",
+    "disposition": {
+      "entry_id": "misfire-1ff9e790-4c75-428d-9b6d-eb24eecc7ae2",
+      "status": "open"
+    }
+  },
+  {
+    "key": "[\"group-calendar-availability-13cece\",\"security-checks-fast.js#checksecretdump\",\"a js template literal referencing process.env.acct sat inside a single-quoted sed replacement written to a .mjs file; the shell never performed command substitution and nothing printed the environment. recording it also trips the guard when the command text is quoted.\"]",
+    "project": "group-calendar-availability-13cece",
+    "hook": "security-checks-fast.js#checkSecretDump",
+    "reason": "A JS template literal referencing process.env.ACCT sat inside a single-quoted sed replacement written to a .mjs file; the shell never performed command substitution and nothing printed the environment. Recording it also trips the guard when the command text is quoted.",
+    "count": 1,
+    "escalated": false,
+    "first_seen": "2026-09-22T04:15:39.654Z",
+    "last_seen": "2026-09-22T04:15:39.654Z",
+    "entry_ids": [
+      "misfire-43f060a0-9fa8-4547-864f-213c1d5b4845"
+    ],
+    "dispositions": [
+      {
+        "entry_id": "misfire-43f060a0-9fa8-4547-864f-213c1d5b4845",
+        "status": "open"
+      }
+    ],
+    "last_session_id": "",
+    "disposition": {
+      "entry_id": "misfire-43f060a0-9fa8-4547-864f-213c1d5b4845",
+      "status": "open"
+    }
+  }
+]
