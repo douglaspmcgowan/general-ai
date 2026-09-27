@@ -43,6 +43,17 @@
         "C:/Users/dougl/Projects/design-lab"
       ],
       "port": 3131
+    },
+    {
+      "name": "app-atlas",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "--prefix",
+        "C:/Users/dougl/Projects/app-atlas"
+      ],
+      "port": 3141
     }
   ]
 }
