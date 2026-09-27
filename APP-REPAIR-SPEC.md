@@ -219,7 +219,7 @@ window. **Style** = combined `.css` + HTML `<style>` measurement: unique hex val
 | [ ] `operating-dashboard` | Live session and task tracker | 2 HTML, 2 JS | local | 89/20/49/1/1/4 | 89 colours in two files; already has 4 dark-mode blocks, so the floor is within reach in one sitting |
 | [ ] `idetc-writing-ide` | Single-file writing IDE, two versions side by side | 2 HTML, 5 style surfaces | local | 46/29/32/**74**/**0**/3 | 74 `!important` and zero `:focus-visible` — the worst floor score in the tree relative to its size. A single-file IDE should stay single-file |
 | [ ] `redline-idetc` | Paper redline across two versions | 2 HTML | local | 36/16/29/8/2/0 | Sibling of `idetc-writing-ide`; same shape, same floor, same sitting |
-| [ ] `shopping-search` | Shopping report generator | **Unversioned**; 264 style surfaces, 3.4 MB, 123 generated HTML reports, 3 Python generator templates | local | **1113**/259/1938/**385**/137/35 | **The largest styling outlier in the tree by every measure, and the brief's outlier list missed it.** But the 123 HTML files are generated output — the repair target is exactly three Python templates. Version control first |
+| [x] `shopping-search` | Shopping report generator | Versioned 2026-09-27; **1 generated HTML surface**, 3 Python generator scripts | local | **55**/27/0/**0**/0/0 → 0 literals outside `:root` after repair | **CORRECTED 2026-09-27, measured in the repository.** The row used to read "1113 colours, 385 `!important`, 3.4 MB, 264 style surfaces, 123 HTML reports". Every one of those numbers came from `tmp\edge-shopping-report-profile\`, a disposable headless-Edge user-data directory full of bundled browser-extension HTML that `.gitignore` excludes via `tmp/`. 122 of the 123 HTML files lived there. The app is a small, clean, single-page print generator, not the tree's largest styling outlier. Stage 2 landed the floor on it: 99-property token layer, focus ring, reduced-motion, dark mode, accessibility verifier |
 
 ### HOLD — 8 units
 
@@ -314,13 +314,13 @@ command is in [Appendix A](#appendix-a--how-every-number-was-taken).
 | Three TS majors (5, 6, 7) | **four plus a float** — 5.6, 5.9, 6.0, 7.0, and `latest` | `schema-studio`'s branch app pins `^5.6.3`; `arch-gp-demo` pins `latest` |
 | 18 apps have zero `transition` | **3** — `hci-260`, `info-272`, `contact-form-caller` | The brief measured `.css` files only. 20 app units keep all their styling in HTML `<style>` blocks, where the transitions are |
 | 12 apps have zero CSS custom properties | **0** | Same cause. The weakest are `daily-brief` (8), `hci-260` (9) and `second-brain-capsule` (12) |
-| 21 apps have no custom easing; 21 no `box-shadow`; 20 no `clamp()`; 35 no container queries | **unmeasured against the HTML-inclusive method** for easing; container queries confirmed absent from 42 of the 46 project roots that carry any styling | Only `design-worlds` (6), `shopping-search` (8), `slides-workbench` (4) and `text-to-spaceship` (2) use `@container` |
+| 21 apps have no custom easing; 21 no `box-shadow`; 20 no `clamp()`; 35 no container queries | **unmeasured against the HTML-inclusive method** for easing; container queries confirmed absent from 42 of the 46 project roots that carry any styling | Only `design-worlds` (6), `slides-workbench` (4) and `text-to-spaceship` (2) use `@container`. **`shopping-search` (8) was wrong and is struck 2026-09-27:** `git grep @container` in that repository returns nothing; the eight hits were inside the gitignored `tmp\edge-shopping-report-profile\` browser profile |
 | 28 apps have no dark mode | **24 of the 46 project roots that carry any styling** | Same HTML-inclusion cause, smaller effect |
-| 23 apps use `!important` | **41 of those same 46 roots have at least one** | Same cause; the total across the tree is dominated by `shopping-search` (385), `compsci-260b` (208), `idetc-writing-ide` (74) and `obsidian-vault-mirror-metropolis` (54) |
+| 23 apps use `!important` | **41 of those same 46 roots have at least one** | Same cause; the total across the tree is dominated by `compsci-260b` (208), `idetc-writing-ide` (74) and `obsidian-vault-mirror-metropolis` (54). **`shopping-search` (385) is struck 2026-09-27:** it has zero `!important`, measured over its one generated HTML surface and its three Python scripts; the 385 were a gitignored browser profile |
 | Playwright in 29 apps | **13 declare `@playwright/test`; 8 carry a `playwright.config`** | The brief likely counted spec files or a global install. `@axe-core/playwright` in 5 is confirmed exactly |
 | "Nine apps served by `python -m http.server`" | **at least 14** app units reference it | Adds `berkeley-research` (10 references), `skill-pathways` (7), `obsidian-vault-mirror-metropolis` (10), `boundaries-reader` (3), `kelly-uniforms-business` (4), `text-to-spaceship` (3) |
 | The app pinned to React `latest` | **`agent-harness/arch-gp-demo`, with all 11 dependencies pinned to `latest`** | It is not one React pin; it is every dependency. And it lives inside the one repository this lane may not modify — see [Conflicts](#conflicts-between-this-specification-and-a-harness-contract) |
-| Outliers: metropolis, `base-flight-finder`, `cad-forge`, `anna-maria-mcgowan-site` | **`shopping-search` and `compsci-260b` are larger outliers than three of those four** and appear in neither list | `shopping-search`: 1113 colours, 3.4 MB, 385 `!important`. `compsci-260b`: 4.1 MB and 208 `!important` in three files |
+| Outliers: metropolis, `base-flight-finder`, `cad-forge`, `anna-maria-mcgowan-site` | **`compsci-260b` is a larger outlier than three of those four** and appears in neither list | `compsci-260b`: 4.1 MB and 208 `!important` in three files. **The `shopping-search` half of this row is withdrawn 2026-09-27:** its 1113 colours / 3.4 MB / 385 `!important` were measured over the gitignored `tmp\edge-shopping-report-profile\`. The real figure is 55 colours in one sheet and no `!important` |
 
 **Can another person use the `http.server` apps today? No.** Measured: no tracked `vercel.json`, no
 authentication code, no TLS configuration, and `python -m http.server` writes nothing, so nothing a
@@ -455,7 +455,7 @@ Rough, and in agent-hours, not Douglas-hours. Ranges are the small-app and outli
 | 2 retire | 0.5 h | per unit, including preserving unlanded work to an `agent/*` branch |
 | 3 float pins | 0.5 h | one app, plus a compatibility run |
 | 4 close drift | 6–10 h | one app, three majors |
-| 5 token layer | 1–3 h typical; 8–16 h for `shopping-search`, `compsci-260b`, metropolis, `truss-forge` | scales with unique-colour count, not file count |
+| 5 token layer | 1–3 h typical; 8–16 h for `compsci-260b`, metropolis, `truss-forge` | scales with unique-colour count, not file count. `shopping-search` is removed from the expensive group 2026-09-27: 55 colours, and the extraction took under an hour |
 | 6 focus + axe | 0.5–1 h | mostly one import and one assertion |
 | 7 motion | 0.5–1.5 h | after 5 |
 | 8 dark mode | 0.5–1 h | after 5; it is one extra `:root` block |
@@ -632,8 +632,10 @@ The invited exception, and only these.
       never the artifacts.
 - [ ] **`truss-forge`'s 50 exported pages and `slides-workbench`'s decks** — generated output of
       `export_static.py` and the deck builders. The source converts; the output is not source.
-- [ ] **`shopping-search`'s 123 generated reports** — same reason. Its three Python generator templates
-      are the repair target, and they stay Python.
+- [x] **`shopping-search`'s generated report** — same reason, but the count was wrong: there is **one**
+      generated HTML report, not 123. The other 122 were bundled-extension pages inside the gitignored
+      `tmp\edge-shopping-report-profile\`. Its three Python generator scripts are the repair target and
+      they stay Python; they were repaired 2026-09-27.
 - [ ] **The Python compute cores of `cad-forge` (340 files), `truss-forge` (231), `schema-studio` (117)
       and the FastAPI sidecars** — the solver, CAD kernel and extraction libraries exist only in Python.
       Their browser layers convert; the cores do not. This is not an exception to the decision so much as
@@ -854,8 +856,9 @@ for d in <app roots>; do (cd "$d" && git ls-files | grep -E '\.(js|mjs|cjs|ts|ts
 ```
 
 **8 — What data each app owns, and where. PARTLY MEASURED.**
-Tracked database files: **`shopping-search` holds 27** `.db`/`.sqlite` files, `text-to-spaceship` 1,
-`project-hady` 1; every other app tracks none. **35 roots carry a `data-manifest.yaml`**, which is where
+Tracked database files: **`text-to-spaceship` 1, `project-hady` 1; every other app tracks none.**
+**Corrected 2026-09-27: `shopping-search` tracks zero**, not 27 — `git ls-files` finds no `.db` or
+`.sqlite` in it, and none exists on disk outside the gitignored browser profile. **35 roots carry a `data-manifest.yaml`**, which is where
 the answer is supposed to live. **UNMEASURED:** the untracked, gitignored runtime data each app writes —
 `.local` caches, generated JSON, SQLite files outside git — which is exactly the data a migration can
 destroy. Measuring it means reading 35 `data-manifest.yaml` files and reconciling each against its
