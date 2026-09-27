@@ -1,0 +1,55 @@
+app	reported	true	diff	declared	arbitrary
+legal-solutions-website	20	24	+4	24	0
+bible-name-search	12	52	+40	14	46
+base-flight-finder (apps/web)	31	31	+0	31	0
+base-flight-finder (apps/desktop)	8	8	+0	8	0
+base-flight-finder (packages/cli)	0	0	+0	0	0
+client-portal	13	15	+2	15	0
+fellowship-tracker	15	16	+1	15	1
+jars-of-clay	23	23	+0	23	0
+kelly-uniforms-business (storefront)	25	25	+0	25	0
+kelly-uniforms-business (brand-gallery)	20	20	+0	20	0
+kelly-uniforms-business (preview)	0	0	+0	0	0
+text-to-spaceship	0	0	+0	0	0
+study-system (berkeley-prelim-study)	41	43	+2	43	0
+168-audit	0	39	+39	39	0
+conference-tracker	0	37	+37	37	0
+docket	22	22	+0	22	0
+vault-review-mobile	25	25	+0	25	0
+arch-gp-app	18	18	+0	18	0
+build-log	40	38	-2	38	0
+mission-control	6	6	+0	6	0
+workscope-graph	7	7	+0	7	0
+schema-studio	24	27	+3	27	0
+anna-maria-mcgowan-site	101	98	-3	98	0
+cad-forge	52	47	-5	47	0
+truss-forge	146	148	+2	148	0
+slides-workbench	25	25	+0	25	0
+marginalia	20	29	+9	20	19
+berkeley-meng	24	24	+0	24	0
+berkeley-research	61	55	-6	55	0
+operating-dashboard	20	20	+0	20	0
+idetc-writing-ide	29	27	-2	27	0
+redline-idetc	16	16	+0	16	0
+shopping-search	18	18	+0	18	0
+berkeley-house	0	4	+4	2	2
+design-worlds	216	204	-12	204	0
+project-hady	0	0	+0	0	0
+boundaries-reader	23	23	+0	23	0
+contact-form-caller	3	3	+0	3	0
+saved-posts	7	7	+0	7	0
+drive-organizer	8	8	+0	8	0
+design-lab	9	19	+10	9	11
+anna-maria-mcgowan	14	14	+0	14	0
+obsidian-vault-mirror-metropolis-runtime	0	0	+0	0	0
+second-brain-capsule-runtime	0	0	+0	0	0
+compsci-260b	11	11	+0	11	0
+obsidian-vault-mirror-metropolis	150	128	-22	128	0
+hci-260	24	24	+0	24	0
+info-272	7	7	+0	7	0
+sarah-stuff	166	173	+7	173	0
+legal-doc-studio	18	17	-1	17	0
+landry-sandbox	20	27	+7	27	0
+daily-brief	23	23	+0	23	0
+second-brain-capsule	10	9	-1	9	0
+skill-pathways	17	17	+0	17	0
