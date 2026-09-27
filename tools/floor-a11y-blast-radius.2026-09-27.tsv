@@ -1,0 +1,55 @@
+app	old_focus	new_focus	focus_verdict	old_dark	new_dark	dark_surface	dark_verdict	important_new
+legal-solutions-website	0	33	FAIL->PASS	0	0	no	same	0
+bible-name-search	1	7	same	0	3	yes	FAIL->PASS	228
+base-flight-finder (apps/web)	17	17	same	1	4	yes	same	2
+base-flight-finder (apps/desktop)	0	0	same	0	0	no	same	1
+base-flight-finder (packages/cli)	0	0	same	0	0	no	same	0
+client-portal	2	2	same	0	0	no	same	4
+fellowship-tracker	3	3	same	1	2	yes	same	5
+jars-of-clay	1	1	same	0	0	no	same	6
+kelly-uniforms-business (storefront)	4	4	same	0	0	no	same	6
+kelly-uniforms-business (brand-gallery)	2	2	same	0	0	no	same	4
+kelly-uniforms-business (preview)	0	0	same	0	0	no	same	0
+text-to-spaceship	0	0	same	0	0	no	same	0
+study-system (berkeley-prelim-study)	1	1	same	0	0	no	same	4
+168-audit	0	11	FAIL->PASS	0	0	no	same	8
+conference-tracker	0	4	FAIL->PASS	0	1	yes	FAIL->PASS	4
+docket	8	8	same	4	4	yes	same	2
+vault-review-mobile	12	12	same	4	4	yes	same	2
+arch-gp-app	1	1	same	0	0	no	same	17
+build-log	3	3	same	0	0	no	same	10
+mission-control	2	2	same	1	1	yes	same	2
+workscope-graph	3	7	same	3	6	yes	same	4
+schema-studio	1	3	same	0	0	no	same	6
+anna-maria-mcgowan-site	23	23	same	0	0	no	same	15
+cad-forge	19	28	same	1	1	no	PASS->FAIL	9
+truss-forge	24	38	same	15	19	yes	same	46
+slides-workbench	16	16	same	2	2	yes	same	8
+marginalia	1	1	same	1	1	yes	same	1
+berkeley-meng	3	6	same	3	3	yes	same	10
+berkeley-research	5	11	same	0	0	no	same	7
+operating-dashboard	1	1	same	4	4	yes	same	1
+idetc-writing-ide	0	0	same	3	3	yes	same	74
+redline-idetc	2	2	same	0	0	no	same	8
+shopping-search	0	0	same	0	0	no	same	0
+berkeley-house	0	87	FAIL->PASS	0	54	yes	FAIL->PASS	0
+design-worlds	73	78	same	4	4	yes	same	46
+project-hady	0	0	same	0	0	no	same	0
+boundaries-reader	0	0	same	0	0	no	same	5
+contact-form-caller	0	0	same	1	1	yes	same	0
+saved-posts	1	1	same	0	1	yes	FAIL->PASS	0
+drive-organizer	2	3	same	1	1	yes	same	2
+design-lab	3	39	same	1	36	yes	same	1
+anna-maria-mcgowan	5	5	same	0	0	no	same	3
+obsidian-vault-mirror-metropolis-runtime	0	0	same	0	0	no	same	0
+second-brain-capsule-runtime	0	0	same	0	0	no	same	0
+compsci-260b	8	26	same	4	4	yes	same	210
+obsidian-vault-mirror-metropolis	5	6	same	15	15	yes	same	74
+hci-260	1	7	same	0	0	no	same	3
+info-272	1	1	same	1	1	yes	same	2
+sarah-stuff	4	51	same	0	1	yes	FAIL->PASS	25
+legal-doc-studio	2	2	same	0	0	no	same	10
+landry-sandbox	8	21	same	0	0	no	same	10
+daily-brief	0	0	same	0	0	no	same	8
+second-brain-capsule	1	2	same	0	0	no	same	2
+skill-pathways	1	1	same	0	0	no	same	3
