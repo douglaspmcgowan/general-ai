@@ -321,7 +321,7 @@ Douglas, after reading v2: "This site needs to show me how all of this stuff wor
 ### The pruner ate the `stack` skill a second time, today, while I watched - 2026-09-27
 
 - [x] **The defect reproduced on its own, hours after I diagnosed it.** `node scripts/build-atlas.mjs` threw `MissingSource ... does not exist at C:\Users\dougl\.agents\skills\stack\SKILL.md` again, and `~/.agents/skills/stack/` was gone again. Something ran `InstallGlobal` out of one of the 51 stale checkouts and reaped it exactly as predicted. Restored with `Manage-Harness.ps1 -Action InstallSkills -Skills stack` from `Projects/agent-harness`, exit 0, all three projections back. **This is the strongest argument available for landing the pruner fix**: it is not a hypothetical about the next new skill, it happened twice in one day to the skill a deliverable depends on. The fix sits in PR 2054 behind the re-pin only Douglas can do.
-- [ ] The router-guard lane died on the same session limit and needs re-dispatching after 12:50pm. <!-- agent: session -->
+- [~] RE-DISPATCHED 14:55, past the reset, together with a new lane for the floor-metric defect. **And routing the second one taught me something the first brief should have known**: the router's validator already returns at least two refusals in this family, not one - it refused my floor-metric brief with `brief-missing-verification` because I headed a section `## Proving` instead of the shape the other briefs use. So the guard lane's job is to match an existing pair of detectors rather than invent a first one, and I sent it that correction with its dispatch. <!-- agent: session -->
 
 ### Carried over, still open
 
