@@ -19,4 +19,6 @@ while IFS=$'\t' read -r name path; do
   dec=$(echo "$det" | sed -n 's/.*declared=\([0-9]*\).*/\1/p'); dec=${dec:-0}
   arb=$(echo "$det" | sed -n 's/.*arbitrary=\([0-9]*\).*/\1/p'); arb=${arb:-0}
   printf '%s\t%s\t%s\t%+d\t%s\t%s\n' "$name" "$old" "$new" "$((new-old))" "$dec" "$arb"
-done < "$roots_file"
+# the roster file checks out CRLF under core.autocrlf=true; strip CR or every
+# path misses by one byte and every row reports MISSING
+done < <(tr -d '\r' < "$roots_file")

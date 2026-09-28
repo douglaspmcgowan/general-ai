@@ -160,9 +160,9 @@ Every row carries one verdict, plus its reason.
 **47 app units, across 55 roster rows.** The arithmetic, so it is checkable rather than asserted:
 
 ```
-55  roster rows                                   grep -c '^| \[ \]' APP-REPAIR-SPEC.md
+55  roster rows                                   grep -c '^| \[.\]' APP-REPAIR-SPEC.md
 -4  sub-surface rows of an app already counted     base-flight-finder (3 rows -> 1), kelly-uniforms-business (3 -> 1)
-= 51 distinct named entries                        grep '^| \[ \]' … | sed 's/^| \[ \] `//; s/`.*//' | sort -u | wc -l
+= 51 distinct named entries                        grep '^| \[.\]' … | sed 's/^| \[.\] `//; s/`.*//' | sort -u | wc -l
 -1  a cleanup row, not an app                      study-system/.tmp-brute-* (15 abandoned lane folders)
 -2  second checkouts of a remote, not apps         obsidian-vault-mirror-metropolis-runtime, second-brain-capsule-runtime
 -1  a scaffold that ships no interface             design-lab
@@ -324,9 +324,9 @@ command is in [Appendix A](#appendix-a--how-every-number-was-taken).
 | Three TS majors (5, 6, 7) | **four plus a float** — 5.6, 5.9, 6.0, 7.0, and `latest` | `schema-studio`'s branch app pins `^5.6.3`; `arch-gp-demo` pins `latest` |
 | 18 apps have zero `transition` | **3** — `hci-260`, `info-272`, `contact-form-caller` | The brief measured `.css` files only. 20 app units keep all their styling in HTML `<style>` blocks, where the transitions are |
 | 12 apps have zero CSS custom properties | **0** | Same cause. The weakest are `daily-brief` (8), `hci-260` (9) and `second-brain-capsule` (12) |
-| 21 apps have no custom easing; 21 no `box-shadow`; 20 no `clamp()`; 35 no container queries | **unmeasured against the HTML-inclusive method** for easing; container queries confirmed absent from 42 of the 46 project roots that carry any styling | Only `design-worlds` (6), `slides-workbench` (4) and `text-to-spaceship` (2) use `@container`. **`shopping-search` (8) was wrong and is struck 2026-09-27:** `git grep @container` in that repository returns nothing; the eight hits were inside the gitignored `tmp\edge-shopping-report-profile\` browser profile |
-| 28 apps have no dark mode | **24 of the 46 project roots that carry any styling** | Same HTML-inclusion cause, smaller effect |
-| 23 apps use `!important` | **41 of those same 46 roots have at least one** | Same cause; the total across the tree is dominated by `compsci-260b` (208) and `obsidian-vault-mirror-metropolis` (54). **`idetc-writing-ide` (74) is struck 2026-09-27:** its app surface had exactly one, and 72 of the 74 are three byte-identical vendored copies of the ASME conference stylesheet; that one is now gone. **`shopping-search` (385) is struck 2026-09-27:** it has zero `!important`, measured over its one generated HTML surface and its three Python scripts; the 385 were a gitignored browser profile |
+| 21 apps have no custom easing; 21 no `box-shadow`; 20 no `clamp()`; 35 no container queries | **unmeasured against the HTML-inclusive method** for easing; container queries absent from **52 of 54 roster rows** (was stated as 42 of 46 roots, a different denominator) | Only `design-worlds` (6) and `slides-workbench` (4) use `@container` under the Appendix A rule, measured 2026-09-28. **`text-to-spaceship` (2) is not recomputable:** the rule finds no tracked `.css` or `.html` in that root, and the only `@container` strings on disk there are in an untracked `cad-verification-env` site-packages stylesheet. **`shopping-search` (8) was wrong and is struck 2026-09-27:** `git grep @container` in that repository returns nothing; the eight hits were inside the gitignored `tmp\edge-shopping-report-profile\` browser profile |
+| 28 apps have no dark mode | **33 of 54 roster rows**, measured 2026-09-28: 25 of the 46 rows with any styling plus all 8 without | Same HTML-inclusion cause, smaller effect. **The published "24 of the 46 roots" is not reproduced** by this rule over this roster. A 2026-09-27 run reads 34, not 33: `berkeley-research` gained a `prefers-color-scheme` block between the two runs |
+| 23 apps use `!important` | **41 of 54 roster rows have at least one**, measured 2026-09-28 (the same 41 were once stated over 46 roots; the 8 unstyled rows have none) | Same cause; the total across the tree is dominated by `compsci-260b` (208) and `obsidian-vault-mirror-metropolis` (54). **`idetc-writing-ide` (74) is struck 2026-09-27:** its app surface had exactly one, and 72 of the 74 are three byte-identical vendored copies of the ASME conference stylesheet; that one is now gone. The checkout at `C:\Users\dougl\Projects\idetc-writing-ide` still reads 74 under the Appendix A rule on 2026-09-28, so that repair is not on the branch checked out there; the row has at least one either way, so the 41 does not move. **`shopping-search` (385) is struck 2026-09-27:** it has zero `!important`, measured over its one generated HTML surface and its three Python scripts; the 385 were a gitignored browser profile |
 | Playwright in 29 apps | **13 declare `@playwright/test`; 8 carry a `playwright.config`** | The brief likely counted spec files or a global install. `@axe-core/playwright` in 5 is confirmed exactly |
 | "Nine apps served by `python -m http.server`" | **at least 14** app units reference it | Adds `berkeley-research` (10 references), `skill-pathways` (7), `obsidian-vault-mirror-metropolis` (10), `boundaries-reader` (3), `kelly-uniforms-business` (4), `text-to-spaceship` (3) |
 | The app pinned to React `latest` | **`agent-harness/arch-gp-demo`, with all 11 dependencies pinned to `latest`** | It is not one React pin; it is every dependency. And it lives inside the one repository this lane may not modify — see [Conflicts](#conflicts-between-this-specification-and-a-harness-contract) |
@@ -719,6 +719,27 @@ for d in */; do [ -d "${d%/}/.git" ] && printf '%s\t%s\n' "${d%/}" "$(git -C "${
 cd /c/Users/dougl/Projects
 for f in $(ls */package.json */*/package.json 2>/dev/null | grep -vE 'node_modules|\.next|\.tmp-'); do
   grep -oE '"(next|react|typescript|vite|tailwindcss)": *"[^"]*"' "$f" | tr '\n' ' '; echo "  <- $f"
+done
+```
+
+**Floor population — every floor figure in this document is over these 54 rows.** The floor tools read
+[`tools/m4-roster-roots.tsv`](tools/m4-roster-roots.tsv), which enumerates **54 roster rows**: the 55
+rows counted above less `study-system/.tmp-brute-*`, a cleanup row with no app root to measure. 46 of the
+54 carry at least one committed `.css` or `.html` file; the other 8 are still in the denominator. A figure
+stated "of 55" or "of the 46 roots" before 2026-09-28 used a different denominator and is restated against
+the 54 where it appears. Read the roster file through `tr -d '\r'`: it checks out CRLF under
+`core.autocrlf=true`, and a CR left on each path makes every row report `MISSING`.
+
+The per-row style-file, dark, `!important` and `@container` counts behind
+[the brief-contradiction table](#other-figures-in-the-brief-that-this-measurement-contradicts) are the
+snippet below run once per roster row, captured at
+[`tools/floor-published-rule.2026-09-28.tsv`](tools/floor-published-rule.2026-09-28.tsv):
+
+```bash
+tr -d '\r' < tools/m4-roster-roots.tsv | while IFS=$'\t' read -r name path; do
+  root=/c/Users/dougl/Projects/$path   # then the L, F and A lines of the snippet below
+  printf '%s\t%s\t%s\t%s\t%s\n' "$name" "$(echo "$F" | grep -c .)" "$(echo "$A" | grep -c 'prefers-color-scheme')" \
+    "$(echo "$A" | grep -c '!important')" "$(echo "$A" | grep -c '@container')"
 done
 ```
 
