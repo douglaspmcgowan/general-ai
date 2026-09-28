@@ -160,9 +160,9 @@ Every row carries one verdict, plus its reason.
 **47 app units, across 55 roster rows.** The arithmetic, so it is checkable rather than asserted:
 
 ```
-55  roster rows                                   grep -c '^| \[ \]' APP-REPAIR-SPEC.md
+55  roster rows                                   grep -c '^| \[.\]' APP-REPAIR-SPEC.md
 -4  sub-surface rows of an app already counted     base-flight-finder (3 rows -> 1), kelly-uniforms-business (3 -> 1)
-= 51 distinct named entries                        grep '^| \[ \]' … | sed 's/^| \[ \] `//; s/`.*//' | sort -u | wc -l
+= 51 distinct named entries                        grep '^| \[.\]' … | sed 's/^| \[.\] `//; s/`.*//' | sort -u | wc -l
 -1  a cleanup row, not an app                      study-system/.tmp-brute-* (15 abandoned lane folders)
 -2  second checkouts of a remote, not apps         obsidian-vault-mirror-metropolis-runtime, second-brain-capsule-runtime
 -1  a scaffold that ships no interface             design-lab
@@ -177,6 +177,15 @@ Columns: **Who** — `local` = reachable only at `localhost` on his machine; `fi
 no server; `hosted` = a tracked `vercel.json` or a README-stated live URL; `desktop` = an installed
 window. **Style** = combined `.css` + HTML `<style>` measurement: unique hex values / distinct font sizes
 / custom properties / `!important` count / `:focus-visible` count / dark-mode blocks.
+
+> **The `distinct font sizes` figure in every Style tuple below is superseded.** It was taken from
+> stylesheets and HTML only, which misses Tailwind arbitrary utilities in JSX — three quarters of the
+> total in `bible-name-search`, and all of it in the two apps whose UI is a template literal inside
+> `server.js`. 23 of 54 rows move. The tuples are left as published so the change stays visible; the
+> corrected figures, the counting rules and the retraction table are in
+> [Appendix A](#correction-2026-09-27--distinct-font-sizes-could-not-see-three-quarters-of-a-tailwind-app).
+> The `:focus-visible` and dark-mode figures have the inverse defect and are not yet corrected — see the
+> same section.
 
 ### CONVERGE — 22 units
 
@@ -314,9 +323,9 @@ command is in [Appendix A](#appendix-a--how-every-number-was-taken).
 | Three TS majors (5, 6, 7) | **four plus a float** — 5.6, 5.9, 6.0, 7.0, and `latest` | `schema-studio`'s branch app pins `^5.6.3`; `arch-gp-demo` pins `latest` |
 | 18 apps have zero `transition` | **3** — `hci-260`, `info-272`, `contact-form-caller` | The brief measured `.css` files only. 20 app units keep all their styling in HTML `<style>` blocks, where the transitions are |
 | 12 apps have zero CSS custom properties | **0** | Same cause. The weakest are `daily-brief` (8), `hci-260` (9) and `second-brain-capsule` (12) |
-| 21 apps have no custom easing; 21 no `box-shadow`; 20 no `clamp()`; 35 no container queries | **unmeasured against the HTML-inclusive method** for easing; container queries confirmed absent from 42 of the 46 project roots that carry any styling | Only `design-worlds` (6), `slides-workbench` (4) and `text-to-spaceship` (2) use `@container`. **`shopping-search` (8) was wrong and is struck 2026-09-27:** `git grep @container` in that repository returns nothing; the eight hits were inside the gitignored `tmp\edge-shopping-report-profile\` browser profile |
-| 28 apps have no dark mode | **24 of the 46 project roots that carry any styling** | Same HTML-inclusion cause, smaller effect |
-| 23 apps use `!important` | **41 of those same 46 roots have at least one** | Same cause; the total across the tree is dominated by `compsci-260b` (208) and `obsidian-vault-mirror-metropolis` (54). **`idetc-writing-ide` (74) is struck 2026-09-27:** its app surface had exactly one, and 72 of the 74 are three byte-identical vendored copies of the ASME conference stylesheet; that one is now gone. **`shopping-search` (385) is struck 2026-09-27:** it has zero `!important`, measured over its one generated HTML surface and its three Python scripts; the 385 were a gitignored browser profile |
+| 21 apps have no custom easing; 21 no `box-shadow`; 20 no `clamp()`; 35 no container queries | **unmeasured against the HTML-inclusive method** for easing; container queries absent from **52 of 54 roster rows** (was stated as 42 of 46 roots, a different denominator) | Only `design-worlds` (6) and `slides-workbench` (4) use `@container` under the Appendix A rule, measured 2026-09-28. **`text-to-spaceship` (2) is not recomputable:** the rule finds no tracked `.css` or `.html` in that root, and the only `@container` strings on disk there are in an untracked `cad-verification-env` site-packages stylesheet. **`shopping-search` (8) was wrong and is struck 2026-09-27:** `git grep @container` in that repository returns nothing; the eight hits were inside the gitignored `tmp\edge-shopping-report-profile\` browser profile |
+| 28 apps have no dark mode | **33 of 54 roster rows**, measured 2026-09-28: 25 of the 46 rows with any styling plus all 8 without | Same HTML-inclusion cause, smaller effect. **The published "24 of the 46 roots" is not reproduced** by this rule over this roster. A 2026-09-27 run reads 34, not 33: `berkeley-research` gained a `prefers-color-scheme` block between the two runs |
+| 23 apps use `!important` | **41 of 54 roster rows have at least one**, measured 2026-09-28 (the same 41 were once stated over 46 roots; the 8 unstyled rows have none) | Same cause; the total across the tree is dominated by `compsci-260b` (208) and `obsidian-vault-mirror-metropolis` (54). **`idetc-writing-ide` (74) is struck 2026-09-27:** its app surface had exactly one, and 72 of the 74 are three byte-identical vendored copies of the ASME conference stylesheet; that one is now gone. The checkout at `C:\Users\dougl\Projects\idetc-writing-ide` still reads 74 under the Appendix A rule on 2026-09-28, so that repair is not on the branch checked out there; the row has at least one either way, so the 41 does not move. **`shopping-search` (385) is struck 2026-09-27:** it has zero `!important`, measured over its one generated HTML surface and its three Python scripts; the 385 were a gitignored browser profile |
 | Playwright in 29 apps | **13 declare `@playwright/test`; 8 carry a `playwright.config`** | The brief likely counted spec files or a global install. `@axe-core/playwright` in 5 is confirmed exactly |
 | "Nine apps served by `python -m http.server`" | **at least 14** app units reference it | Adds `berkeley-research` (10 references), `skill-pathways` (7), `obsidian-vault-mirror-metropolis` (10), `boundaries-reader` (3), `kelly-uniforms-business` (4), `text-to-spaceship` (3) |
 | The app pinned to React `latest` | **`agent-harness/arch-gp-demo`, with all 11 dependencies pinned to `latest`** | It is not one React pin; it is every dependency. And it lives inside the one repository this lane may not modify — see [Conflicts](#conflicts-between-this-specification-and-a-harness-contract) |
@@ -712,7 +721,30 @@ for f in $(ls */package.json */*/package.json 2>/dev/null | grep -vE 'node_modul
 done
 ```
 
-**Floor measurement (`m4.sh`).** Measures `.css` **and** `.html` together, which is the correction that
+**Floor population — every floor figure in this document is over these 54 rows.** The floor tools read
+[`tools/m4-roster-roots.tsv`](tools/m4-roster-roots.tsv), which enumerates **54 roster rows**: the 55
+rows counted above less `study-system/.tmp-brute-*`, a cleanup row with no app root to measure. 46 of the
+54 carry at least one committed `.css` or `.html` file; the other 8 are still in the denominator. A figure
+stated "of 55" or "of the 46 roots" before 2026-09-28 used a different denominator and is restated against
+the 54 where it appears. Read the roster file through `tr -d '\r'`: it checks out CRLF under
+`core.autocrlf=true`, and a CR left on each path makes every row report `MISSING`.
+
+The per-row style-file, dark, `!important` and `@container` counts behind
+[the brief-contradiction table](#other-figures-in-the-brief-that-this-measurement-contradicts) are the
+snippet below run once per roster row, captured at
+[`tools/floor-published-rule.2026-09-28.tsv`](tools/floor-published-rule.2026-09-28.tsv):
+
+```bash
+tr -d '\r' < tools/m4-roster-roots.tsv | while IFS=$'\t' read -r name path; do
+  root=/c/Users/dougl/Projects/$path   # then the L, F and A lines of the snippet below
+  printf '%s\t%s\t%s\t%s\t%s\n' "$name" "$(echo "$F" | grep -c .)" "$(echo "$A" | grep -c 'prefers-color-scheme')" \
+    "$(echo "$A" | grep -c '!important')" "$(echo "$A" | grep -c '@container')"
+done
+```
+
+**Floor measurement (`m4.sh`).** The snippet below is the rule as originally published and is retained for
+audit; its `distinct-font-sizes` line was wrong and is superseded by [`tools/m4.sh`](tools/m4.sh) — see the
+correction that follows. It measures `.css` **and** `.html` together, which is the correction that
 matters: 20 app units keep all their styling inside HTML `<style>` blocks, and a `.css`-only scan reports
 them as having no transitions, no tokens and no dark mode when they do.
 
@@ -734,6 +766,103 @@ done
 `/\.agents/` is excluded because the shared harness installs the same tracked JavaScript and CSS into
 every repository; counting it makes every app look larger and more similar than it is. That exclusion is
 also why the JavaScript-file counts here are lower than a naive `find`.
+
+#### Correction, 2026-09-27 — `distinct-font-sizes` could not see three quarters of a Tailwind app
+
+The `distinct-font-sizes` line above greps `font-size:` in committed `.css` and `.html` only. In a
+Tailwind-first app most sizes are never written as a `font-size` declaration and never reach a
+stylesheet: they are arbitrary utilities inside class attributes in `.jsx` and `.tsx`. For
+`bible-name-search` the published rule reported **12**; the true figure is **52** — 14 declared and 46
+more as `text-[…]` values, with 0.82, 0.83, 0.84, 0.85, 0.855, 0.86 and 0.875rem alive at once. For
+`168-audit` and `conference-tracker` it reported nothing at all, because their entire UI is a template
+literal inside `server.js`; they carry 39 and 37 distinct sizes.
+
+**A measurement that cannot see three quarters of its subject is worse than none, because it reads as a
+pass.** The measurement is now [`tools/m4.sh`](tools/m4.sh) — a file, not a snippet, so it can be
+re-run and diffed. [`tools/m4-fontsizes-old.sh`](tools/m4-fontsizes-old.sh) is the frozen pre-correction
+rule, kept only so the correction stays auditable; [`tools/m4.regression.sh`](tools/m4.regression.sh)
+pins the JSX-class-name path and fails against the old rule (2) and passes against the new one (8).
+[`tools/m4-blast-radius.sh`](tools/m4-blast-radius.sh) prints the whole-roster before-and-after.
+
+Counting rules, stated because a metric that silently changes what it counts is the defect being fixed:
+
+| Rule | Decision | Why |
+|---|---|---|
+| File set | The original `.css`/`.html` set, plus `.jsx .tsx .js .ts .mjs .cjs .vue .svelte .astro .mdx .php .erb` | The old set was a guess about where sizes live, not a measurement of it |
+| Sources | `font-size:` and `fontSize:` declarations anywhere, including inline `style=` and JSX style objects; plus `text-[<value>]` utilities, variant- and `!`-prefixed forms included | `text-` is overloaded in Tailwind, so only **length-valued** arbitraries count: `text-[var(--text-1)]` and `text-[#fff]` are colours. `text-[length:var(--x)]` is an explicit length and counts |
+| Units | `px` and `pt` are converted to `rem` at the default 16px root, so `0.625rem` and `10px` are **one** size. `em`, `%`, `vw`, `ch` and friends are **not** folded into `rem` | A rendered size is what a reader sees, so the same rendered size is one decision. Relative and viewport units depend on a context the scan cannot see, and calling them equal would be a guess dressed as a measurement |
+| Dedupe | One normalised set per app unit | A size repeated in forty files is one decision, not forty |
+| Named steps | `text-sm`, `text-lg` and friends are **excluded** from the total and reported separately as `named-steps` | m4 measures scale *drift* — sizes invented outside the system. A named step is on the scale by construction; forty uses of `text-sm` are one decision, while `text-[0.82rem]` and `text-[0.83rem]` are two. Counting them would also make every Tailwind app's number incomparable with every hand-written app's |
+
+Normalisation cuts as well as adds. Six roots fall because the old rule counted `15px` and `0.9375rem`,
+or `clamp(2.6rem, 6vw, 4.4rem)` and `clamp(2.6rem,6vw,4.4rem)`, as different sizes: `design-worlds`
+216 → 204, `obsidian-vault-mirror-metropolis` 150 → 128, `berkeley-research` 61 → 55, `cad-forge`
+52 → 47, `anna-maria-mcgowan-site` 101 → 98, `build-log` 40 → 38. Those apps were never as fragmented as
+their rows claimed.
+
+**Not corrected, and why.** `:focus-visible` and `prefers-color-scheme` have the *inverse* form of the
+same blind spot: they grep for the CSS at-rule and pseudo-class, so a Tailwind app that writes
+`focus-visible:` and `dark:` variants in markup scores **zero** and reads as a floor *failure* it does
+not have. Measured in markup: `legal-solutions-website` 33 `focus-visible:` and 1 `dark:` against a
+published `0/0`; `bible-name-search` 6 against a published 1; `design-lab` 34 and 37 against a published
+`0/0`; `berkeley-house` 87 and 54, which is why the reference implementation is at the floor. That fix is
+a different shape — variant-prefix resolution, not arbitrary-value parsing — and it moves floor
+*verdicts*, so it is filed rather than folded in here. The `unique-hex` metric has the same
+arbitrary-value blind spot in principle and, measured across the roster, **one** value in one app
+(`bible-name-search`), so no published colour count is restated.
+
+**The correction, row by row, as a retraction rather than an edit.** 23 of 54 roster rows move; 31 do not.
+The roster tables above keep their published tuples so the change stays visible; this is the authoritative
+`distinct-font-sizes` figure. Re-derive it with `bash tools/m4-blast-radius.sh`.
+
+| App unit | Published | True | Δ |
+|---|---|---|---|
+| `legal-solutions-website` | 20 | 24 | +4 |
+| `bible-name-search` | 12 | 52 | +40 |
+| `client-portal` | 13 | 15 | +2 |
+| `fellowship-tracker` | 15 | 16 | +1 |
+| `study-system (berkeley-prelim-study)` | 41 | 43 | +2 |
+| `168-audit` | not measured | 39 | +39 |
+| `conference-tracker` | not measured | 37 | +37 |
+| `build-log` | 40 | 38 | −2 |
+| `schema-studio` | 24 | 27 | +3 |
+| `anna-maria-mcgowan-site` | 101 | 98 | −3 |
+| `cad-forge` | 52 | 47 | −5 |
+| `truss-forge` | 146 | 148 | +2 |
+| `marginalia` | 20 | 29 | +9 |
+| `berkeley-research` | 61 | 55 | −6 |
+| `idetc-writing-ide` | 29 | 27 | −2 |
+| `berkeley-house` | not measured | 4 | +4 |
+| `design-worlds` | 216 | 204 | −12 |
+| `design-lab` | 9 | 19 | +10 |
+| `obsidian-vault-mirror-metropolis` | 150 | 128 | −22 |
+| `sarah-stuff` | 166 | 173 | +7 |
+| `legal-doc-studio` | 18 | 17 | −1 |
+| `landry-sandbox` | 20 | 27 | +7 |
+| `second-brain-capsule` | 10 | 9 | −1 |
+
+Unchanged, which is the finding that scopes the fix safely: `base-flight-finder` (all three units),
+`jars-of-clay`, `kelly-uniforms-business` (all three), `text-to-spaceship`, `docket`,
+`vault-review-mobile`, `arch-gp-app`, `mission-control`, `workscope-graph`, `slides-workbench`,
+`berkeley-meng`, `operating-dashboard`, `redline-idetc`, `shopping-search`, `project-hady`,
+`boundaries-reader`, `contact-form-caller`, `saved-posts`, `drive-organizer`, `anna-maria-mcgowan`,
+`compsci-260b`, `hci-260`, `info-272`, `daily-brief`, `skill-pathways`, and the two retired duplicate
+checkouts.
+
+**What moves in the ranking.** No workstream changes position: the ranking is by value per hour of a
+*workstream*, and no workstream's defence rests on a font-size count. What moves is the app ordering
+inside two of them. `bible-name-search` enters **outlier triage (#15)** — at 52 it is the fifth-most
+fragmented type scale in the tree, with seven sizes between 0.82 and 0.875rem, and it is hosted, so it
+belongs beside `shopping-search` rather than in the quiet middle. `168-audit` and `conference-tracker`
+enter the **token layer (#10)** denominator they were absent from, at 39 and 37 sizes each, which is
+consistent with their existing verdict that a UI inside a template literal cannot be styled. `study-system`
+loses its "142 distinct font sizes in one app" headline — the true figure is 43 and the 142 was never
+reproducible. `design-worlds` and `obsidian-vault-mirror-metropolis` fall but stay where they were.
+
+**Three roster numbers are not reproducible by the command above**, independently of this correction:
+`study-system (berkeley-prelim-study)` published 142, the command yields 41; `sarah-stuff` published 31,
+yields 166; `berkeley-research` published 54, yields 61. Whatever produced those three was not this
+script.
 
 **Explicitly unmeasured.** Custom easing functions (`cubic-bezier` and `linear()` declarations) were not
 counted; the brief's figure of 21 apps without custom easing is neither confirmed nor contradicted here.
