@@ -1165,3 +1165,58 @@ Named precisely, as instructed. Each is unmeasured, never estimated.
 | 10 runtime performance value | Needs every app running in a browser; the static byte metric is already measured | 8–10 agent-hours |
 | 7 near-duplicate code | Needs a similarity tool across 2,222 files; the exact-duplicate measurement is complete and returned one group | 1–2 agent-hours |
 | Custom easing coverage | Noted as unmeasured in Appendix A before this addendum | 0.25 agent-hours |
+
+## Addendum — the landed sweep: how much of the renovation is on a default branch
+
+Measured 2026-09-27 by `tools/landed-sweep.sh` over all 38 app units that have an audit record
+in `app-atlas/data/audit/`. Output: `tools/landed-sweep.2026-09-27.tsv`, 38 rows. The sweep is
+read-only over every app repository: no fetch, no checkout, no merge, no push. Origin state comes
+from `git ls-remote` and from remote-tracking refs; pull-request state from `gh pr list`.
+
+**Of 38 renovated app units, 0 have their renovation on the default branch.**
+
+| Class | Units |
+|---|---|
+| Landed on the default branch | **0** |
+| Unlanded, open pull request exists | 32 |
+| Unlanded, no pull request | 2 — `client-portal` (17 ahead), `second-brain-capsule` (38 ahead) |
+| Unlanded, no GitHub remote to open a PR against | 4 — `build-log`, `operating-dashboard`, `shopping-search` (no `origin`); `slides-workbench` (`origin` is a local `.bundle` file) |
+| Repair branch missing entirely | 0 |
+| Merged but the floor artifact is absent from the default branch | 0, vacuously — nothing is merged |
+
+Every one of the 38 repair branches exists and carries commits the default branch does not: 1 to 38
+commits ahead, and every one of the 38 still has a live worktree checked out on it.
+
+**Four pull requests would not land the work on the default branch even if merged**, because their
+base is not it: `arch-gp-app` #7 → `agent/arch-gp-real-data-app`; `base-flight-finder` #11 → `master`
+while `origin/HEAD` is `main`; `fellowship-tracker` #19 → `codex/fellowship-modernization` (the audit
+record documents this as deliberate); `kelly-uniforms-business` #1 → `codex/mt-uniforms-storefront`.
+
+**Two units are not the repository at `Projects/<app>`.** The renovated app is a nested repository:
+`study-system` → `study-system/berkeley-prelim-study` (remote `berkeley-prelim-study`, PR #2), and
+`text-to-spaceship` → `text-to-spaceship/text-to-satellite` (remote `text-to-satellite`, PR #5).
+A sweep that resolves the repository by app name alone reports both as having no repair branch.
+
+### The artifact probe
+
+Per unit, the `:focus-visible` occurrence count in tracked files, taken on the default branch and on
+the repair branch. It is this program's own floor metric, it is uniform across all 38 units — the
+audit records are not, their schemas differ record to record — and `git grep -c` prints paths and
+counts only, never file contents, so it cannot leak the credential one app carries in a tracked file.
+A second probe, README presence on the default branch, is recorded in the same row.
+
+Five default branches carry zero `:focus-visible` while their repair branch carries between 9 and 18:
+`client-portal`, `idetc-writing-ide`, `legal-solutions-website`, `second-brain-capsule`,
+`shopping-search`. Seven default branches have no README at all: `bible-name-search`,
+`idetc-writing-ide`, `info-272`, `kelly-uniforms-business`, `legal-solutions-website`,
+`slides-workbench`, `study-system`.
+
+Two rows run the other way and the probe does not explain them: `bible-name-search` counts 9 on
+`main` against 3 on the repair branch, and `truss-forge` 33 against 26. The repair branch is behind
+the default branch on unrelated work in both. Neither is a contradiction of an audit claim; both mean
+the count alone cannot certify those two units, and a per-file probe would be needed.
+
+### Reproducibility
+
+`bash tools/landed-sweep.sh` run twice produced byte-identical output,
+`git hash-object` = `45aa7b35cc063e9ad216c32e8782d0b975a750eb` both times. `git diff --check` exit 0.
