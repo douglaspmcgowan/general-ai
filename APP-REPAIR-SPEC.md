@@ -847,31 +847,40 @@ moving the verdict (`bible-name-search` 1 -> 7, `cad-forge` 19 -> 28, `truss-for
 3 -> 39, `sarah-stuff` 4 -> 51, `landry-sandbox` 8 -> 21, `berkeley-research` 5 -> 11, `hci-260` 1 -> 7,
 `workscope-graph` 3 -> 7, `berkeley-meng` 3 -> 6, `schema-studio` 1 -> 3, `compsci-260b` 8 -> 26,
 `design-worlds` 73 -> 78, `drive-organizer` 2 -> 3, `second-brain-capsule` 1 -> 2,
-`obsidian-vault-mirror-metropolis` 5 -> 6). **34 rows are unaffected on both properties**, which is the
-finding that bounds the fix: this is a Tailwind-app defect, and most of the roster is not Tailwind.
+`obsidian-vault-mirror-metropolis` 5 -> 6). **The other 34 of 54 rows are unaffected on `:focus-visible`**
+(4 + 16 + 34 = 54), and 33 of 54 keep the same focus count and the same verdict on both properties. That
+is the finding that bounds the fix: this is a Tailwind-app defect, and most of the roster is not Tailwind.
 
 **The retraction, not an edit. Dark mode.** 6 verdicts flip: **5 false failures corrected to passes**
 (`bible-name-search`, `conference-tracker`, `berkeley-house`, `saved-posts`, `sarah-stuff`) and **1 genuine
 failure the old rule missed** (`cad-forge`, which the old rule passed on a `prefers-color-scheme` hit that
 is not a dark block).
 
-| Estate figure | Published 2026-09-27 | Corrected | Delta |
-|---|---|---|---|
-| Dark mode fails | **34 of 55** | **30 of 54** | -4 |
-| `:focus-visible` = 0 | 16 of 54 under the old rule | **12 of 54**, of which 5 are not browser surfaces | -4 |
-| `!important` >= 1 | **41 of 55** (stated over 46 roots, so the denominators differ) | **43 of 54 roster rows** | see below |
+Every figure in this table is over the same 54 roster rows (see [Floor population](#appendix-a--how-every-number-was-taken)),
+old rule and corrected rule alike, so each row is a clean before and after.
+
+| Estate figure | Old rule, 54 rows | Corrected, 54 rows | Delta | Reproduce |
+|---|---|---|---|---|
+| Dark mode fails | **34 of 54** | **30 of 54** | -4 | `old_dark` = 0 and `dark_verdict`/`dark_surface` in the 2026-09-27 snapshot. A 2026-09-28 re-run reads 33 -> 29: `berkeley-research` gained a dark block in between, on both rules |
+| `:focus-visible` = 0 | **16 of 54** | **12 of 54**, of which 5 are not browser surfaces | -4 | `old_focus` and `new_focus` = 0 in the snapshot; unchanged on 2026-09-28 |
+| `!important` >= 1 | **41 of 54** | **43 of 54** | +2 | old: `important=` from `tools/floor-a11y-old.sh` per row; new: `important_new` in the blast-radius table; both 2026-09-28. The two are `168-audit` (0 -> 8) and `conference-tracker` (0 -> 4), whose UI the old `.css`/`.html` file set could not see. Both flip B5 from pass to fail |
+| Custom properties (B1) | not recomputable | not recomputable | - | see below |
+
+**Historical, superseded 2026-09-28:** an earlier draft of this table stated dark mode as "34 of 55" and
+`!important` as "41 of 55" (the 41 was measured over the 46 rows that carry any `.css`/`.html`), and
+a brief stated "tokens 26 of 55". None of those denominators is one a tool enumerates; the 54 above is.
 
 **`!important` and tokens share the blind spot, and one row is severe.** `bible-name-search` is published
 at **3** `!important` and carries **228** — 3 in CSS plus **225 Tailwind v3 important-prefix utilities**,
 mostly `!text-[0.72rem]` and `!text-[var(--x)]`, spot-checked at `app/collections/[id]/page.tsx:353`,
-`app/collections/[id]/page.tsx:449` and `app/error.tsx:27`. It was already failing B5 at 3, so **no B5
-verdict flips**, but its repair cost is two orders of magnitude off the published figure. No other roster
+`app/collections/[id]/page.tsx:449` and `app/error.tsx:27`. It was already failing B5 at 3, so **its B5
+verdict does not flip**, but its repair cost is two orders of magnitude off the published figure. No other roster
 row has a prefix-important utility. Token *declaration* counts move on 8 rows, two of them from nothing:
 `168-audit` 0 -> 68 and `conference-tracker` 0 -> 27 (the `server.js` file set again), plus
 `landry-sandbox` 66 -> 96, `sarah-stuff` 1261 -> 1275, `study-system` 22 -> 23, `schema-studio` 48 -> 49,
 `cad-forge` 64 -> 65, `design-lab` 111 -> 112, `obsidian-vault-mirror-metropolis` 140 -> 141. **The
-published "tokens 26 of 55" is not restated here**, because B1 as written is a *literal-outside-`:root`*
-test, not a custom-property count, and this scan does not implement it. `transition` has the same shape and
+historical "tokens 26 of 55" is not restated, and cannot be recomputed**: B1 as written is a
+*literal-outside-`:root`* test, not a custom-property count, and no tool here implements it. `transition` has the same shape and
 is a count rather than a verdict: `legal-solutions-website` 45 -> 118, `berkeley-house` 60 -> 108,
 `168-audit` 72 -> 100, `conference-tracker` 49 -> 77, `bible-name-search` 58 -> 114, `design-lab` 18 -> 33.
 
