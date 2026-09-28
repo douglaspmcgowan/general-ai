@@ -184,8 +184,9 @@ window. **Style** = combined `.css` + HTML `<style>` measurement: unique hex val
 > `server.js`. 23 of 54 rows move. The tuples are left as published so the change stays visible; the
 > corrected figures, the counting rules and the retraction table are in
 > [Appendix A](#correction-2026-09-27--distinct-font-sizes-could-not-see-three-quarters-of-a-tailwind-app).
-> The `:focus-visible` and dark-mode figures have the inverse defect and are not yet corrected — see the
-> same section.
+> The `:focus-visible` and dark-mode figures had the inverse defect and are **now corrected** — see
+> [the accessibility correction](#correction-2026-09-27--the-floor-reported-accessibility-failures-that-do-not-exist).
+> Four apps published at zero focus styling in fact carry 33, 87, 11 and 4.
 
 ### CONVERGE — 22 units
 
@@ -800,16 +801,94 @@ or `clamp(2.6rem, 6vw, 4.4rem)` and `clamp(2.6rem,6vw,4.4rem)`, as different siz
 52 → 47, `anna-maria-mcgowan-site` 101 → 98, `build-log` 40 → 38. Those apps were never as fragmented as
 their rows claimed.
 
-**Not corrected, and why.** `:focus-visible` and `prefers-color-scheme` have the *inverse* form of the
-same blind spot: they grep for the CSS at-rule and pseudo-class, so a Tailwind app that writes
-`focus-visible:` and `dark:` variants in markup scores **zero** and reads as a floor *failure* it does
-not have. Measured in markup: `legal-solutions-website` 33 `focus-visible:` and 1 `dark:` against a
-published `0/0`; `bible-name-search` 6 against a published 1; `design-lab` 34 and 37 against a published
-`0/0`; `berkeley-house` 87 and 54, which is why the reference implementation is at the floor. That fix is
-a different shape — variant-prefix resolution, not arbitrary-value parsing — and it moves floor
-*verdicts*, so it is filed rather than folded in here. The `unique-hex` metric has the same
+**Corrected in turn, 2026-09-27 — see the next section.** `:focus-visible` and `prefers-color-scheme` had
+the *inverse* form of the same blind spot, and it is now fixed. The `unique-hex` metric has the same
 arbitrary-value blind spot in principle and, measured across the roster, **one** value in one app
 (`bible-name-search`), so no published colour count is restated.
+
+#### Correction, 2026-09-27 — the floor reported accessibility failures that do not exist
+
+The `:focus-visible` and `prefers-color-scheme` lines above grep committed `.css`/`.html` for a
+pseudo-class and an at-rule. A Tailwind app writes neither. It writes `focus-visible:ring-2` and
+`dark:bg-slate-900` as **variant prefixes in class names, in markup**. So those apps scored **zero** and
+read as a floor *failure they do not have*.
+
+**This is strictly worse than the font-size defect it mirrors.** A false pass wastes nothing. A false
+failure sends an agent to redo finished work, and workstream #6 was sized on the claim that "a keyboard
+user cannot operate six of these apps at all." Four named apps are removed from any such list:
+`legal-solutions-website` (0 -> 33), `berkeley-house` (0 -> 87), `168-audit` (0 -> 11) and
+`conference-tracker` (0 -> 4). Under the old rule 16 of 54 roster rows scored zero focus styling; under the
+corrected rule 12 do, and 5 of those 12 are not browser surfaces at all (a CLI package, a Tauri shell, two
+second checkouts of a remote, one static preview folder).
+
+The measurement is now [`tools/floor-a11y.sh`](tools/floor-a11y.sh).
+[`tools/floor-a11y-old.sh`](tools/floor-a11y-old.sh) is the frozen pre-correction rule, kept only so the
+correction stays auditable; [`tools/floor-a11y.regression.sh`](tools/floor-a11y.regression.sh) pins the
+markup-variant path and **fails against the old rule (focus 0, dark 0) and passes against the new one
+(focus 5, dark 4)**. [`tools/floor-a11y-blast-radius.sh`](tools/floor-a11y-blast-radius.sh) prints the
+whole-roster before-and-after, captured at
+[`tools/floor-a11y-blast-radius.2026-09-27.tsv`](tools/floor-a11y-blast-radius.2026-09-27.tsv).
+
+Counting rules, stated because a metric that silently changes what it counts is the defect being fixed:
+
+| Rule | Decision | Why |
+|---|---|---|
+| File set | The original `.css`/`.html` set, plus `.jsx .tsx .js .ts .mjs .cjs .vue .svelte .astro .mdx .php .erb` — identical to `m4.sh` R1 | The old set was a guess about where focus and dark styling live, not a measurement of it. It is also what opens `168-audit` and `conference-tracker`, whose entire UI is a template literal inside `server.js` |
+| B2 threshold | **Unchanged at `focus >= 1`.** Only *where the rule looks* changed, and the markup-variant form was added | Moving the threshold would change what the floor means, which is not a measurement decision |
+| What counts as focus styling | CSS-form `:focus-visible` plus markup-form `focus-visible:` variants; stacked forms (`group-focus-visible:`, `peer-focus-visible:`) count once each. Bare `focus:` is reported as `focus-only` and does **not** satisfy B2 | B2 names the focus-*visible* behaviour. `focus:outline-none` on its own is the defect B2 exists to catch, not evidence against it. No threshold above 1 and no interactive-element filter: this is a floor, not a review, and "the focus ring is ugly" is not this metric's business |
+| B4 verdict | A dark treatment must reach the page **surface**: a `prefers-color-scheme:...dark` block, or at least one background-establishing dark variant (`dark:bg-`, `dark:from-`/`via-`/`to-`, `dark:[--token:`). The raw count is reported beside it as `dark-surface=yes` or `no` | This is the closest faithful translation of B4 ("a block that **redefines the `:root` tokens**") into variant terms. A single `dark:text-slate-400` with no dark surface leaves the page white in dark mode, so it is a token slip, not dark-mode support. **Stated plainly: a one-variant app fails under this rule, and that is intended.** `cad-forge` fails B4 for exactly this reason — a `prefers-color-scheme` hit that is not a dark block, which the old count-anything rule passed |
+| Dark mechanism | Reported as `dark-mechanism=media`, `class` or `none`. Tailwind v4 `@custom-variant dark` and v3 `darkMode: 'class'` change what `dark:` resolves against | Two roster apps configure it — `berkeley-house` (`app/globals.css`) and `design-lab` (`src/app/globals.css`), both `@custom-variant dark`. **Neither count changes:** a class-strategy app still declares its dark treatment in the same `dark:` variants. It is reported so a class-strategy app with no toggle control is visible rather than silently counted as supporting dark mode |
+| `!important` (B5) | Tailwind's v3 **prefix** form `!py-2` / `!text-[0.72rem]` is counted. The v4 **suffix** form `text-red-500!` is **not** | In this file set the suffix form is indistinguishable from a TypeScript non-null assertion (`className={styles.x!}`): counting it took `bible-name-search` from 8 to 221, none of them real. The prefix form is required to have an internal `-`, which drops JSX boolean negation (`!open`). If an app adopts the v4 suffix this undercounts and must be revisited; no roster app does today |
+| Occurrences, not lines | Every count here is occurrences; the old rule used `grep -c`, which counts matching **lines** | A minified or single-line stylesheet with nine `:focus-visible` rules scored 1. The blast-radius table therefore compares **verdicts**, not counts, and prints both numbers |
+
+**The retraction, not an edit. `:focus-visible`.** 4 verdicts flip, **all of them false failures corrected
+to passes**. Zero genuine failures were missed by the old rule. 16 further rows move in count without
+moving the verdict (`bible-name-search` 1 -> 7, `cad-forge` 19 -> 28, `truss-forge` 24 -> 38, `design-lab`
+3 -> 39, `sarah-stuff` 4 -> 51, `landry-sandbox` 8 -> 21, `berkeley-research` 5 -> 11, `hci-260` 1 -> 7,
+`workscope-graph` 3 -> 7, `berkeley-meng` 3 -> 6, `schema-studio` 1 -> 3, `compsci-260b` 8 -> 26,
+`design-worlds` 73 -> 78, `drive-organizer` 2 -> 3, `second-brain-capsule` 1 -> 2,
+`obsidian-vault-mirror-metropolis` 5 -> 6). **The other 34 of 54 rows are unaffected on `:focus-visible`**
+(4 + 16 + 34 = 54), and 33 of 54 keep the same focus count and the same verdict on both properties. That
+is the finding that bounds the fix: this is a Tailwind-app defect, and most of the roster is not Tailwind.
+
+**The retraction, not an edit. Dark mode.** 6 verdicts flip: **5 false failures corrected to passes**
+(`bible-name-search`, `conference-tracker`, `berkeley-house`, `saved-posts`, `sarah-stuff`) and **1 genuine
+failure the old rule missed** (`cad-forge`, which the old rule passed on a `prefers-color-scheme` hit that
+is not a dark block).
+
+Every figure in this table is over the same 54 roster rows (see [Floor population](#appendix-a--how-every-number-was-taken)),
+old rule and corrected rule alike, so each row is a clean before and after.
+
+| Estate figure | Old rule, 54 rows | Corrected, 54 rows | Delta | Reproduce |
+|---|---|---|---|---|
+| Dark mode fails | **34 of 54** | **30 of 54** | -4 | `old_dark` = 0 and `dark_verdict`/`dark_surface` in the 2026-09-27 snapshot. A 2026-09-28 re-run reads 33 -> 29: `berkeley-research` gained a dark block in between, on both rules |
+| `:focus-visible` = 0 | **16 of 54** | **12 of 54**, of which 5 are not browser surfaces | -4 | `old_focus` and `new_focus` = 0 in the snapshot; unchanged on 2026-09-28 |
+| `!important` >= 1 | **41 of 54** | **43 of 54** | +2 | old: `important=` from `tools/floor-a11y-old.sh` per row; new: `important_new` in the blast-radius table; both 2026-09-28. The two are `168-audit` (0 -> 8) and `conference-tracker` (0 -> 4), whose UI the old `.css`/`.html` file set could not see. Both flip B5 from pass to fail |
+| Custom properties (B1) | not recomputable | not recomputable | - | see below |
+
+**Historical, superseded 2026-09-28:** an earlier draft of this table stated dark mode as "34 of 55" and
+`!important` as "41 of 55" (the 41 was measured over the 46 rows that carry any `.css`/`.html`), and
+a brief stated "tokens 26 of 55". None of those denominators is one a tool enumerates; the 54 above is.
+
+**`!important` and tokens share the blind spot, and one row is severe.** `bible-name-search` is published
+at **3** `!important` and carries **228** — 3 in CSS plus **225 Tailwind v3 important-prefix utilities**,
+mostly `!text-[0.72rem]` and `!text-[var(--x)]`, spot-checked at `app/collections/[id]/page.tsx:353`,
+`app/collections/[id]/page.tsx:449` and `app/error.tsx:27`. It was already failing B5 at 3, so **its B5
+verdict does not flip**, but its repair cost is two orders of magnitude off the published figure. No other roster
+row has a prefix-important utility. Token *declaration* counts move on 8 rows, two of them from nothing:
+`168-audit` 0 -> 68 and `conference-tracker` 0 -> 27 (the `server.js` file set again), plus
+`landry-sandbox` 66 -> 96, `sarah-stuff` 1261 -> 1275, `study-system` 22 -> 23, `schema-studio` 48 -> 49,
+`cad-forge` 64 -> 65, `design-lab` 111 -> 112, `obsidian-vault-mirror-metropolis` 140 -> 141. **The
+historical "tokens 26 of 55" is not restated, and cannot be recomputed**: B1 as written is a
+*literal-outside-`:root`* test, not a custom-property count, and no tool here implements it. `transition` has the same shape and
+is a count rather than a verdict: `legal-solutions-website` 45 -> 118, `berkeley-house` 60 -> 108,
+`168-audit` 72 -> 100, `conference-tracker` 49 -> 77, `bible-name-search` 58 -> 114, `design-lab` 18 -> 33.
+
+**One roster claim this measurement cannot confirm.** The `idetc-writing-ide` row states 6 `:focus-visible`
+after its Stage 2 repair. Measured at `C:\Users\dougl\Projects\idetc-writing-ide`, the string
+`focus-visible` appears in **zero** tracked files. Either that repair has not landed on the branch checked
+out there, or the row is describing work in a worktree. Not repaired here — it is outside this lane's owned
+paths — but it should not stand as measured fact.
 
 **The correction, row by row, as a retraction rather than an edit.** 23 of 54 roster rows move; 31 do not.
 The roster tables above keep their published tuples so the change stays visible; this is the authoritative
