@@ -1,0 +1,2 @@
+{"last_step":"registered","state":"starting","agent_id":"route-2934a722","surface":"route","heartbeat_at":"2026-09-27T21:53:47.1172157Z"}
+{"state":"failed","heartbeat_at":"2026-09-27T21:54:38.2180504Z","surface":"route","agent_id":"route-2934a722","last_step":"router-refused: no-qualified-pair-for-stage: tactics"}
