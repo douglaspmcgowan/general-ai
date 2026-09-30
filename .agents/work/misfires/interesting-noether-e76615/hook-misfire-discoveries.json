@@ -1,0 +1,146 @@
+[
+  {
+    "key": "[\"interesting-noether-e76615\",\"security-checks-fast.js#checkbulkdelete\",\"manage-harness.ps1 -action ensureproject is the harness's own canonical installer and is named verbatim as the setup command in the project agents.md commands section. the guard scanned the invoked script body, found a recursive remove-item inside the installer, and refused the sanctioned setup route. no delete was requested by the caller; the argument list is -action ensureproject -repository <path>. effect: dispatch-checklist's rule 'install the harness in the target repository before the firs\"]",
+    "project": "interesting-noether-e76615",
+    "hook": "security-checks-fast.js#checkBulkDelete",
+    "reason": "Manage-Harness.ps1 -Action EnsureProject is the harness's own canonical installer and is named verbatim as the Setup command in the project AGENTS.md Commands section. The guard scanned the invoked script BODY, found a recursive Remove-Item inside the installer, and refused the sanctioned setup route. No delete was requested by the caller; the argument list is -Action EnsureProject -Repository <path>. Effect: DISPATCH-CHECKLIST's rule 'install the harness in the target repository before the firs",
+    "count": 1,
+    "escalated": false,
+    "first_seen": "2026-09-20T06:18:05.240Z",
+    "last_seen": "2026-09-20T06:18:05.240Z",
+    "entry_ids": [
+      "misfire-f71aa294-449f-4418-8d9f-e1f5a5c83be5"
+    ],
+    "dispositions": [
+      {
+        "entry_id": "misfire-f71aa294-449f-4418-8d9f-e1f5a5c83be5",
+        "status": "open"
+      }
+    ],
+    "last_session_id": "",
+    "disposition": {
+      "entry_id": "misfire-f71aa294-449f-4418-8d9f-e1f5a5c83be5",
+      "status": "open"
+    }
+  },
+  {
+    "key": "[\"interesting-noether-e76615\",\"check-secret-exposure.js\",\"heredoc writing a playwright render script to a temp dir; its only environment reference was the temp directory path read inside node, not a credential; nothing printed\"]",
+    "project": "interesting-noether-e76615",
+    "hook": "check-secret-exposure.js",
+    "reason": "heredoc writing a Playwright render script to a temp dir; its only environment reference was the TEMP directory path read inside node, not a credential; nothing printed",
+    "count": 1,
+    "escalated": false,
+    "first_seen": "2026-09-21T05:20:07.713Z",
+    "last_seen": "2026-09-21T05:20:07.713Z",
+    "entry_ids": [
+      "misfire-9bfedcd5-97f8-4cde-b477-873ed7eb50fe"
+    ],
+    "dispositions": [
+      {
+        "entry_id": "misfire-9bfedcd5-97f8-4cde-b477-873ed7eb50fe",
+        "status": "open"
+      }
+    ],
+    "last_session_id": "",
+    "disposition": {
+      "entry_id": "misfire-9bfedcd5-97f8-4cde-b477-873ed7eb50fe",
+      "status": "open"
+    }
+  },
+  {
+    "key": "[\"interesting-noether-e76615\",\"security-checks-fast.js#unresolvedsecurityverdict\",\"node --test takes a directory operand; the guard tried to read the directory as a script file and refused (eisdir). the directory contains only repo test files.\"]",
+    "project": "interesting-noether-e76615",
+    "hook": "security-checks-fast.js#unresolvedSecurityVerdict",
+    "reason": "node --test takes a directory operand; the guard tried to read the directory as a script file and refused (EISDIR). The directory contains only repo test files.",
+    "count": 1,
+    "escalated": false,
+    "first_seen": "2026-09-21T05:22:57.065Z",
+    "last_seen": "2026-09-21T05:22:57.065Z",
+    "entry_ids": [
+      "misfire-2852fe4b-c163-4e15-9bc8-4b0f40190367"
+    ],
+    "dispositions": [
+      {
+        "entry_id": "misfire-2852fe4b-c163-4e15-9bc8-4b0f40190367",
+        "status": "open"
+      }
+    ],
+    "last_session_id": "",
+    "disposition": {
+      "entry_id": "misfire-2852fe4b-c163-4e15-9bc8-4b0f40190367",
+      "status": "open"
+    }
+  },
+  {
+    "key": "[\"interesting-noether-e76615\",\"security-checks-fast.js#checkprocesskill\",\"pid 34148 is a headless-playwright node process a reviewer subagent of this session started (parent chain bash->bash->bash->claude.exe 876); a bare numeric pid descended from the session should be allowed, but the check refuses it, and the //t //f git-bash flag form is refused too\"]",
+    "project": "interesting-noether-e76615",
+    "hook": "security-checks-fast.js#checkProcessKill",
+    "reason": "PID 34148 is a headless-Playwright node process a reviewer subagent of this session started (parent chain bash->bash->bash->claude.exe 876); a bare numeric PID descended from the session should be allowed, but the check refuses it, and the //T //F Git-Bash flag form is refused too",
+    "count": 1,
+    "escalated": false,
+    "first_seen": "2026-09-21T05:36:57.029Z",
+    "last_seen": "2026-09-21T05:36:57.029Z",
+    "entry_ids": [
+      "misfire-8eb39fbd-03a1-4f63-8a20-3c66a54b7dda"
+    ],
+    "dispositions": [
+      {
+        "entry_id": "misfire-8eb39fbd-03a1-4f63-8a20-3c66a54b7dda",
+        "status": "open"
+      }
+    ],
+    "last_session_id": "",
+    "disposition": {
+      "entry_id": "misfire-8eb39fbd-03a1-4f63-8a20-3c66a54b7dda",
+      "status": "open"
+    }
+  },
+  {
+    "key": "[\"interesting-noether-e76615\",\"security-checks-fast.js#checkgitpublish\",\"marginalia#6 merges agent/durable-decisions-hardening into agent/durable-decisions, both agent-created branches, neither the default branch; agents.md permits own-branch merges. the same guard allowed gh pr merge 42 (agent branch into agent branch) in berkeley-research minutes earlier, so the verdict is inconsistent\"]",
+    "project": "interesting-noether-e76615",
+    "hook": "security-checks-fast.js#checkGitPublish",
+    "reason": "marginalia#6 merges agent/durable-decisions-hardening into agent/durable-decisions, both agent-created branches, neither the default branch; AGENTS.md permits own-branch merges. The same guard allowed gh pr merge 42 (agent branch into agent branch) in berkeley-research minutes earlier, so the verdict is inconsistent",
+    "count": 1,
+    "escalated": false,
+    "first_seen": "2026-09-21T06:03:11.758Z",
+    "last_seen": "2026-09-21T06:03:11.758Z",
+    "entry_ids": [
+      "misfire-66b4e8c1-5e9e-4a53-8e31-1dafe7e2c80c"
+    ],
+    "dispositions": [
+      {
+        "entry_id": "misfire-66b4e8c1-5e9e-4a53-8e31-1dafe7e2c80c",
+        "status": "open"
+      }
+    ],
+    "last_session_id": "",
+    "disposition": {
+      "entry_id": "misfire-66b4e8c1-5e9e-4a53-8e31-1dafe7e2c80c",
+      "status": "open"
+    }
+  },
+  {
+    "key": "[\"interesting-noether-e76615\",\"security-checks-fast.js#checksecretdump\",\"add-projectintake title text merely names the non-secret claude code flag claude_code_silent_turn_reminder; nothing prints any environment value\"]",
+    "project": "interesting-noether-e76615",
+    "hook": "security-checks-fast.js#checkSecretDump",
+    "reason": "Add-ProjectIntake title text merely names the non-secret Claude Code flag CLAUDE_CODE_SILENT_TURN_REMINDER; nothing prints any environment value",
+    "count": 1,
+    "escalated": false,
+    "first_seen": "2026-09-22T05:33:28.790Z",
+    "last_seen": "2026-09-22T05:33:28.790Z",
+    "entry_ids": [
+      "misfire-6fd64a7b-9db3-498c-8fb3-efb6d881c18f"
+    ],
+    "dispositions": [
+      {
+        "entry_id": "misfire-6fd64a7b-9db3-498c-8fb3-efb6d881c18f",
+        "status": "open"
+      }
+    ],
+    "last_session_id": "",
+    "disposition": {
+      "entry_id": "misfire-6fd64a7b-9db3-498c-8fb3-efb6d881c18f",
+      "status": "open"
+    }
+  }
+]
