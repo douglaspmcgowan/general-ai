@@ -1,0 +1,13 @@
+{"heartbeat_at":"2026-09-20T07:37:31.4585701Z","surface":"route","state":"starting","last_step":"registered","agent_id":"route-584a4f19"}
+{"heartbeat_at":"2026-09-20T07:37:37.0078549Z","agent_id":"route-584a4f19","state":"starting","last_step":"selected","surface":"codex"}
+{"heartbeat_at":"2026-09-20T07:37:39.1779638Z","agent_id":"route-584a4f19","state":"working","last_step":"starting","surface":"codex"}
+{"state":"working","last_step":"starting","progress":false,"heartbeat_at":"2026-09-20T07:37:39.3809879Z","agent_id":"route-584a4f19","surface":"codex"}
+{"agent_id":"route-584a4f19","last_step":"working 2026-09-20T07:38:39.8339399Z","heartbeat_at":"2026-09-20T07:38:40.3290811Z","state":"working","surface":"codex"}
+{"state":"working","last_step":"working 2026-09-20T07:38:39.8339399Z","progress":true,"heartbeat_at":"2026-09-20T07:38:40.5293887Z","agent_id":"route-584a4f19","surface":"codex"}
+{"last_step":"working 2026-09-20T07:39:40.9969636Z","agent_id":"route-584a4f19","heartbeat_at":"2026-09-20T07:39:41.5854951Z","state":"working","surface":"codex"}
+{"state":"working","last_step":"working 2026-09-20T07:39:40.9969636Z","progress":true,"heartbeat_at":"2026-09-20T07:39:41.8251733Z","agent_id":"route-584a4f19","surface":"codex"}
+{"surface":"codex","state":"working","heartbeat_at":"2026-09-20T07:40:42.8278970Z","last_step":"working 2026-09-20T07:40:42.3429773Z","agent_id":"route-584a4f19"}
+{"state":"working","last_step":"working 2026-09-20T07:40:42.3429773Z","progress":true,"heartbeat_at":"2026-09-20T07:40:43.0450617Z","agent_id":"route-584a4f19","surface":"codex"}
+{"surface":"codex","agent_id":"route-584a4f19","state":"working","heartbeat_at":"2026-09-20T07:40:49.6233797Z","last_step":"completed exit=0"}
+{"state":"working","last_step":"completed exit=0","progress":true,"heartbeat_at":"2026-09-20T07:40:49.8222038Z","agent_id":"route-584a4f19","surface":"codex"}
+{"last_step":"exit-zero-clean","state":"finished","heartbeat_at":"2026-09-20T07:41:10.2302696Z","surface":"codex","agent_id":"route-584a4f19"}

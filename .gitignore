@@ -34,6 +34,15 @@ taskstate/
 .agents/work/tmp/
 .agents/work/**/*.tmp
 
+# Fleet-router scratch, written into whatever repository a dispatch targets. `.agents-hold` is the
+# router's own lock file and `.agents/fleet-briefs/` holds a copy of each brief it wrapped and sent.
+# Both are per-dispatch artifacts of the machine that ran the dispatch, not source: nothing reads
+# them back, and two sessions dispatching from the same repository produce different sets. Measured
+# 2026-09-20 in this worktree: both appeared as untracked in every `git status` of a long session,
+# which is exactly the noise that gets swept into an unrelated commit by a `git add -A`.
+.agents-hold
+.agents/fleet-briefs/
+
 # Compiled-assembly cache for WorkScope.psm1's two C# blocks. The module used to re-run the C#
 # compiler on every import -- 742 ms of a ~900 ms import, measured 2026-08-15 under pwsh 7.6.4,
 # paid by every process the task hooks start. It now compiles once to a DLL beside itself, keyed

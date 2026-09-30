@@ -1,0 +1,25 @@
+{"surface":"route","last_step":"registered","agent_id":"route-866a3e9b","heartbeat_at":"2026-09-22T04:27:03.9797846Z","state":"starting"}
+{"agent_id":"route-866a3e9b","last_step":"selected","surface":"codex","heartbeat_at":"2026-09-22T04:27:10.4909259Z","state":"starting"}
+{"agent_id":"route-866a3e9b","heartbeat_at":"2026-09-22T04:27:12.6042056Z","last_step":"starting","state":"working","surface":"codex"}
+{"agent_id":"route-866a3e9b","last_step":"starting","progress":false,"surface":"codex","state":"working","heartbeat_at":"2026-09-22T04:27:12.8031088Z"}
+{"state":"working","heartbeat_at":"2026-09-22T04:28:13.9035983Z","last_step":"working 2026-09-22T04:28:13.3970997Z","surface":"codex","agent_id":"route-866a3e9b"}
+{"agent_id":"route-866a3e9b","last_step":"working 2026-09-22T04:28:13.3970997Z","progress":true,"surface":"codex","state":"working","heartbeat_at":"2026-09-22T04:28:14.1065250Z"}
+{"state":"working","last_step":"working 2026-09-22T04:29:14.5694849Z","agent_id":"route-866a3e9b","heartbeat_at":"2026-09-22T04:29:15.0551475Z","surface":"codex"}
+{"agent_id":"route-866a3e9b","last_step":"working 2026-09-22T04:29:14.5694849Z","progress":true,"surface":"codex","state":"working","heartbeat_at":"2026-09-22T04:29:15.2251897Z"}
+{"agent_id":"route-866a3e9b","last_step":"working 2026-09-22T04:30:15.6909722Z","heartbeat_at":"2026-09-22T04:30:16.2519773Z","state":"working","surface":"codex"}
+{"agent_id":"route-866a3e9b","last_step":"working 2026-09-22T04:30:15.6909722Z","progress":true,"surface":"codex","state":"working","heartbeat_at":"2026-09-22T04:30:16.4689714Z"}
+{"last_step":"working 2026-09-22T04:31:16.8385846Z","surface":"codex","heartbeat_at":"2026-09-22T04:31:17.3433078Z","agent_id":"route-866a3e9b","state":"working"}
+{"agent_id":"route-866a3e9b","last_step":"working 2026-09-22T04:31:16.8385846Z","progress":true,"surface":"codex","state":"working","heartbeat_at":"2026-09-22T04:31:17.5549376Z"}
+{"heartbeat_at":"2026-09-22T04:32:18.5030893Z","surface":"codex","agent_id":"route-866a3e9b","last_step":"working 2026-09-22T04:32:17.9683628Z","state":"working"}
+{"agent_id":"route-866a3e9b","last_step":"working 2026-09-22T04:32:17.9683628Z","progress":true,"surface":"codex","state":"working","heartbeat_at":"2026-09-22T04:32:18.7111191Z"}
+{"heartbeat_at":"2026-09-22T04:33:19.6217645Z","state":"working","agent_id":"route-866a3e9b","last_step":"working 2026-09-22T04:33:19.1637315Z","surface":"codex"}
+{"agent_id":"route-866a3e9b","last_step":"working 2026-09-22T04:33:19.1637315Z","progress":true,"surface":"codex","state":"working","heartbeat_at":"2026-09-22T04:33:19.8015661Z"}
+{"surface":"codex","agent_id":"route-866a3e9b","last_step":"working 2026-09-22T04:34:20.1947613Z","state":"working","heartbeat_at":"2026-09-22T04:34:20.5756403Z"}
+{"agent_id":"route-866a3e9b","last_step":"working 2026-09-22T04:34:20.1947613Z","progress":true,"surface":"codex","state":"working","heartbeat_at":"2026-09-22T04:34:20.7327136Z"}
+{"agent_id":"route-866a3e9b","last_step":"working 2026-09-22T04:35:21.1862719Z","surface":"codex","heartbeat_at":"2026-09-22T04:35:21.6390227Z","state":"working"}
+{"agent_id":"route-866a3e9b","last_step":"working 2026-09-22T04:35:21.1862719Z","progress":true,"surface":"codex","state":"working","heartbeat_at":"2026-09-22T04:35:21.8110970Z"}
+{"state":"working","last_step":"working 2026-09-22T04:36:22.2998430Z","surface":"codex","heartbeat_at":"2026-09-22T04:36:22.7293610Z","agent_id":"route-866a3e9b"}
+{"agent_id":"route-866a3e9b","last_step":"working 2026-09-22T04:36:22.2998430Z","progress":true,"surface":"codex","state":"working","heartbeat_at":"2026-09-22T04:36:22.9072713Z"}
+{"agent_id":"route-866a3e9b","surface":"codex","last_step":"completed exit=0","heartbeat_at":"2026-09-22T04:36:42.8539791Z","state":"finished"}
+{"agent_id":"route-866a3e9b","last_step":"completed exit=0","progress":true,"surface":"codex","state":"working","heartbeat_at":"2026-09-22T04:36:43.0455302Z"}
+{"agent_id":"route-866a3e9b","state":"finished","heartbeat_at":"2026-09-22T04:36:57.5830098Z","surface":"codex","last_step":"exit-zero-clean"}

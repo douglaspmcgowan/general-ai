@@ -2,81 +2,58 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "anna-static",
+      "name": "strata-preview",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "8765", "--directory", "C:\\Users\\dougl\\anna-mcgowan"],
-      "port": 8765
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8791",
+        "--directory",
+        ".local/preview"
+      ],
+      "port": 8791
     },
     {
-      "name": "redline",
-      "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "8766", "--directory", "C:\\Users\\dougl\\projects\\idetc-writing-ide"],
-      "port": 8766
-    }
-  ,
-    {
-      "name": "conference-tracker",
+      "name": "hci-260",
       "runtimeExecutable": "node",
-      "runtimeArgs": ["C:\\Users\\dougl\\Projects\\conference-tracker\\server.js"],
-      "port": 3010
+      "runtimeArgs": [
+        "server.mjs"
+      ],
+      "port": 3000,
+      "cwd": "C:\\Users\\dougl\\Projects\\hci-260"
     },
     {
-      "name": "paper-journal",
-      "runtimeExecutable": "node",
-      "runtimeArgs": ["C:\\Users\\dougl\\pj-preview\\node_modules\\next\\dist\\bin\\next", "dev", "C:\\Users\\dougl\\pj-preview"],
-      "port": 3000
+      "name": "amm-concepts",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8795"
+      ],
+      "port": 8795,
+      "cwd": "C:\\Users\\dougl\\Projects\\anna-maria-mcgowan-site"
     },
     {
-      "name": "drive-organizer",
-      "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "8778", "--directory", "C:\\Users\\dougl\\projects\\drive-organizer"],
-      "port": 8778
-    }
-  ,
-    {
-      "name": "client-portal",
-      "runtimeExecutable": "node",
-      "runtimeArgs": ["C:\\Users\\dougl\\Projects\\client-portal\\node_modules\\next\\dist\\bin\\next", "dev", "C:\\Users\\dougl\\Projects\\client-portal", "--port", "3001"],
-      "port": 3001
-    }
-  ,
-    {
-      "name": "dfm-kg-agent-v2",
-      "runtimeExecutable": "node",
-      "runtimeArgs": ["G:\\My Drive\\UC Berkeley\\Research\\dfm_scraping\\dfm-kg-agent-v2\\apps\\web\\node_modules\\vite\\bin\\vite.js", "--config", "G:\\My Drive\\UC Berkeley\\Research\\dfm_scraping\\dfm-kg-agent-v2\\apps\\web\\vite.config.ts", "--port", "5173"],
-      "port": 5173
+      "name": "design-lab",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "--prefix",
+        "C:/Users/dougl/Projects/design-lab"
+      ],
+      "port": 3131
     },
     {
-      "name": "fellowship-tracker",
-      "runtimeExecutable": "node",
-      "runtimeArgs": ["C:\\Users\\dougl\\Projects\\fellowship-tracker\\node_modules\\next\\dist\\bin\\next", "dev", "C:\\Users\\dougl\\Projects\\fellowship-tracker", "--port", "3002"],
-      "port": 3002
-    },
-    {
-      "name": "dfm-graph-explorer",
-      "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "8769", "--directory", "C:\\Users\\dougl\\dfm-graph-explorer"],
-      "port": 8769
-    },
-    {
-      "name": "recital",
-      "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "8911", "--directory", "C:\\Users\\dougl\\projects\\legal-doc-studio"],
-      "port": 8911
-    }
-  ,
-    {
-      "name": "jars",
-      "runtimeExecutable": "node",
-      "runtimeArgs": ["C:\\Users\\dougl\\projects\\jars-of-clay\\node_modules\\next\\dist\\bin\\next", "dev", "C:\\Users\\dougl\\projects\\jars-of-clay", "--port", "3100"],
-      "port": 3100
-    }
-  ,
-    {
-      "name": "contact-form-caller",
-      "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "8799", "--directory", "C:\\Users\\dougl\\projects\\contact-form-caller"],
-      "port": 8799
+      "name": "app-atlas",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "--prefix",
+        "C:/Users/dougl/Projects/app-atlas"
+      ],
+      "port": 3141
     }
   ]
 }
