@@ -137,5 +137,71 @@
     "The INDEX.md content was not judged for correctness beyond its currency against the canonical copy.",
     "I did not establish which machine or harness checkout the producer used. That 8f7f5c3b0 was its source is inferred from the matching blob.",
     "The candidate branch and the stable checkout were not modified. All writes went to temp clones under %LOCALAPPDATA%\\Temp\\ga-48324522-review, to two intake filings, and to this report."
+  ],
+  "followups": [
+    {
+      "date": "2026-10-29T08:16:09Z",
+      "task_id": "ga-c27ae481",
+      "reviewer": "claude-opus-5-5 at xhigh (reviewer), same review resumed",
+      "verdict": "ACCEPT",
+      "verdict_scope": "Exact head 088fe5850f2509a5d8e8370a468be6b243080bc5 only. The original REJECT of 06627cc71e22ecd682c5fd7dbefc06472f571692 stays above as history and is unchanged.",
+      "identity": {
+        "candidate_sha": "088fe5850f2509a5d8e8370a468be6b243080bc5",
+        "candidate_parent": "06627cc71e22ecd682c5fd7dbefc06472f571692",
+        "base_sha": "4d47f4ddbcdfce5c34cc0264aed3bbbeae67f21c",
+        "remote_check": "origin/agent/mc-generalai-projection-20261029 and the gh PR 21 headRefOid are both 088fe585; PR 21 is OPEN and MERGEABLE; gitleaks scan SUCCESS x2 at 08:06:55Z/08:06:57Z",
+        "origin_master": "4d47f4ddbcdfce5c34cc0264aed3bbbeae67f21c (still equal to base; no reconcile needed)",
+        "canonical_harness_sha": "53d0aab5af04506979143c5604f28eda4f972fcb"
+      },
+      "correction_commit": {
+        "scope": "git show --stat 088fe585 lists only .agents/INDEX.md (7 insertions, 6 deletions); git diff --name-status 06627cc7 088fe585 lists only 'M .agents/INDEX.md'",
+        "index_blob": "72251a66e03ad735fa1797229b6be7e2c7d8561f, equal to the required canonical blob",
+        "other_nine_unchanged": "DISPATCH-CHECKLIST 5892c40e, harness-provenance 1f8574fb, .claude/settings 50551be6, .codex/hooks 23251554, .gitignore 661068b0, AGENTS e20bf80e, DESIGN 3c3faa0b, PRODUCT 98c59ac3, skills-manifest 340b0b2e: all SAME at 06627cc7 and 088fe585"
+      },
+      "canonical_match": "10/10: git rev-parse 088fe585:<path> equals git hash-object for every file of the prior real 53d EnsureProject regeneration from a base clone (%LOCALAPPDATA%Tempga-48324522-review\realgeneral-ai, still at base 4d47f4dd with those 10 generated paths). Prior finding 1 is resolved.",
+      "commands": [
+        {
+          "command": "git diff --check 4d47f4dd 088fe585",
+          "exit": 0,
+          "output": "(none)"
+        },
+        {
+          "command": "fresh clone of github general-ai at detached 088fe585; harness 53d Manage-Harness.ps1 -Action VerifyProject -Repository <clone>",
+          "exit": 0,
+          "output": "Project harness verification passed. changed {} gates {}; DESIGN detector scan skipped (no tracked interface files); clone stayed clean"
+        },
+        {
+          "command": "hash-object comparison of the 10 paths against the prior regeneration",
+          "exit": 0,
+          "output": "EQUAL_TO_REGEN=10/10"
+        }
+      ],
+      "producer_worktree_dirt": {
+        "path": "C:UsersdouglWorktreesgeneral-aimc-generalai-projection-20261029 (HEAD 088fe585, in sync with origin)",
+        "status": "git --no-optional-locks status shows 7 M paths: .agents/DISPATCH-CHECKLIST.md, .agents/harness-provenance.json, .claude/settings.json, .codex/hooks.json, AGENTS.md, DESIGN.md, skills-manifest.json. git diff --stat and git diff --cached --stat are empty. Nothing is untracked.",
+        "classification": "Line endings only; the content has not drifted. For all 7 paths, git hash-object (clean filters, core.autocrlf=true) equals the index blob, and the index blob equals the HEAD blob. Raw bytes show the 08:05:47-48Z builder EnsureProject rewrite (mtimes 01:05:47-48 -0700): LF-only (CR=0) for provenance, both hook manifests and skills-manifest; mixed endings in AGENTS.md (CR 119/LF 184) and DESIGN.md (CR 31/LF 138), where Set-MarkedBlock wrote the managed block with LF inside a CRLF checkout. DISPATCH-CHECKLIST has CR=0 and the source mtime (23:44:31), because Copy-Item preserves the source mtime. The committed blobs are unaffected.",
+        "not_touched": "Not discarded, renormalized or refreshed. Reads used --no-optional-locks. Whether to clear it is the root's call: until someone renormalizes or re-checks out those paths, the worktree reads as dirty to a reaper.",
+        "pr_body_note": "PR 21's body says 'the other 8 files show M'. The measured count is 7."
+      },
+      "builder_receipt": {
+        "status_file": "%LOCALAPPDATA%AgentHarness\repositoriesdouglaspmcgowangeneral-ai\fleetagent-status\route-0ab544a2.json: state finished, task ga-1e9f4f7c, claude-local, last_step 'exit-zero-clean; account=berkeley-dpm5970', artifact confirmed, PR 21",
+        "lane_log": "%LOCALAPPDATA%Tempohx-remoteclaude-local-slot3-288476984225.log: claude-haiku-5-5 at medium; head before 06627cc, dirty before 0; result 'Changed: .agents/INDEX.md (blob 72251a66...)'; proof claimed real EnsureProject exit 0, VerifyProject exit 0, git diff --check exit 0; 'dirty after = 7 head = 088fe58'. This lane independently re-verified the blob, scope, VerifyProject and diff-check claims above. The builder's EnsureProject exit is taken from its log, which is consistent with the mtimes and the LF rewrite.",
+        "lane_log_noise": "The lane log shows task-event 'refused: unknown task ga-1e9f4f7c' at start and at return. That is router task-store bookkeeping and does not affect this artifact.",
+        "specs_checked": "PR body cites a-generated-view-changes-only-through-its-generator at .agents/work/specs.jsonl line 289 (verified at harness 53d) and intent-install-preserves-drift at INTENT.md line 1315 (verified in the prior review)."
+      },
+      "dependency_drift": {
+        "general_ai": "none (origin/master = base)",
+        "harness": "origin/master 7777e9fe is 2 commits past 53d0aab5 and changes only .agents/skills/slides/** and .agents/skills/voice/scripts/**. Projection sources are identical at both: .agents/INDEX.md 72251a66, .agents/DISPATCH-CHECKLIST.md 5892c40e, .agents/tools/Manage-Harness.ps1 313d7c7f, .agents/templates tree 112a09cb, .agents/skills/impeccable tree 97e591f9. The relevant templates have not drifted."
+      },
+      "still_open_separately": [
+        "Harness defect ensureproject-dryrun-returns-before-planning-20261029 (prior finding 2): EnsureProject -DryRun is still not evidence.",
+        "Harness defect verifyproject-skips-projected-index-currency-20261029 (prior finding 3): VerifyProject EXIT 0 still does not prove that INDEX.md is current. The acceptance here rests on blob equality."
+      ],
+      "honest_limits": [
+        "No EnsureProject was run on the candidate or on the installed home in this follow-up; the canonical match reuses the prior real base-clone regeneration (same immutable 53d source, unchanged on harness master for every projection source).",
+        "Gitleaks was not run locally; the CI scan passed on the new head.",
+        "The merge into master belongs to the root and needs its own authorization; this report grants none."
+      ]
+    }
   ]
 }
