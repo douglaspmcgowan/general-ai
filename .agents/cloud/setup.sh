@@ -20,6 +20,12 @@ fi
 # shellcheck disable=SC1091
 set -a; . "$repo_root/.agents/cloud/tool-versions.sh"; set +a
 
+# Refuse a malformed project pin before any filesystem or package-manager effects.
+if [ -n "$NODE_PIN_ERROR" ]; then
+  printf '[setup] SETUP FAILED: %s\n' "$NODE_PIN_ERROR" >&2
+  exit 1
+fi
+
 tool_root="$repo_root/${CLOUD_TOOL_ROOT:-.local/agent-tools}"
 bin_dir="$tool_root/bin"
 mkdir -p "$bin_dir" "$repo_root/.local/project-data"
@@ -175,7 +181,8 @@ log "image tools:"
 for t in git curl jq tar unzip sha256sum rg sqlite3; do
   if have "$t"; then log "  $t $( { "$t" --version 2>/dev/null || true; } | head -n1)"; else warn "  $t missing"; fi
 done
-node_matches_release() { have node && node --version 2>/dev/null | grep -qE "^v${NODE_RELEASE_LINE}\\."; }
+# NODE_RELEASE_LINE is the canonical default, or the project's reviewed .nvmrc (tool-versions.sh).
+node_matches_release() { have node && node_version_in_release_line "$(node --version 2>/dev/null)"; }
 # The Codex Cloud image defaults node to another line but carries others under nvm. Select an
 # already-installed node of exactly the release line; installs nothing.
 select_installed_node() {
@@ -183,9 +190,9 @@ select_installed_node() {
   cand=''
   while IFS= read -r dir; do
     [ -x "$dir/node" ] || continue
-    "$dir/node" --version 2>/dev/null | grep -qE "^v${NODE_RELEASE_LINE}\\." || continue
+    node_version_in_release_line "$("$dir/node" --version 2>/dev/null)" || continue
     cand="$dir"
-  done < <(for d in "$nvm_root"/versions/node/v"${NODE_RELEASE_LINE}".*/bin; do [ -d "$d" ] && printf '%s\n' "$d"; done | sort -V)
+  done < <(for d in "$nvm_root"/versions/node/v"${NODE_RELEASE_LINE}"/bin "$nvm_root"/versions/node/v"${NODE_RELEASE_LINE}".*/bin; do [ -d "$d" ] && printf '%s\n' "$d"; done | sort -V)
   [ -n "$cand" ] || return 1
   ver="$("$cand/node" --version 2>/dev/null)"
   local t
@@ -278,138 +285,45 @@ else
 fi
 
 # ----------------------------------------------------------- pwsh (Work Scope)
-# Work Scope's guard, evidence, and event-chain invariants live in one PowerShell
-# module. Installing the same module here (rather than reimplementing it) is what
-# makes a Linux write byte-identical to a Windows one in events.jsonl.
-#
-# WHERE it lands matters as much as whether it lands. The task-state hook resolves
-# pwsh from a fixed allowlist and rejects symlinks, so it will not execute an
-# interpreter supplied by the checked-out repository. When a project is Work Scope
-# enrolled and the hook cannot validate state, it fails CLOSED and exits 2 on every
-# prompt. So prefer /opt/microsoft/powershell/7 -- the canonical location the hook
-# already trusts -- and treat the repo-local tool root as a degraded fallback that
-# serves the CLI but not the hook.
-: "${POWERSHELL_PREFIXES:=/opt/microsoft/powershell/7}"
-
-# Why this environment ended up without a pinned pwsh, carried to the gate at the
-# end of the file so the failure names its own cause instead of only its symptom.
+# A legitimate provider-supplied regular binary remains separate from the
+# implementation-owned canonical runtime. Only the canonical operation creates
+# or repairs its own prefix and launcher, from authenticated archive bytes.
 powershell_note=''
-
-# Does this path actually START PowerShell, at the version this kit pins?
-#
-# WHY EXISTENCE IS NOT ENOUGH, MEASURED
-#
-# `pwsh` is a .NET apphost: it locates `pwsh.dll` NEXT TO ITSELF and execs that. So a hard
-# link or a copy placed at /usr/local/bin/pwsh looks perfect to every `[ -f ]` test and
-# cannot run at all -- it searches for /usr/local/bin/pwsh.dll, which no install ever puts
-# there. On 2026-09-02 in a container built from this kit that was the live state:
-# /usr/local/bin/pwsh and /opt/microsoft/powershell/7/pwsh shared inode 549734, the
-# readiness gate below reported powershell=ready against it, and running it produced
-#   The application to execute does not exist: '/usr/local/bin/pwsh.dll'   (exit 154)
-# Every .agents/tools/*.ps1 in that container was unreachable, and the task-state hook --
-# which spawns bare `pwsh` from PATH -- failed closed on an enrolled project, which is the
-# exact symptom filed as five-of-six-enrolled-projects-have-no-cloud-kit-20260823.
-#
-# So the question this asks is behavioural: run it, and require the pinned version in its
-# own output. A launcher that starts nothing is an absent interpreter, whatever it looks like.
+# shellcheck source=powershell-runtime.sh
+. "$repo_root/.agents/cloud/powershell-runtime.sh"
+pwsh_process_cache=$(mktemp -d)
+chmod 0700 "$pwsh_process_cache"
+trap 'find -P "$pwsh_process_cache" -depth -delete' EXIT
 pwsh_candidate_runs() {
   local candidate="$1"
-  [ -x "$candidate" ] || return 1
-  "$candidate" --version 2>/dev/null | head -n1 | grep -qF "$POWERSHELL_VERSION"
+  [ -f "$candidate" ] && [ ! -L "$candidate" ] && [ -x "$candidate" ] || return 1
+  powershell_runtime_with_cache "$pwsh_process_cache" "$candidate" --version 2>/dev/null | head -n1 | grep -qxF "PowerShell $POWERSHELL_VERSION"
 }
-
-# Place a hook-trustable entry point at /usr/local/bin/pwsh: a regular file (the hook's scan
-# rejects symlinks) that EXECS the real interpreter from its own prefix, so the apphost
-# resolves pwsh.dll beside the binary rather than beside the launcher. A stale or broken
-# one is replaced -- refusing to touch an existing path is what left the inode above in
-# place across every re-run of this script.
-install_pwsh_launcher() {
-  local prefix="$1"
-  [ -n "$prefix" ] || return 1
-  if [ -f /usr/local/bin/pwsh ] && [ ! -L /usr/local/bin/pwsh ] && pwsh_candidate_runs /usr/local/bin/pwsh; then
-    return 0
-  fi
-  mkdir -p /usr/local/bin 2>/dev/null || return 1
-  [ -w /usr/local/bin ] || return 1
-  rm -f /usr/local/bin/pwsh 2>/dev/null || true
-  {
-    printf '#!/bin/sh\n'
-    printf '# Generated by .agents/cloud/setup.sh. Execs the pinned PowerShell from its own\n'
-    printf '# prefix so the .NET apphost finds pwsh.dll beside the binary, not beside this file.\n'
-    printf 'exec "%s/pwsh" "$@"\n' "$prefix"
-  } > /usr/local/bin/pwsh 2>/dev/null || return 1
-  chmod 0755 /usr/local/bin/pwsh 2>/dev/null || return 1
-  if pwsh_candidate_runs /usr/local/bin/pwsh; then
-    return 0
-  fi
-  rm -f /usr/local/bin/pwsh 2>/dev/null || true
-  return 1
-}
-
-install_powershell() {
-  local archive="$1" prefix
-  for prefix in $POWERSHELL_PREFIXES; do
-    if mkdir -p "$prefix" 2>/dev/null && [ -w "$prefix" ]; then
-      if tar -xzf "$archive" -C "$prefix" 2>/dev/null; then
-        chmod +x "$prefix/pwsh"
-        ln -sf "$prefix/pwsh" "$bin_dir/pwsh"
-        log "pwsh installed to $prefix (trusted by the task-state hook)"
-        if install_pwsh_launcher "$prefix"; then
-          log "hook-trustable pwsh launcher at /usr/local/bin/pwsh -> $prefix/pwsh"
-        else
-          warn "could not place a working non-symlink pwsh at /usr/local/bin/pwsh"
-        fi
-        return 0
-      fi
-    fi
-  done
-  mkdir -p "$tool_root/powershell"
-  tar -xzf "$archive" -C "$tool_root/powershell"
-  chmod +x "$tool_root/powershell/pwsh"
-  ln -sf "$tool_root/powershell/pwsh" "$bin_dir/pwsh"
-  warn "pwsh installed to the repo-local tool root; Work Scope tools work from the"
-  warn "  shell, but the task-state hook will not trust a repository-supplied"
-  warn "  interpreter and fails closed on an enrolled project. Grant write access to"
-  warn "  one of: $POWERSHELL_PREFIXES"
-  powershell_note="installed to the repo-local tool root because none of these were writable: $POWERSHELL_PREFIXES"
-  return 0
-}
-
-if have pwsh && pwsh --version 2>/dev/null | grep -qF "$POWERSHELL_VERSION"; then
-  log "pwsh $POWERSHELL_VERSION already present"
-  # A resumed container takes this branch, so the launcher repair has to happen here too --
-  # otherwise a /usr/local/bin/pwsh that cannot start survives every re-run of setup, which
-  # is how the broken inode above outlived the install that created it. `have pwsh` says
-  # something on PATH works; it says nothing about the path the task-state hook resolves.
-  present_pwsh_prefix="$(dirname "$(readlink -f "$(command -v pwsh)" 2>/dev/null)" 2>/dev/null)"
-  if [ -n "$present_pwsh_prefix" ] && [ -f "$present_pwsh_prefix/pwsh.dll" ]; then
-    if install_pwsh_launcher "$present_pwsh_prefix"; then
-      log "hook-trustable pwsh launcher at /usr/local/bin/pwsh -> $present_pwsh_prefix/pwsh"
-    else
-      warn "could not place a working non-symlink pwsh at /usr/local/bin/pwsh"
-    fi
-  fi
-else
-  log "installing PowerShell $POWERSHELL_VERSION"
-  if [ "$archive_supported" -ne 1 ]; then
-    warn "PowerShell $POWERSHELL_VERSION was not installed; no verified archive exists for this architecture"
-    powershell_note="no verified archive exists for architecture $(uname -m)"
+pwsh_candidate_classification() {
+  local candidate="$1"
+  if [ "$candidate" = "$POWERSHELL_RUNTIME_LAUNCHER" ] && _powershell_runtime_is_owned_wrapper; then
+    printf '%s\n' canonical-own
+  elif pwsh_candidate_runs "$candidate"; then
+    printf '%s\n' provider
   else
-    tmp="$(mktemp -d)"
-    if curl -fsSL -o "$tmp/pwsh.tar.gz" \
-      "https://github.com/PowerShell/PowerShell/releases/download/v${POWERSHELL_VERSION}/powershell-${POWERSHELL_VERSION}-linux-${pwsh_archive_arch}.tar.gz"; then
-    if verify_digest "$tmp/pwsh.tar.gz" "$pwsh_archive_sha256" "PowerShell $POWERSHELL_VERSION"; then
-      install_powershell "$tmp/pwsh.tar.gz"
-      log "pwsh -> $("$bin_dir/pwsh" --version 2>&1 | head -n1)"
-    else
-      warn "PowerShell was not installed; Work Scope state will be read-only in this environment"
-      powershell_note="the pinned archive's SHA-256 did not match tool-versions.sh; the bytes were refused"
-    fi
-    else
-    warn "PowerShell $POWERSHELL_VERSION download failed; Work Scope state will be read-only in this environment"
-    powershell_note="the pinned archive could not be downloaded"
-    fi
-    rm -rf "$tmp"
+    printf '%s\n' unavailable
+  fi
+}
+pwsh_candidate= pwsh_classification=unavailable
+if have pwsh; then
+  pwsh_candidate=$(command -v pwsh)
+  pwsh_classification=$(pwsh_candidate_classification "$pwsh_candidate")
+fi
+if [ "$pwsh_classification" = provider ]; then
+  log "pwsh $POWERSHELL_VERSION already present from provider"
+else
+  log "installing canonical PowerShell $POWERSHELL_VERSION"
+  if powershell_runtime_install; then
+    hash -r 2>/dev/null || true
+    log "pwsh -> $(powershell_runtime_with_cache "$pwsh_process_cache" /usr/local/bin/pwsh --version 2>&1 | head -n1)"
+  else
+    warn "canonical PowerShell installation failed; Work Scope state will be read-only"
+    powershell_note="canonical pinned runtime installation failed"
   fi
 fi
 
@@ -424,7 +338,7 @@ fi
 # verify.sh's delegation-target check is the fallback for a container where this could not run.
 router_generator="$repo_root/.agents/tools/Build-CapabilityRouter.ps1"
 if [ -f "$router_generator" ] && have pwsh; then
-  if pwsh -NoProfile -File "$router_generator" >/dev/null 2>&1; then
+  if powershell_runtime_with_cache "$pwsh_process_cache" "$(command -v pwsh)" -NoProfile -File "$router_generator" >/dev/null 2>&1; then
     log "capability-router.json regenerated for this device (delegation CLI roster is live, not inherited)"
   else
     warn "capability-router.json regeneration failed; its delegation CLI roster may still describe another device (verify.sh checks this)"
@@ -550,7 +464,7 @@ powershell_state='absent'; powershell_path=''; powershell_version=''
 if have pwsh; then
   powershell_state='untrusted'
   powershell_path="$(command -v pwsh)"
-  powershell_version="$(pwsh --version 2>&1 | head -n1)"
+  powershell_version="$(powershell_runtime_with_cache "$pwsh_process_cache" "$powershell_path" --version 2>&1 | head -n1)"
   # Both questions, in this order: is the candidate shaped the way the hook requires (a
   # regular file, not a symlink), and DOES IT START. Asking only the first is what reported
   # powershell=ready against a /usr/local/bin/pwsh that exited 154 on every invocation --

@@ -2,7 +2,53 @@
 # Owned by ONBOARDING/CLOUD-AGENTS.md ("Required base toolchain").
 # Agent CLIs use exact pins. Language runtimes use supported release lines.
 
+# Canonical Node default. A project's reviewed `.nvmrc` replaces it (see resolve_node_release_line).
 NODE_RELEASE_LINE=22
+# The headless Obsidian client needs Node 22+, so no project pin may select an older major.
+NODE_MIN_MAJOR=22
+NODE_PIN_ERROR=''
+
+# resolve_node_release_line
+#
+# The project's own `<repo>/.nvmrc` is the only override. It must be a regular file (never a
+# symlink) holding one line of `[v]MAJOR[.MINOR[.PATCH]]` (at most 31 characters), read as data and never sourced or
+# evaluated. The result is a dotted prefix: `24` selects any 24.x.y, `24.1` any 24.1.y, `24.1.0`
+# that release only. Aliases (`lts/*`, `node`), ranges and anything else set NODE_PIN_ERROR, which
+# setup.sh and verify.sh turn into a failure -- there is no fallback to another major. Nothing is
+# installed or downloaded. https://github.com/nvm-sh/nvm#nvmrc
+resolve_node_release_line() {
+  local pin_file pin major
+  pin_file="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/.nvmrc"
+  NODE_PIN_ERROR=''
+  { [ -e "$pin_file" ] || [ -L "$pin_file" ]; } || return 0
+  if [ -L "$pin_file" ] || [ ! -f "$pin_file" ]; then
+    NODE_PIN_ERROR="unsupported .nvmrc: $pin_file must be a regular file, not a symlink or directory"
+    return 0
+  fi
+  pin=''
+  if IFS= read -r -d '' pin < "$pin_file"; then
+    NODE_PIN_ERROR="unsupported .nvmrc: NUL bytes are not permitted"
+    return 0
+  fi
+  pin="${pin//$''/}"
+  pin="${pin#"${pin%%[![:space:]]*}"}"
+  pin="${pin%"${pin##*[![:space:]]}"}"
+  if [ "${#pin}" -ge 32 ] || ! [[ "$pin" =~ ^v?([1-9][0-9]*)(\.(0|[1-9][0-9]*)){0,2}$ ]]; then
+    NODE_PIN_ERROR="unsupported .nvmrc: expected one line of [v]MAJOR[.MINOR[.PATCH]] (for example 24), not an alias, range or multi-line value"
+    return 0
+  fi
+  pin="${pin#v}"
+  major="${pin%%.*}"
+  if [ "${#major}" -lt "${#NODE_MIN_MAJOR}" ] || \
+     { [ "${#major}" -eq "${#NODE_MIN_MAJOR}" ] && [[ "$major" < "$NODE_MIN_MAJOR" ]]; }; then
+    NODE_PIN_ERROR="unsupported .nvmrc: Node $pin is older than the supported minimum ${NODE_MIN_MAJOR}"
+    return 0
+  fi
+  NODE_RELEASE_LINE="$pin"
+}
+resolve_node_release_line
+# Matches `node --version` output (v24.1.0) against NODE_RELEASE_LINE as a dotted prefix.
+node_version_in_release_line() { [[ "$1" =~ ^v${NODE_RELEASE_LINE//./\.}(\.|$) ]]; }
 PYTHON_RELEASE_LINE=3
 GH_VERSION=2.94.0
 VERCEL_CLI_VERSION=58.0.0

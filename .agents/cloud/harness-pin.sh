@@ -4,4 +4,4 @@
 # Bump it to a commit already on master; Test-ContractLoaderChain.ps1 and
 # install-shared-contract.test.sh check that the commit exists in this repository's history.
 HARNESS_REPO_URL='https://github.com/pyrgos-ai/doug-harness.git'
-HARNESS_COMMIT='8c082364dd343ea47025fe6cfce3592c14c93be0'
+HARNESS_COMMIT='99d3cb0ac2536cb56e8d91b1bbdede77804e66d2'

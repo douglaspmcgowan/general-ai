@@ -46,6 +46,7 @@ build_fixture() {
   mkdir -p "$root/repo/.agents/cloud" "$root/repo/.local/agent-tools/bin" "$root/home" "$root/stub"
 
   cp "$here/tool-versions.sh" "$root/repo/.agents/cloud/tool-versions.sh"
+  cp "$here/powershell-runtime.sh" "$root/repo/.agents/cloud/powershell-runtime.sh"
   cp "$here/credential-profile.sh" "$root/repo/.agents/cloud/credential-profile.sh"
   cp "$here/FRESH-MACHINE-READINESS.md" "$root/repo/.agents/cloud/FRESH-MACHINE-READINESS.md"
   cp "$here/install-shared-contract.sh" "$root/repo/.agents/cloud/install-shared-contract.sh"
@@ -124,7 +125,8 @@ run_setup() {
     && PATH="$root/stub:$PATH" \
        HOME="$root/home" \
        CLOUD_TOOL_ROOT=".local/agent-tools" \
-       POWERSHELL_PREFIXES="$root/pwsh-prefix" \
+       POWERSHELL_RUNTIME_PREFIX="$root/pwsh-prefix" \
+       POWERSHELL_RUNTIME_LAUNCHER="$root/pwsh-bin/pwsh" \
        bash "$root/repo/.agents/cloud/setup.sh" ) >"$log" 2>&1
 }
 
@@ -158,7 +160,7 @@ build_minimal_runtime_fixture() {
   local root="$1" tool candidate persist_clis="${2:-1}"
   build_fixture "$root" '' "$persist_clis"
   mkdir -p "$root/minimal"
-  for tool in awk bash cat chmod cmp cp cut date dirname env git grep head id install ln mkdir mktemp mv readlink rm sed sha256sum tail tar touch; do
+  for tool in awk bash cat chmod cmp cp cut date dirname env find git grep head id install ln mkdir mktemp mv readlink realpath rm rmdir sed sha256sum stat tail tar touch uname; do
     candidate="$(command -v "$tool")"
     if [ -n "$candidate" ]; then
       ln -s "$candidate" "$root/minimal/$tool"
@@ -198,8 +200,10 @@ run_minimal_runtime_setup() {
   ( cd "$root/repo" \
     && PATH="$root/minimal" \
        HOME="$root/home" \
+       NVM_DIR="$root/home/.nvm" \
        CLOUD_TOOL_ROOT=".local/agent-tools" \
-       POWERSHELL_PREFIXES="$root/pwsh-prefix" \
+       POWERSHELL_RUNTIME_PREFIX="$root/pwsh-prefix" \
+       POWERSHELL_RUNTIME_LAUNCHER="$root/pwsh-bin/pwsh" \
        FAKE_APT_LOG="$root/apt.log" \
        FAKE_RUNTIME_BIN="$root/minimal" \
        FAKE_NODE_VERSION="$node_version" \
@@ -247,7 +251,8 @@ run_architecture_setup() {
     && PATH="$root/minimal" \
        HOME="$root/home" \
        CLOUD_TOOL_ROOT=".local/agent-tools" \
-       POWERSHELL_PREFIXES="$root/pwsh-prefix" \
+       POWERSHELL_RUNTIME_PREFIX="$root/pwsh-prefix" \
+       POWERSHELL_RUNTIME_LAUNCHER="$root/pwsh-bin/pwsh" \
        FAKE_APT_LOG="$root/apt.log" \
        FAKE_RUNTIME_BIN="$root/minimal" \
        FAKE_NODE_VERSION="v${NODE_RELEASE_LINE}.0.0" \
@@ -311,7 +316,8 @@ run_setup_without_project_data_root() {
       && PATH="$root/stub:$PATH" \
          HOME="$root/home" \
          CLOUD_TOOL_ROOT=".local/agent-tools" \
-         POWERSHELL_PREFIXES="$root/pwsh-prefix" \
+         POWERSHELL_RUNTIME_PREFIX="$root/pwsh-prefix" \
+       POWERSHELL_RUNTIME_LAUNCHER="$root/pwsh-bin/pwsh" \
          bash "$root/repo/.agents/cloud/setup.sh" ) >"$log" 2>&1
 }
 
@@ -321,7 +327,8 @@ run_setup_with_incomplete_credentials() {
     && PATH="$root/stub:$PATH" \
        HOME="$root/home" \
        CLOUD_TOOL_ROOT=".local/agent-tools" \
-       POWERSHELL_PREFIXES="$root/pwsh-prefix" \
+       POWERSHELL_RUNTIME_PREFIX="$root/pwsh-prefix" \
+       POWERSHELL_RUNTIME_LAUNCHER="$root/pwsh-bin/pwsh" \
        BWS_PROJECT_ID='value-free-fixture-id' \
        bash "$root/repo/.agents/cloud/setup.sh" ) >"$log" 2>&1
 }
@@ -362,9 +369,181 @@ test_fail_closed() {
     else fail "no refusing guard in ~/$settings (rc=$guard_rc)"; fi
   done
 }
+# ============================================================ project Node pin
+# SETUP_TEST_SECTION=node-pin runs only this section.
+test_node_pin() {
+  # A reviewed project .nvmrc selects the Node release line setup and verify both require; with
+  # no project pin the canonical default stays. Offline: every node is a stub under a fixture nvm.
+  node_pin_fixture() {
+    local root="$1" pin="$2" versions="$3" v d
+    build_minimal_runtime_fixture "$root"
+    for t in sort; do
+      ln -s "$(command -v $t)" "$root/minimal/$t"
+      copy_runtime_deps "$(command -v $t)" "$root/minimal"
+    done
+    printf '#!/usr/bin/env bash\necho v20.20.2\n' > "$root/minimal/node"
+    printf '#!/usr/bin/env bash\necho 10.0.0\n' > "$root/minimal/npm"
+    chmod +x "$root/minimal/node" "$root/minimal/npm"
+    for v in $versions; do
+      d="$root/home/.nvm/versions/node/v$v/bin"
+      mkdir -p "$d"
+      printf '#!/usr/bin/env bash\necho v%s\n' "$v" > "$d/node"
+      cat > "$d/npm" <<'EOF'
+#!/usr/bin/env bash
+printf '%s\n' "$*" >> "${FIXTURE_NPM_LOG:?}"
+[ "${1:-}" = --version ] && { echo 10.0.0; exit 0; }
+echo 'offline fixture npm refused an install' >&2
+exit 97
+EOF
+      cat > "$d/npx" <<'EOF'
+#!/usr/bin/env bash
+echo 'offline fixture npx refused execution' >&2
+exit 97
+EOF
+      chmod +x "$d/node" "$d/npm" "$d/npx"
+    done
+    [ -z "$pin" ] || printf '%b' "$pin" > "$root/repo/.nvmrc"
+  }
+  node_pin_case() { # name pin versions
+    local root="$work/nodepin-$1"
+    node_pin_fixture "$root" "$2" "$3"
+    FIXTURE_NPM_LOG="$root/npm.log" run_minimal_runtime_setup "$root" "$work/nodepin-$1.log" 'v20.20.2'
+    NP_RC=$?
+    NP_LOG="$work/nodepin-$1.log"
+    NP_ROOT="$root"
+  }
+  # Parser proof runs before setup, with no package manager or network-capable process.
+  np_parse() {
+    local root="$work/nodeparse-$1"
+    mkdir -p "$root/repo/.agents/cloud"
+    cp "$here/tool-versions.sh" "$root/repo/.agents/cloud/tool-versions.sh"
+    printf '%b' "$2" > "$root/repo/.nvmrc"
+    (cd "$root/repo" && . .agents/cloud/tool-versions.sh && printf 'LINE=%s\nERROR=%s\n' "$NODE_RELEASE_LINE" "$NODE_PIN_ERROR")
+  }
+  np_out="$(np_parse full '24.1.2\n')"
+  printf '%s\n' "$np_out" | grep -qx 'LINE=24.1.2' \
+    && pass 'parser preserves a full MAJOR.MINOR.PATCH pin' \
+    || fail "parser did not preserve a full pin: $np_out"
+  np_out="$(np_parse multiline '24\n22\n')"
+  printf '%s\n' "$np_out" | grep -q 'ERROR=unsupported .nvmrc' \
+    && pass 'parser refuses a long multiline pin before setup effects' \
+    || fail "parser accepted a multiline pin: $np_out"
+  np_out="$(np_parse huge '999999999999999999999999999999999\n')"
+  printf '%s\n' "$np_out" | grep -q 'ERROR=unsupported .nvmrc' \
+    && pass 'parser handles a huge major deterministically' \
+    || fail "parser accepted a huge major: $np_out"
+  # Selector proof uses only an explicit fixture NVM_DIR and fixture PATH.
+  np_selector_root="$work/nodeselect"
+  mkdir -p "$np_selector_root/home/.nvm/versions/node/v22.8.0/bin" "$np_selector_root/bin" "$np_selector_root/path"
+  for np_tool in ln readlink rm sort; do
+    ln -s "$(command -v "$np_tool")" "$np_selector_root/path/$np_tool"
+  done
+  for np_tool in node npm npx; do
+    printf '#!/bin/bash\necho v22.8.0\n' > "$np_selector_root/home/.nvm/versions/node/v22.8.0/bin/$np_tool"
+    chmod +x "$np_selector_root/home/.nvm/versions/node/v22.8.0/bin/$np_tool"
+  done
+  np_selector_fn="$(sed -n '/^select_installed_node() {$/,/^}$/p' "$here/setup.sh")"
+  np_out="$(
+    set -uo pipefail
+    log() { printf 'LOG %s\n' "$*"; }
+    have() { command -v "$1" >/dev/null 2>&1; }
+    node_version_in_release_line() { [[ "$1" =~ ^v22(\.|$) ]]; }
+    NODE_RELEASE_LINE=22
+    bin_dir="$np_selector_root/bin"
+    PATH="$np_selector_root/path"
+    NVM_DIR="$np_selector_root/home/.nvm"
+    export PATH NVM_DIR
+    eval "$np_selector_fn"
+    select_installed_node
+    printf 'node=%s\nnpm=%s\nnpx=%s\n' \
+      "$(readlink -f "$bin_dir/node")" "$(readlink -f "$bin_dir/npm")" "$(readlink -f "$bin_dir/npx")"
+  )"
+  printf '%s\n' "$np_out" | grep -q "node=$np_selector_root/home/.nvm/" \
+    && printf '%s\n' "$np_out" | grep -q "npm=$np_selector_root/home/.nvm/" \
+    && printf '%s\n' "$np_out" | grep -q "npx=$np_selector_root/home/.nvm/" \
+    && pass 'selector binds node, npm and npx to the explicit fixture NVM_DIR' \
+    || fail "selector escaped its explicit fixture boundary: $np_out"
+  node_pin_case none '' '20.20.2 22.9.0 24.1.0'
+  { [ "$NP_RC" -eq 0 ] && grep -q 'selected installed Node v22.9.0' "$NP_LOG"; } \
+    && pass 'no project .nvmrc keeps the canonical Node 22 default when 20, 22 and 24 are installed' \
+    || fail "no-pin setup did not select v22.9.0 (rc $NP_RC): $(tail -3 "$NP_LOG")"
+  for np_tool in node npm npx; do
+    np_target="$(readlink -f "$NP_ROOT/repo/.local/agent-tools/bin/$np_tool" 2>/dev/null || true)"
+    case "$np_target" in
+      "$NP_ROOT/home/.nvm/"*) pass "$np_tool resolves inside the fixture NVM_DIR" ;;
+      *) fail "$np_tool escaped the fixture: ${np_target:-<missing>}" ;;
+    esac
+  done
+  [ -s "$NP_ROOT/npm.log" ] && ! grep -qv '^install ' "$NP_ROOT/npm.log" \
+    && pass 'offline install attempts reached only the refusing fixture npm' \
+    || fail 'fixture npm did not deterministically record/refuse setup install attempts'
+  printf '  evidence fixture_home=%s nvm_dir=%s path=%s\n' "$NP_ROOT/home" "$NP_ROOT/home/.nvm" "$NP_ROOT/repo/.local/agent-tools/bin:$NP_ROOT/minimal"
+  printf '  evidence before_node=%s before_interpreter=%s\n' "$NP_ROOT/minimal/node" "$(readlink -f "$NP_ROOT/minimal/bash")"
+  printf '  evidence after_node=%s after_npm=%s after_npx=%s npm_attempts=%s\n' \
+    "$(readlink -f "$NP_ROOT/repo/.local/agent-tools/bin/node")" \
+    "$(readlink -f "$NP_ROOT/repo/.local/agent-tools/bin/npm")" \
+    "$(readlink -f "$NP_ROOT/repo/.local/agent-tools/bin/npx")" \
+    "$(wc -l < "$NP_ROOT/npm.log")"
+  node_pin_case p24 '24\n' '20.20.2 22.9.0 24.1.0'
+  { [ "$NP_RC" -eq 0 ] && grep -q 'selected installed Node v24.1.0' "$NP_LOG"; } \
+    && pass 'project .nvmrc 24 selects the installed Node 24 for setup' \
+    || fail "setup ignored .nvmrc 24 (rc $NP_RC): $(grep -i 'node' "$NP_LOG" | tail -3)"
+  node_pin_case p24v 'v24.1\r\n' '22.9.0 24.10.0 24.1.2'
+  { [ "$NP_RC" -eq 0 ] && grep -q 'selected installed Node v24.1.2' "$NP_LOG"; } \
+    && pass 'project .nvmrc v24.1 matches 24.1.x only, never 24.10' \
+    || fail "partial pin matched the wrong release (rc $NP_RC): $(grep -i 'node' "$NP_LOG" | tail -3)"
+  node_pin_case absent24 '24\n' '20.20.2 22.9.0'
+  { [ "$NP_RC" -ne 0 ] && grep -q 'Node 24 is required' "$NP_LOG" && ! grep -q 'selected installed Node v22' "$NP_LOG"; } \
+    && pass 'project .nvmrc 24 with no Node 24 installed fails clearly, with no fallback to 22' \
+    || fail "absent Node 24 did not fail clearly (rc $NP_RC): $(tail -3 "$NP_LOG")"
+  np_i=0
+  for np_bad in 'lts/*\n' '^24\n' '24; touch PWNED\n' '$(touch PWNED)\n' '21\n' '24\n22\n' '24                                                                \n22\n' '\n' '24.x\n' 'node\n' '024\n' '99999999999999999999999999999999\n'; do
+    np_i=$((np_i + 1))
+    node_pin_case "bad$np_i" "$np_bad" '20.20.2 22.9.0 24.1.0'
+    { [ "$NP_RC" -ne 0 ] && grep -q 'unsupported .nvmrc' "$NP_LOG" && [ ! -e "$NP_ROOT/repo/PWNED" ] && ! grep -q 'selected installed Node' "$NP_LOG"; } \
+      && pass "malformed or unsupported .nvmrc is refused: $(printf '%s' "$np_bad" | head -c 20)" \
+      || fail "malformed .nvmrc was not refused (rc $NP_RC): $np_bad / $(tail -2 "$NP_LOG")"
+  done
+  node_pin_case nul '2\x004\n' '22.9.0 24.1.0'
+  { [ "$NP_RC" -ne 0 ] && grep -q 'NUL bytes are not permitted' "$NP_LOG"; } \
+    && pass 'an embedded NUL cannot collapse 2<NUL>4 into Node 24' \
+    || fail "an embedded NUL was not refused (rc $NP_RC): $(tail -2 "$NP_LOG")"
+  np_root="$work/nodepin-symlink"
+  node_pin_fixture "$np_root" '' '22.9.0 24.1.0'
+  printf '24\n' > "$np_root/real-pin"; ln -s "$np_root/real-pin" "$np_root/repo/.nvmrc"
+  if [ -L "$np_root/repo/.nvmrc" ]; then
+    run_minimal_runtime_setup "$np_root" "$work/nodepin-symlink.log" 'v20.20.2'
+    { [ $? -ne 0 ] && grep -q 'unsupported .nvmrc' "$work/nodepin-symlink.log"; } \
+      && pass 'a symlinked .nvmrc is refused' \
+      || fail 'a symlinked .nvmrc was accepted'
+  else
+    fail 'symlinked .nvmrc case could not run: this Linux host cannot create symlinks'
+  fi
+  # verify.sh requires the same line setup selected.
+  for np_case in 'p24ok|24\n|v24.1.0|PASS  node v24.1.0' 'p24full|24.1.0\n|v24.1.0|PASS  node v24.1.0' 'p24fullbad|24.1.0\n|v24.1.1|FAIL  node is v24.1.1' 'p24bad|24\n|v22.0.0|FAIL  node is v22.0.0' 'none|-|v22.0.0|PASS  node v22.0.0' 'none20|-|v20.20.2|FAIL  node is v20.20.2' 'mal|lts/*\n|v22.0.0|FAIL  .*unsupported .nvmrc'; do
+    IFS='|' read -r np_n np_pin np_ver np_expect <<<"$np_case"
+    np_root="$work/nodepin-verify-$np_n"
+    build_fixture "$np_root"; build_verify_fixture "$np_root"
+    printf '#!/usr/bin/env bash\necho "%s"\n' "$np_ver" > "$np_root/repo/.local/agent-tools/bin/node"
+    [ "$np_pin" = '-' ] || printf '%b' "$np_pin" > "$np_root/repo/.nvmrc"
+    run_verify "$np_root" "$work/nodepin-verify-$np_n.log"
+    grep -qE "$np_expect" "$work/nodepin-verify-$np_n.log" \
+      && pass "verify.sh node check for pin '${np_pin%\n}' and node $np_ver: $np_expect" \
+      || fail "verify.sh node check wrong for pin '$np_pin' node $np_ver: $(grep -i node "$work/nodepin-verify-$np_n.log" | head -3)"
+  done
+}
 if [ "${SETUP_TEST_SECTION:-}" = fail-closed ]; then
   test_fail_closed
   printf '\nsetup.test.sh (fail-closed): %d passed, %d failed\n' "$pass_count" "$fail_count"
+  [ "$fail_count" -eq 0 ] || exit 1
+  exit 0
+fi
+
+if [ "${SETUP_TEST_SECTION:-}" = node-pin ]; then
+  test_node_pin
+  printf '
+setup.test.sh (node-pin): %d passed, %d failed
+' "$pass_count" "$fail_count"
   [ "$fail_count" -eq 0 ] || exit 1
   exit 0
 fi
@@ -772,7 +951,8 @@ run_setup_no_pwsh() {
     && PATH="$root/stub-nopwsh:$(path_without_pwsh)" \
        HOME="$root/home" \
        CLOUD_TOOL_ROOT=".local/agent-tools" \
-       POWERSHELL_PREFIXES="$root/pwsh-prefix" \
+       POWERSHELL_RUNTIME_PREFIX="$root/pwsh-prefix" \
+       POWERSHELL_RUNTIME_LAUNCHER="$root/pwsh-bin/pwsh" \
        POWERSHELL_HOOK_CANDIDATES="$candidate" \
        CLOUD_SETUP_ALLOW_DEGRADED_POWERSHELL="$ack" \
        bash "$root/repo/.agents/cloud/setup.sh" ) >"$log" 2>&1
@@ -788,7 +968,8 @@ run_setup_with_pwsh() {
     && PATH="$root/stub:$PATH" \
        HOME="$root/home" \
        CLOUD_TOOL_ROOT=".local/agent-tools" \
-       POWERSHELL_PREFIXES="$root/pwsh-prefix" \
+       POWERSHELL_RUNTIME_PREFIX="$root/pwsh-prefix" \
+       POWERSHELL_RUNTIME_LAUNCHER="$root/pwsh-bin/pwsh" \
        POWERSHELL_HOOK_CANDIDATES="$candidate" \
        bash "$root/repo/.agents/cloud/setup.sh" ) >"$log" 2>&1
 }
@@ -1425,6 +1606,7 @@ else
 fi
 
 test_fail_closed
+test_node_pin
 
 printf '\nsetup.test.sh: %d passed, %d failed\n' "$pass_count" "$fail_count"
 [ "$fail_count" -eq 0 ] || exit 1

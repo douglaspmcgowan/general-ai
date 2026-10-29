@@ -56,8 +56,8 @@ check_tool() {
     fail "$1 $2 printed nothing"
   elif printf '%s' "$out" | grep -qiE 'command not found|no such file|not recognized|not installed|permission denied'; then
     fail "$1 $2 reported: $out"
-  elif [ -n "${3:-}" ] && ! printf '%s' "$out" | grep -qF "$3"; then
-    fail "$1 is $out; expected $3"
+  elif [ -n "${3:-}" ] && { case "$3" in re:*) ! printf '%s' "$out" | grep -qE "${3#re:}" ;; *) ! printf '%s' "$out" | grep -qF "$3" ;; esac; }; then
+    fail "$1 is $out; expected ${3#re:}"
   else
     pass "$1 $out"
   fi
@@ -79,7 +79,11 @@ check_pip() {
 
 echo '--- toolchain'
 check_tool git --version
-check_tool node --version "v${NODE_RELEASE_LINE}."
+if [ -n "$NODE_PIN_ERROR" ]; then
+  fail "$NODE_PIN_ERROR"
+else
+  check_tool node --version "re:^v${NODE_RELEASE_LINE//./\\.}(\\.|\$)"
+fi
 check_tool python3 --version
 check_tool npm --version
 check_pip
