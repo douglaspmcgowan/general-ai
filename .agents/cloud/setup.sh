@@ -464,7 +464,9 @@ powershell_state='absent'; powershell_path=''; powershell_version=''
 if have pwsh; then
   powershell_state='untrusted'
   powershell_path="$(command -v pwsh)"
-  powershell_version="$(powershell_runtime_with_cache "$pwsh_process_cache" "$powershell_path" --version 2>&1 | head -n1)"
+  # A refused probe is a state, not a reason to exit: under set -e and pipefail this assignment
+  # otherwise ends setup silently before the shared-contract report and the status file below.
+  powershell_version="$(powershell_runtime_with_cache "$pwsh_process_cache" "$powershell_path" --version 2>&1 | head -n1)" || powershell_version=''
   # Both questions, in this order: is the candidate shaped the way the hook requires (a
   # regular file, not a symlink), and DOES IT START. Asking only the first is what reported
   # powershell=ready against a /usr/local/bin/pwsh that exited 154 on every invocation --
