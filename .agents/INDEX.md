@@ -10,7 +10,7 @@ reaches all three products; this file is how you check that it really did.
 Connected MCP servers are listed in the generated capability router under `probe.mcp_servers`; read that roster for this device and list a server's tools before choosing `make-mcp`.
 Project an explicit vault mirror with `Build-HarnessIndex.ps1 -ProjectVaultMirror`; verify both surfaces with `Build-HarnessIndex.ps1 -ProjectVaultMirror -Verify`.
 
-Counts: **115 canonical skills**, **398 repository tool routes**, and **no Claude command files** -- `<repo>\commands\` holds only its `RETIRED.md`. Everything a command used to do is a canonical skill now, which is what makes it reachable from Codex and Cursor as well.
+Counts: **115 canonical skills**, **399 repository tool routes**, and **no Claude command files** -- `<repo>\commands\` holds only its `RETIRED.md`. Everything a command used to do is a canonical skill now, which is what makes it reachable from Codex and Cursor as well.
 
 ## Search surfaces
 
@@ -1017,6 +1017,7 @@ runtimes carry their exact path because they have no shared, side-effect-free he
 | `Test-IntentPlacement.ps1` | Require project intent at the repository root and reject a harness-global intent file. | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Test-IntentPlacement.ps1` |
 | `Test-IrreversibleAuthorization.ps1` | Static verifier for `no-irreversible-act-without-explicit-authorization`. | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Test-IrreversibleAuthorization.ps1` |
 | `Test-LongrunOvernightAlias.ps1` | Asserts longrun's arming, supervision and Drive clause, and that the retired overnight package stays merged into longrun. | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Test-LongrunOvernightAlias.ps1` |
+| `Test-LoopContract.ps1` | (no comment-based synopsis) | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Test-LoopContract.ps1` |
 | `Test-MergeDidNotDelete.ps1` | Refuses a merge commit that silently dropped a top-level symbol neither side authored a deletion for. | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Test-MergeDidNotDelete.ps1` |
 | `Test-MergedUnitsLanded.ps1` | Fail when a pull request marked MERGED is not reachable from the default branch. | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Test-MergedUnitsLanded.ps1` |
 | `Test-NoTrackedIgnoredFiles.ps1` | (no comment-based synopsis) | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Test-NoTrackedIgnoredFiles.ps1` |
@@ -1174,9 +1175,9 @@ evidence yet shows it costs anything. Source: <https://cursor.com/docs/skills.md
 
 - Measured list budget: **21,502 characters** (`codex debug prompt-input`, 2026-09-28, codex-cli 0.155.0, gpt-6-astra).
 - Codex system + plugin skills consume **2,623**, leaving **18,879** for canonical skills.
-- The 115 canonical skills currently cost **17,874 characters**.
+- The 115 canonical skills currently cost **17,925 characters**.
 - 1 skill(s) set `disable-model-invocation: true` and cost nothing: `correct`. They stay invokable as `/name` on Claude and Codex but never appear in the model-visible listing -- by design, not by cap.
-- **Under budget with 1,005 characters of headroom. All 115 canonical skills are visible to Codex.**
+- **Under budget with 954 characters of headroom. All 115 canonical skills are visible to Codex.**
 
 ### Claude budget math
 
@@ -1187,13 +1188,13 @@ default everyone reports. It is not on the official skills page; it is stated in
 overrides the whole computation with a fixed count when set.
 
 - This device: 200,000 tokens x 4 x 0.06 = **48,000 characters**. The fraction is per-device and product-owned; `InstallGlobal` does not reproduce it, so another machine needs it set by hand and this arithmetic re-checked.
-- Claude reads `description` **and** `when_to_use`, so an entry here weighs far more than the same entry on Codex. The 115 canonical skills cost **35,827 characters** -- 2.0x their Codex weight.
+- Claude reads `description` **and** `when_to_use`, so an entry here weighs far more than the same entry on Codex. The 115 canonical skills cost **35,878 characters** -- 2.0x their Codex weight.
 - **There are no command files left to share the budget with.** `<repo>\commands\` holds only
   its `RETIRED.md`, so the shared-budget question that used to change this arithmetic by the
   whole answer -- one formatter over one list, or two -- is moot on this tree. It returns the
   moment a command file does, including one written by hand into `~\.claude\commands\`, which
   no generator here reproduces or sees.
-- **Headroom: 35,827 used of 48,000, leaving 12,173 characters** -- about **38 more model-visible skills** at the current 314-character mean entry. A user-only skill costs nothing and is not on this count at all, which is why 1 of the 115 canonical skills are absent from it.
+- **Headroom: 35,878 used of 48,000, leaving 12,122 characters** -- about **38 more model-visible skills** at the current 315-character mean entry. A user-only skill costs nothing and is not on this count at all, which is why 1 of the 115 canonical skills are absent from it.
 
 ## Canonical skills
 
@@ -1279,7 +1280,7 @@ they agree: one is computed from `surfaces:` and the other from the character ca
 | `package` | Package a repository as portable and clean-clone-verified. | yes | yes |
 | `paper-read` | Use when one research paper must be read closely enough to argue with it, not summarized. | yes | yes |
 | `pathway` | Run a named, ordered chain of existing skills from the pathway registry against one target. | yes | yes |
-| `plan` | Turn a prompt brief into a one-reply approval packet and Work Scope tasks: units, routing, approvals, loops. | yes | yes |
+| `plan` | Turn a prompt brief into a one-reply approval packet and Work Scope tasks: tactician-owned chunks, waves, approvals, loops, and a copy-and-go execu... | yes | yes |
 | `present` | Test whether a rendered interface communicates both its concrete data and its intended takeaway to a fresh viewer. | yes | yes |
 | `probe` | Measure test effectiveness through risk-led coverage gaps, properties, and mutation testing where applicable. | yes | yes |
 | `prompt` | Turn a raw or rambling prompt into a structured, harness-enriched brief with cited context and stop conditions. | yes | yes |
