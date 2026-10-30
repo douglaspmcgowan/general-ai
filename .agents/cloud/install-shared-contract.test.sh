@@ -17,19 +17,39 @@ skip() { printf '  skip  %s\n' "$1"; }
 work="$(mktemp -d)"
 trap 'rm -rf "$work"' EXIT
 
+# The package the cases copy from: this repository's own .agents when the test runs inside the
+# harness, otherwise a minimal inert package synthesized here. A product checkout has no canonical
+# contract, so the synthetic package carries only the markers and placeholders the production
+# renderer substitutes (the Claude import line, the {{CANONICAL_AGENTS}} embed, the first contract
+# line) and no live instructions.
+canon="$harness"
+for f in AGENTS.md templates/AGENTS.md adapters/claude/CLAUDE.md adapters/codex/AGENTS.md adapters/opencode/AGENTS.md adapters/agy/AGENTS.md; do
+  [ -f "$harness/$f" ] || canon=''
+done
+if [ -z "$canon" ]; then
+  canon="$work/synthetic-package"
+  mkdir -p "$canon/templates" "$canon/adapters/claude" "$canon/adapters/codex" "$canon/adapters/opencode" "$canon/adapters/agy"
+  printf '# Synthetic shared contract (test fixture)\n\nInert rule: this fixture carries no live instructions.\n' > "$canon/AGENTS.md"
+  printf '# Synthetic template (test fixture)\n' > "$canon/templates/AGENTS.md"
+  printf '<!-- agent-harness:claude-loader:v1:start -->\n@{{HOME_POSIX}}/.agents/AGENTS.md\n<!-- agent-harness:claude-loader:v1:end -->\n' > "$canon/adapters/claude/CLAUDE.md"
+  for adapter in codex opencode agy; do
+    printf '<!-- agent-harness:%s-loader:v1:start -->\n{{CANONICAL_AGENTS}}\n<!-- agent-harness:%s-loader:v1:end -->\n' "$adapter" "$adapter" > "$canon/adapters/$adapter/AGENTS.md"
+  done
+fi
+
 # A minimal harness package: the contract, the template that marks it as the harness, and the
 # adapters the script renders.
 make_package() {
   local dest="$1" adapter
   mkdir -p "$dest/templates" "$dest/adapters/claude" "$dest/adapters/codex" "$dest/adapters/opencode" "$dest/adapters/agy"
-  cp "$harness/AGENTS.md" "$dest/AGENTS.md"
-  cp "$harness/templates/AGENTS.md" "$dest/templates/AGENTS.md"
+  cp "$canon/AGENTS.md" "$dest/AGENTS.md"
+  cp "$canon/templates/AGENTS.md" "$dest/templates/AGENTS.md"
   for adapter in claude/CLAUDE.md codex/AGENTS.md opencode/AGENTS.md agy/AGENTS.md; do
-    cp "$harness/adapters/$adapter" "$dest/adapters/$adapter"
+    cp "$canon/adapters/$adapter" "$dest/adapters/$adapter"
   done
 }
 
-first_line="$(grep -m1 -v '^\s*$' "$harness/AGENTS.md")"
+first_line="$(grep -m1 -v '^\s*$' "$canon/AGENTS.md")"
 guard_text='agent-harness: ~/.agents/AGENTS.md is missing'
 count_in() { grep -cF -- "$2" "$1" 2>/dev/null || true; }
 is_installed() { case "$out" in shared_contract=installed*) return 0 ;; *) return 1 ;; esac; }
@@ -55,7 +75,7 @@ guard_rc() {
 
 check_installed() {
   local label="$1" home="$2" loader settings
-  if [ -f "$home/.agents/AGENTS.md" ] && diff -q <(tr -d '\r' < "$home/.agents/AGENTS.md") <(tr -d '\r' < "$harness/AGENTS.md") >/dev/null; then
+  if [ -f "$home/.agents/AGENTS.md" ] && diff -q <(tr -d '\r' < "$home/.agents/AGENTS.md") <(tr -d '\r' < "$canon/AGENTS.md") >/dev/null; then
     pass "$label: ~/.agents/AGENTS.md is the shared contract"
   else
     fail "$label: ~/.agents/AGENTS.md missing or different"
@@ -182,7 +202,9 @@ fi
 # 10. The pinned commit is a real commit of this repository's history.
 # shellcheck disable=SC1091
 pin_commit="$(. "$here/harness-pin.sh" && printf '%s' "$HARNESS_COMMIT")"
-if git -C "$harness" cat-file -e "${pin_commit}^{commit}" 2>/dev/null; then
+if [ "$canon" != "$harness" ]; then
+  skip 'harness-pin.sh commit: product topology, the pinned commit lives in the harness repository'
+elif git -C "$harness" cat-file -e "${pin_commit}^{commit}" 2>/dev/null; then
   pass "harness-pin.sh names a commit in this repository ($pin_commit)"
 elif [ "$(git -C "$harness" rev-parse --is-shallow-repository 2>/dev/null)" = true ]; then
   skip 'harness-pin.sh commit: a shallow checkout cannot see it'
