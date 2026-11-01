@@ -16,7 +16,7 @@ Not checked by the router or `New-AgentBrief.ps1` (author discipline):
 1. **Model and effort.** First qualified pair on the mode's ladder. Haiku 5.5 at medium builds routine work, Sonnet 5.5 hard work only; "when a task fails twice you can give it to an opus tactician"; Opus writes final prose only as `Work-class: final-prose` ("yeah you can add something to the router aobut having opus write final prose."); long-running work is tactician work.
 2. **Provider ladder.** Follow the mode's `worker_ladder`; a local launch names its `dispatch_routing.local_exceptions` entry unless exempt; cloud preconditions there. Every brief tells the delegate to reconcile on its own `agent/*` or `cloud/*` branch (merge the default branch INTO it) and push it; pushing or merging the default branch, or any history-rewriting push, needs a live authorization. Every delegate must reconcile on its own branch before reporting done. It does not push the default branch or merge into it unless an explicit authorization for that action is live. Full text, measurements and tests: `references/dispatch-rule-detail.md` § Item 2.
 3. **Model is never unset.** An omitted model inherits the session model.
-3a. **Placement.** Every brief states `required_machine`, `reason` and `current_machine`; dispatch refuses a conflict.
+3a. **Placement.** Every brief states the task's `placement` object (`required_machine`, `reason`, `current_machine`); dispatch refuses a conflict. `references/dispatch-provider-ladder.md` § Item 3a owns it.
 7b. **Repository.** Name, remote URL or clone path; `brief-repository-mismatch` is refused.
 11. **Runtime configuration.** Tools, skills (none by default), `maxTurns`, `isolation: worktree` for every repository lane, memory (none by default). Full text: `references/dispatch-rule-detail.md`.
 15. **Skills cost.** Preload only what a lane needs; `disable-model-invocation` skills cannot be preloaded.
@@ -29,7 +29,7 @@ Not checked by the router or `New-AgentBrief.ps1` (author discipline):
 4b. **Never sleep or poll in the foreground.** Use `run_in_background` or Monitor.
 5. **Commit every intended file before leaving the worktree.** The result includes the commit SHA.
 6. **File a harness defect, do not work around it.** `report-hook-misfire.js` for a block; `Add-ProjectIntake.ps1` otherwise; say so in the report.
-6a. **Finding repair fields; queue-only reporting.** `FixRecommendation`, `FixLocation`, `FixRationale`; workers never run a task-state writer.
+6a. **Finding repair fields; queue-only reporting.** `FixRecommendation`, `FixLocation`, `FixRationale`; workers never run a task-state writer, `New-PlanPacket.ps1 -Write` included (`CLUSTERING.md` **One project, one Work Scope writer**).
 9. **Post status on each event, not on a timer.** `Update-StatusBoard.ps1 -Action post`.
 
 ## Orchestrator rules
