@@ -86,7 +86,6 @@
     {
       "capability": "harden-tail",
       "canonical": [
-        "pathway",
         "tech-debt-audit",
         "review",
         "design-review",

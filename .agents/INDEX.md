@@ -10,7 +10,7 @@ reaches all three products; this file is how you check that it really did.
 Connected MCP servers are listed in the generated capability router under `probe.mcp_servers`; read that roster for this device and list a server's tools before choosing `make-mcp`.
 Project an explicit vault mirror with `Build-HarnessIndex.ps1 -ProjectVaultMirror`; verify both surfaces with `Build-HarnessIndex.ps1 -ProjectVaultMirror -Verify`.
 
-Counts: **115 canonical skills**, **399 repository tool routes**, and **no Claude command files** -- `<repo>\commands\` holds only its `RETIRED.md`. Everything a command used to do is a canonical skill now, which is what makes it reachable from Codex and Cursor as well.
+Counts: **105 canonical skills**, **402 repository tool routes**, and **no Claude command files** -- `<repo>\commands\` holds only its `RETIRED.md`. Everything a command used to do is a canonical skill now, which is what makes it reachable from Codex and Cursor as well.
 
 ## Search surfaces
 
@@ -112,7 +112,7 @@ The repository remote `pyrgos-ai/doug-harness` is the source. A receiving comput
 | HTML-slides token theme catalogue | `skills\html-slides\assets\themes\tokens\README.md` |
 | HTML-slides full-deck template rationale, one `README.md` per template under `templates\full-decks\` | `skills\html-slides\templates\full-decks\course-module\README.md`; `skills\html-slides\templates\full-decks\dir-key-nav-minimal\README.md`; `skills\html-slides\templates\full-decks\graphify-dark-graph\README.md`; `skills\html-slides\templates\full-decks\hermes-cyber-terminal\README.md`; `skills\html-slides\templates\full-decks\knowledge-arch-blueprint\README.md`; `skills\html-slides\templates\full-decks\obsidian-claude-gradient\README.md`; `skills\html-slides\templates\full-decks\pitch-deck\README.md`; `skills\html-slides\templates\full-decks\presenter-mode-reveal\README.md`; `skills\html-slides\templates\full-decks\product-launch\README.md`; `skills\html-slides\templates\full-decks\tech-sharing\README.md`; `skills\html-slides\templates\full-decks\testing-safety-alert\README.md`; `skills\html-slides\templates\full-decks\weekly-report\README.md`; `skills\html-slides\templates\full-decks\xhs-pastel-card\README.md`; `skills\html-slides\templates\full-decks\xhs-post\README.md`; `skills\html-slides\templates\full-decks\xhs-white-editorial\README.md` |
 | Where a new file goes in a scaffolded app, and what it may import | `skills\stack\architecture.md` |
-| Solo-review code-reviewer dispatch template | `skills\solo-review\code-reviewer.md` |
+| Review code-reviewer dispatch template | `skills\review\code-reviewer.md` |
 | Slides proofing-bench operator docs (current, non-legacy) | `skills\slides\eval\EVAL.md`; `skills\slides\eval\test-suite.md`; `skills\slides\eval\eval-system-design.md`; `skills\slides\eval\schema\README.md`; `skills\slides\eval\fixtures\README.md`; `skills\slides\eval\metrics\visual-criteria.md` |
 | Validate-deck component test coverage | `skills\slides\scripts\validate-deck\testing\test-all-components.md` |
 
@@ -121,9 +121,7 @@ The repository remote `pyrgos-ai/doug-harness` is the source. A receiving comput
 
 ## Review surfaces
 
-`skills\review\SKILL.md` is the router — "review this" names no surface, so it reads the target's scope and failure category and picks between a single-perspective pass, an independent-perspective panel, a defect-class lens sweep, and a pre-merge worktree review. Pointed at this harness's own hooks, loops, rules, and safety edges it lands on `skills\harness-review\SKILL.md`; Hook reviews exercise synthetic stdin payloads and expected verdicts in a real subprocess rather than reasoning about what the hook would do.
-
-`skills\pathway\SKILL.md` runs a named ordered chain of those surfaces against one target; `skill-pathways.json` registers chains already extracted from real sessions with the evidence that named them. `skills\trailblaze\SKILL.md` authors or revises an entry there; a one-off sequence is not a pathway and routes back to the owners it borrows.
+`skills\review\SKILL.md` is the router and the single-reviewer — "review this" names no surface, so it reads the target's scope and failure category and picks between a single-perspective pass, an independent-perspective panel, a defect-class lens sweep, and a pre-merge worktree review. Pointed at this harness's own hooks, loops, rules, and safety edges it runs its own harness mode; Hook reviews exercise synthetic stdin payloads and expected verdicts in a real subprocess rather than reasoning about what the hook would do.
 
 
 ## Data, secrets, and vaults
@@ -268,6 +266,7 @@ Every active markdown document under `.agents\` is listed here so an agent can r
 | `CLOUD-PROTOCOL.md` |
 | `CLOUD-SURFACES.md` |
 | `cloud\FRESH-MACHINE-READINESS.md` |
+| `cloud\pds-bootstrap-distribution\README.md` |
 | `cloud\VAULT-CONTRACT.md` |
 | `CLUSTERING.md` |
 | `conductor\ADVISOR-BACKEND.md` |
@@ -449,6 +448,7 @@ Every active markdown document under `.agents\` is listed here so an agent can r
 | `design\workflow-design-template.md` |
 | `DISPATCH-CHECKLIST.md` |
 | `feedback\FEEDBACK-LOG.md` |
+| `fleet-results\tts-inspection-event-repair-20261031.md` |
 | `handoffs\af-design-proposal-awaiting-gate.md` |
 | `handoffs\capsule-portable-setup-folder-20260810.md` |
 | `handoffs\cloud-rollout-stalled-at-two-of-sixteen-20260809.md` |
@@ -494,6 +494,7 @@ Every active markdown document under `.agents\` is listed here so an agent can r
 | `overlays\verification-before-completion-evidence.md` |
 | `port-surface\README.md` |
 | `prompts\hourly-conductor-loop.md` |
+| `prompts\meng-transcripts.md` |
 | `recordings\README.md` |
 | `references\agy.md` |
 | `references\ai-studio.md` |
@@ -625,6 +626,9 @@ Every active markdown document under `.agents\` is listed here so an agent can r
 | `templates\Outputs\00 - Outputs Index.md` |
 | `templates\PRODUCT.md` |
 | `templates\TASK.md` |
+| `tools\auth-tag-catalogue\live-listing.md` |
+| `tools\auth-tag-catalogue\localhost-grants.md` |
+| `tools\auth-tag-catalogue\session-revocation.md` |
 | `tools\fleet-adapters\README.md` |
 | `tools\fleet-adapters\SOLO_REVIEW_2026-09-14.md` |
 | `tools\pilot-tests\PILOT-README.md` |
@@ -699,6 +703,7 @@ runtimes carry their exact path because they have no shared, side-effect-free he
 | `attune-stylometry.py` | (no comment-based synopsis) | `<harness-root>/tools/attune-stylometry.py` |
 | `Backup-AgentWorkspace.cmd` | (no comment-based synopsis) | `<harness-root>/tools/Backup-AgentWorkspace.cmd` |
 | `Backup-AgentWorkspace.ps1` | (no comment-based synopsis) | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Backup-AgentWorkspace.ps1` |
+| `Bind-CodexCloudNativeHandoff.ps1` | Atomically binds caller-observed Codex native thread evidence to one prepared handoff. | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Bind-CodexCloudNativeHandoff.ps1` |
 | `Build-AgentRoleProjections.ps1` | Project the canonical agent-role definitions onto Claude and Codex, and publish the dispatch manifest. | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Build-AgentRoleProjections.ps1` |
 | `Build-AuthTagCatalogue.ps1` | (no comment-based synopsis) | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Build-AuthTagCatalogue.ps1` |
 | `Build-CapabilityRouter.ps1` | Build the generated capability router that the SessionStart hook pushes into every session. | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Build-CapabilityRouter.ps1` |
@@ -724,6 +729,7 @@ runtimes carry their exact path because they have no shared, side-effect-free he
 | `Clear-PlaywrightOrphans.ps1` | Reclaim orphaned Playwright browser trees and their abandoned temp profile directories. | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Clear-PlaywrightOrphans.ps1` |
 | `Clear-StaleAgentProcesses.ps1` | (no comment-based synopsis) | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Clear-StaleAgentProcesses.ps1` |
 | `Clear-StaleLocks.ps1` | (no comment-based synopsis) | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Clear-StaleLocks.ps1` |
+| `CloudGovernanceMaterialize.py` | (no comment-based synopsis) | `<harness-root>/tools/CloudGovernanceMaterialize.py` |
 | `codex-dispatch-reference.ps1` | Harness-owned Codex dispatch shapes that Test-DispatchCompliance.ps1 can measure. | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool codex-dispatch-reference.ps1` |
 | `Collect-RemoteLane.ps1` | Retrieves a remote machine's committed lane branch and publishes it, in one command. | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Collect-RemoteLane.ps1` |
 | `Collect-RemoteLaneBranch.ps1` | Recovers a lane branch from a peer with no GitHub auth: bundle, verify, fetch, push. | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Collect-RemoteLaneBranch.ps1` |
@@ -736,7 +742,6 @@ runtimes carry their exact path because they have no shared, side-effect-free he
 | `Dispatch-Lane.ps1` | Records and completes a routed lane's worktree lifecycle. | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Dispatch-Lane.ps1` |
 | `Enable-Gitleaks.cmd` | (no comment-based synopsis) | `<harness-root>/tools/Enable-Gitleaks.cmd` |
 | `Enable-Gitleaks.ps1` | (no comment-based synopsis) | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Enable-Gitleaks.ps1` |
-| `Enable-LfsHookGuard.ps1` | Installs the LFS-guarded post-checkout/post-commit/post-merge hooks into the active core.hooksPath. | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Enable-LfsHookGuard.ps1` |
 | `Ensure-AgentProject.cmd` | (no comment-based synopsis) | `<harness-root>/tools/Ensure-AgentProject.cmd` |
 | `Ensure-AgentProject.ps1` | (no comment-based synopsis) | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Ensure-AgentProject.ps1` |
 | `Export-HarnessBackup.ps1` | (no comment-based synopsis) | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Export-HarnessBackup.ps1` |
@@ -788,6 +793,7 @@ runtimes carry their exact path because they have no shared, side-effect-free he
 | `Initialize-FleetAgent.ps1` | Enrolls one agent into the fleet enrollment store (SEAM 1). | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Initialize-FleetAgent.ps1` |
 | `Initialize-WorkScope.ps1` | (no comment-based synopsis) | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Initialize-WorkScope.ps1` |
 | `Install-AgentBackupTask.ps1` | (no comment-based synopsis) | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Install-AgentBackupTask.ps1` |
+| `Install-ClaudeAccountSetup.ps1` | Give one manifest Claude account the same multi-claude setup as the 5970 and 4587 accounts. | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Install-ClaudeAccountSetup.ps1` |
 | `Install-FleetQuotaRefreshTask.ps1` | (no comment-based synopsis) | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Install-FleetQuotaRefreshTask.ps1` |
 | `Install-HarnessScheduledTask.ps1` | Registers a harness-owned scheduled task, but only when the existing task (if any) is not already equivalent to the intended definition, and downgr... | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Install-HarnessScheduledTask.ps1` |
 | `Install-RepairShopHost.ps1` | (no comment-based synopsis) | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Install-RepairShopHost.ps1` |
@@ -810,7 +816,7 @@ runtimes carry their exact path because they have no shared, side-effect-free he
 | `Invoke-FleetRoute.TestSupport.ps1` | (no comment-based synopsis) | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Invoke-FleetRoute.TestSupport.ps1` |
 | `Invoke-GateDigest.ps1` | (no comment-based synopsis) | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Invoke-GateDigest.ps1` |
 | `Invoke-GmailReadOnlyQuery.ps1` | (no comment-based synopsis) | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Invoke-GmailReadOnlyQuery.ps1` |
-| `Invoke-HeavyTestAdmission.ps1` | Checks or runs a command through the one-per-machine heavy-test admission gate. | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Invoke-HeavyTestAdmission.ps1` |
+| `Invoke-HeavyTestAdmission.ps1` | Checks or runs a command through the managed per-machine heavy-test pool. | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Invoke-HeavyTestAdmission.ps1` |
 | `Invoke-HookMisfireDispatch.js` | (no comment-based synopsis) | `<harness-root>/tools/Invoke-HookMisfireDispatch.js` |
 | `Invoke-ImpeccableDetector.ps1` | Runs the bundled Impeccable design detector and fails closed when any target was not actually scanned. | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Invoke-ImpeccableDetector.ps1` |
 | `Invoke-LagTrap.ps1` | The lag trap. | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Invoke-LagTrap.ps1` |
@@ -927,6 +933,7 @@ runtimes carry their exact path because they have no shared, side-effect-free he
 | `Start-AppSupervisor.ps1` | (no comment-based synopsis) | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Start-AppSupervisor.ps1` |
 | `Start-BackgroundRun.ps1` | (no comment-based synopsis) | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Start-BackgroundRun.ps1` |
 | `Start-ClaudeAccount.ps1` | `ca`: open an interactive Claude Code session on one named Claude account on this machine. | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Start-ClaudeAccount.ps1` |
+| `Start-ClaudeAccountAutoLogin.ps1` | Semi-automatic Claude CLI sign-in for an account folder: opens the login URL in a throwaway Chrome profile, fetches the sign-in code from dpm5970's... | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Start-ClaudeAccountAutoLogin.ps1` |
 | `Start-DesignSpaceExplorer.ps1` | (no comment-based synopsis) | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Start-DesignSpaceExplorer.ps1` |
 | `Start-FleetAtlas.ps1` | (no comment-based synopsis) | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Start-FleetAtlas.ps1` |
 | `Start-FleetLane.ps1` | Typed launcher for background and foreground fleet lanes. | `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <harness-root>/tools/Show-ToolHelp.ps1 -Tool Start-FleetLane.ps1` |
@@ -1088,7 +1095,7 @@ runtimes carry their exact path because they have no shared, side-effect-free he
 
 ## Retired paths and names
 
-`manifests/retired-paths.json` is authoritative: **161 retired paths** and **67 retired names**. Retiring something means adding its entry in the same commit; `Test-HarnessPathClaims.ps1` and `Test-RetiredNames.ps1` (``& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File .agents/tools/Test-RetiredNames.ps1 -RepoRoot <path>``) enforce it.
+`manifests/retired-paths.json` is authoritative: **172 retired paths** and **67 retired names**. Retiring something means adding its entry in the same commit; `Test-HarnessPathClaims.ps1` and `Test-RetiredNames.ps1` (``& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File .agents/tools/Test-RetiredNames.ps1 -RepoRoot <path>``) enforce it.
 
 ## Interface design route
 
@@ -1175,9 +1182,9 @@ evidence yet shows it costs anything. Source: <https://cursor.com/docs/skills.md
 
 - Measured list budget: **21,502 characters** (`codex debug prompt-input`, 2026-09-28, codex-cli 0.155.0, gpt-6-astra).
 - Codex system + plugin skills consume **2,623**, leaving **18,879** for canonical skills.
-- The 115 canonical skills currently cost **17,925 characters**.
+- The 105 canonical skills currently cost **13,530 characters**.
 - 1 skill(s) set `disable-model-invocation: true` and cost nothing: `correct`. They stay invokable as `/name` on Claude and Codex but never appear in the model-visible listing -- by design, not by cap.
-- **Under budget with 954 characters of headroom. All 115 canonical skills are visible to Codex.**
+- **Under budget with 5,349 characters of headroom. All 105 canonical skills are visible to Codex.**
 
 ### Claude budget math
 
@@ -1188,13 +1195,13 @@ default everyone reports. It is not on the official skills page; it is stated in
 overrides the whole computation with a fixed count when set.
 
 - This device: 200,000 tokens x 4 x 0.06 = **48,000 characters**. The fraction is per-device and product-owned; `InstallGlobal` does not reproduce it, so another machine needs it set by hand and this arithmetic re-checked.
-- Claude reads `description` **and** `when_to_use`, so an entry here weighs far more than the same entry on Codex. The 115 canonical skills cost **35,878 characters** -- 2.0x their Codex weight.
+- Claude reads `description` **and** `when_to_use`, so an entry here weighs far more than the same entry on Codex. The 105 canonical skills cost **10,092 characters** -- 0.7x their Codex weight.
 - **There are no command files left to share the budget with.** `<repo>\commands\` holds only
   its `RETIRED.md`, so the shared-budget question that used to change this arithmetic by the
   whole answer -- one formatter over one list, or two -- is moot on this tree. It returns the
   moment a command file does, including one written by hand into `~\.claude\commands\`, which
   no generator here reproduces or sees.
-- **Headroom: 35,878 used of 48,000, leaving 12,122 characters** -- about **38 more model-visible skills** at the current 315-character mean entry. A user-only skill costs nothing and is not on this count at all, which is why 1 of the 115 canonical skills are absent from it.
+- **Headroom: 10,092 used of 48,000, leaving 37,908 characters** -- about **390 more model-visible skills** at the current 97-character mean entry. A user-only skill costs nothing and is not on this count at all, which is why 1 of the 105 canonical skills are absent from it.
 
 ## Canonical skills
 
@@ -1214,121 +1221,111 @@ they agree: one is computed from `surfaces:` and the other from the character ca
 
 | Skill | Purpose | Claude | Codex |
 |---|---|---|---|
-| `assets` | Maintain a small append-only index of reusable produced assets. | yes | yes |
-| `boss-update` | Roll daily reports over a date range into an upward, outcome-only status update for a boss or advisor. | yes | yes |
-| `brainstorming` | Use before any creative work -- a new feature, component, or behavior change -- to explore intent, requirements, and design first. | yes | yes |
-| `brandkit` | Generate premium brand-kit imagery: logo systems, identity decks, guideline boards. | yes | yes |
-| `browser-use` | Use when driving a browser or webview for live UI work where session state, user-authored content, downloads, timeouts, or multiple browser surfaces. | yes | yes |
-| `burnout` | Spend remaining usage productively through the bounded frontier loop before a limit reset. | yes | yes |
-| `caltime` | Log Douglas's weekly Berkeley AI-tutor hours in TRS: pick blocks from his calendar, enter and save, never submit. | yes | yes |
-| `canvas-sync` | Launch one xhigh Haiku agent to diff Canvas against the courses app, then update the app, Obsidian notes and Todoist. | yes | yes |
-| `clean` | Use for cleanup of documents (vault, notes, skills, briefs) or source code (dead code, duplication, module boundaries, debt). | yes | yes |
-| `clean-downloads` | Sort new Downloads files into existing Google Drive folders, quarantine sensitive ones, delete junk. | yes | yes |
-| `cloud-protocol` | Use before dispatching, monitoring, or landing a Codex Cloud task: environment setup, remote preflight, host verification, and the. | yes | yes |
-| `codex-cloud-environment` | Create and verify one Codex Cloud environment through a one-call Haiku browser agent. | yes | yes |
-| `compare-options` | Compare concrete options for a tool, approach, or design choice using evidence and explicit tradeoffs. | yes | yes |
-| `condense` | Use when a paper must be shortened in its authors' words or re-shown as an outline, visual set, or poster. | yes | yes |
-| `connect` | Choose and plan the smallest useful CLI, MCP, HTTP, or library integration surface for an app. | yes | yes |
-| `correct` | Use when Douglas reports a correction, repeated defect, unsafe omission, or a safeguard that did not fire. | `/name` only | `/name` only |
-| `craft` | Use for any design operation: create or edit interfaces, critique, visual systems, tokens, type, color, slides, or brands. | yes | yes |
-| `daily-activity` | Produce a report-only daily activity summary with outcomes, debugging arcs, and follow-up opportunities. | yes | yes |
-| `debloat` | Use when sweeping a system for unnecessary or pointless things — dead paths, unread config, orphan packages, unconsumed jobs — where the finding. | yes | yes |
+| `boss-update` | Roll daily reports over a date range into an outcome-only update for a boss/advisor. | yes | yes |
+| `brainstorming` | Before creative work (new feature, component, behavior change): explore design. | yes | yes |
+| `brandkit` | Brand-kit imagery: logo systems, identity decks, guideline boards. | yes | yes |
+| `browser-use` | Drive a browser or webview for live UI work: sessions, downloads, timeouts, surfaces. | yes | yes |
+| `burnout` | Burn down remaining usage on safe queued work before a limit reset. | yes | yes |
+| `caltime` | Log Berkeley AI-tutor hours in TRS, CalTime, timesheet, MECENG 102B; save, never submit. | yes | yes |
+| `canvas-sync` | Diff Canvas (bCourses) vs courses app, Obsidian, Todoist; INFO 272, CS 260B changes. | yes | yes |
+| `clean` | Clean up docs (vault, notes, skills, briefs, README) or code (dead code, duplication). | yes | yes |
+| `clean-downloads` | Sort Downloads into Drive folders, quarantine sensitive files, delete junk. | yes | yes |
+| `cloud-protocol` | Dispatch, monitor or land a Codex Cloud task: preflight, READY-to-PR. | yes | yes |
+| `codex-cloud-environment` | Create and verify a Codex Cloud environment via a Haiku browser agent. | yes | yes |
+| `compare-options` | Pick one among named tools, skills, frameworks or design variants using evidence. | yes | yes |
+| `condense` | Shorten a research paper in authors' words or re-show as outline, visuals, poster. | yes | yes |
+| `connect` | Plan the smallest CLI, MCP, HTTP or library integration surface before adding one; build the CLI. | yes | yes |
+| `correct` | Douglas reports a correction, repeated defect, unsafe omission or safeguard that missed. | `/name` only | `/name` only |
+| `craft` | Any design work: interfaces, critique, visual systems, tokens, type, color, slides, brand. | yes | yes |
+| `daily-activity` | Write the internal per-day report: what was built, broke, and should be automated. | yes | yes |
+| `debloat` | Sweep a system for pointless things: dead paths, unread config, orphan packages, jobs; harness decay sweep. | yes | yes |
 | `deep-search` | Multi-step cited web research for open questions needing 3+ sources. | yes | yes |
-| `design-review` | Review a built interface's information architecture, usability, and visual hierarchy; return prioritized findings only. | yes | yes |
-| `detective` | Use when investigating patterns across many recent agent sessions, transcripts, or work records. | yes | yes |
-| `discussion-prep` | Prepare evidence-linked cards, questions, briefs, and slides from mixed discussion materials. | yes | yes |
-| `environment-preflight` | Run a cheap, evidence-based readiness audit before substantial project work. | yes | yes |
-| `evolve` | Use when improving a tool by doing real work with it: dogfooding, friction logs, 'test it by using it', self-hosted harness changes. | yes | yes |
-| `fleet` | Dispatch, delegate, launch, route, and harvest agents through the fleet router. | yes | yes |
-| `forms` | Fill, read, validate, export or share Douglas's structured forms and fillable PDFs through the local form-editor `forms` CLI. | yes | yes |
-| `frontend-slides` | Create stunning, animation-rich HTML presentations from scratch or by converting PowerPoint files. | yes | yes |
-| `frontier` | Use when open-ended work or research needs repeated, user-directed choices about the next direction. | yes | yes |
-| `full-output-enforcement` | Force complete, unabridged code output: no placeholders, no elisions, clean handling of token-limit splits. | yes | yes |
-| `fullscope` | Use when Douglas says 'full scope' or gives a short build ask like 'make an app': expand it to a 50-200 item scope brief, then build it canary-first. | yes | yes |
-| `goal-engineer` | Author measurable, bounded goals that unattended work can consume and verify. | yes | yes |
-| `grill-me` | Interview the user relentlessly about a plan or design until reaching shared understanding, resolving each branch of the decision tree. | yes | yes |
-| `harness-review` | Adversarially review a harness or code target for edge cases, unsafe assumptions, and missing evidence, or sweep the whole harness for decay. | yes | yes |
-| `hone` | Measure, isolate, and verify one performance improvement at a time; keep only gains proven against a baseline. | yes | yes |
-| `html-slides` | Single-file HTML decks with a component library: flip cards, charts, tables, timelines, themes. | yes | yes |
-| `hue` | Generate a new design-language skill from a brief, screenshot, or an existing skill to remix. | yes | yes |
-| `image-artist` | Route image-generation work to the matching brand, web, or mobile owner, or to the image-to-code craft leaf; generate nothing itself. | yes | yes |
-| `imagegen-frontend-mobile` | Elite mobile app image-generation skill for creating premium, app-native screen concepts and flows. | yes | yes |
-| `imagegen-frontend-web` | Generate premium, conversion-aware website section reference images, one image per section. | yes | yes |
-| `impeccable` | Frontend interface work of any kind: design, redesign, critique, audit, or polish a site, app, dashboard, or component. | yes | yes |
-| `index` | The one entry point for NEW vault material — a source, topic, or question. | yes | yes |
-| `ingest` | Route new material to vault or recording ingestion by source type; perform no ingestion itself. | yes | yes |
-| `investigate` | Find the root cause and full impact of one specific incident using authoritative evidence. | yes | yes |
-| `janitor` | Audit this machine's processes, sessions, ports, and memory; prepare safe cleanup evidence. | yes | yes |
+| `design-review` | Critique a built interface: IA, usability, visual hierarchy; findings only. | yes | yes |
+| `detective` | Sweep many agent sessions, transcripts or work records for a recurring pattern. | yes | yes |
+| `discussion-prep` | Seminar, journal club, meeting prep: cards, questions, briefs, slides. | yes | yes |
+| `fleet` | Dispatch, delegate, launch, route, harvest agents; Codex Cloud, agy, Cursor, opencode. | yes | yes |
+| `forms` | '/forms', 'fill the form', 'the form editor': fill, read, validate, export Douglas's forms and fillable PDFs. | yes | yes |
+| `frontend-slides` | Animation-rich HTML presentations from scratch or converted from PPT/PPTX. | yes | yes |
+| `frontier` | Develop one target over several legs, Douglas picking each direction; --research for cited research. | yes | yes |
+| `full-output-enforcement` | Force complete, unabridged code output; no placeholders or elisions. | yes | yes |
+| `fullscope` | 'fullscope', 'full scope', 'go big', 'make me an app': expand a short build ask into a 50-200 item brief, canary-first. | yes | yes |
+| `goal-engineer` | 'Give me a new goal', 'output a goal', 'check whether my goal needs updating': measurable goals, verifiers, retirement. | yes | yes |
+| `grill-me` | Stress-test a plan or design by relentless interview; \"grill me\". | yes | yes |
+| `hone` | '/hone', 'make it faster', 'where is the bottleneck': profile, baseline, measured performance work. | yes | yes |
+| `html-slides` | Single-file HTML slide decks: flip cards, charts, timelines, /html-slides. | yes | yes |
+| `hue` | Generate a design-language skill from a brief, screenshot, or skill to remix. | yes | yes |
+| `image-artist` | Route generated-imagery work to the brand, web, mobile or image-to-code owner. | yes | yes |
+| `imagegen-frontend-mobile` | iOS/Android app screen concept images in phone mockups; no code. | yes | yes |
+| `imagegen-frontend-web` | Website section reference images, one per section. | yes | yes |
+| `impeccable` | Frontend design, redesign, critique, audit, polish: site, app, dashboard, UI. | yes | yes |
+| `index` | Entry point for NEW vault material: source, topic, or question. | yes | yes |
+| `ingest` | Route new material to vault or recording ingestion by source type. | yes | yes |
+| `investigate` | Root cause and full impact of one incident: crash, hook failure, missing files. | yes | yes |
+| `janitor` | Audit machine processes, sessions, ports, memory; safe cleanup evidence. | yes | yes |
 | `learn` | Learn a practical craft or workflow from current primary and practitioner evidence. | yes | yes |
-| `lego` | Catalog proven, reusable implementation patterns from real source files into a cited LEGO.md library. | yes | yes |
-| `librarian` | Use when maintaining, auditing, consolidating, or repairing Douglas's Obsidian vault, especially link, corpus, archive, or navigation drift. | yes | yes |
-| `longrun` | Arm and operate a long unattended project run with durable state, supervision, recurring self-checks, and safe approval handling. | yes | yes |
-| `loop-engineer` | Use when authoring, checking, arming, revising, or debugging a bounded agent loop contract. | yes | yes |
-| `loop-protocol` | Use before authoring, arming, revising, or debugging a recurring agent run. | yes | yes |
-| `machine-ops` | Route a fault in this Windows host itself to the versioned tool that repairs it, and to janitor when the answer is measurement. | yes | yes |
-| `make-api` | Design, build, and live-test a small HTTP API with an explicit contract and safe operational defaults. | yes | yes |
-| `make-cli` | Design and implement a reliable command-line interface for a defined local or service workflow. | yes | yes |
-| `make-mcp` | Build and verify an MCP server after validating that an existing server cannot meet the need. | yes | yes |
-| `mastermind` | Choose the next planning or exploratory move across projects and agent threads; run no work itself. | yes | yes |
-| `mission-control` | One-glance status of this machine and every project: what needs attention, what's filed, machine health. | yes | yes |
-| `modernize` | Find current harness or ecosystem changes that plausibly improve one existing codebase. | yes | yes |
-| `multi-claude` | Use when configuring, launching, or piloting multiple Claude accounts that share one harness on one or more Windows machines. | yes | yes |
-| `news-digest` | Build and refresh Douglas's persistent AI, design, and technology news digest from authorized inbox and public sources. | yes | yes |
-| `notes` | Write notes, student docs, or quick messages in Douglas's human note voice: terse, skimmable. | yes | yes |
-| `onboard` | Make a codebase or application legible with an evidence-backed developer explainer or in-app help. | yes | yes |
-| `orchestration-protocol` | Use for conductor lifecycle, bounded delegation, independent verification, and integration evidence: one writer, one proving command, one. | yes | yes |
-| `package` | Package a repository as portable and clean-clone-verified. | yes | yes |
-| `paper-read` | Use when one research paper must be read closely enough to argue with it, not summarized. | yes | yes |
-| `pathway` | Run a named, ordered chain of existing skills from the pathway registry against one target. | yes | yes |
-| `plan` | Turn a prompt brief into a one-reply approval packet and Work Scope tasks: tactician-owned chunks, waves, approvals, loops, and a copy-and-go execu... | yes | yes |
-| `present` | Test whether a rendered interface communicates both its concrete data and its intended takeaway to a fresh viewer. | yes | yes |
-| `probe` | Measure test effectiveness through risk-led coverage gaps, properties, and mutation testing where applicable. | yes | yes |
-| `prompt` | Turn a raw or rambling prompt into a structured, harness-enriched brief with cited context and stop conditions. | yes | yes |
-| `queue` | Use when a defect or idea belongs in a project's discovery queue for later work. | yes | yes |
-| `recon` | Map a field, mirror what Douglas already does, and hand him a Have/Partial/Gap comparison plus forward paths. | yes | yes |
-| `recording-ingest` | Turn a recording or its transcript into an attributed extraction -- summary, every task and commitment with its owner and quoted line, decisions. | yes | yes |
-| `redact` | Black out SSNs, account numbers and other sensitive values in a PDF or image without reading the document. | yes | yes |
-| `reference-hunt` | Find, open, licence-check, and screenshot real visual references, then write a one-page art direction before any design is built. | yes | yes |
-| `remote-machine-protocol` | Use for driving agent CLIs on a second physical Windows machine over the tailnet: SSH, psmux session persistence, slot dispatch, and what an SSH. | yes | yes |
-| `replicate` | Replicate a reference artifact through an explicit feature-parity checklist and item-by-item verification. | yes | yes |
-| `review` | Route any review request to its single best owner; this skill chooses but never runs the review. | yes | yes |
-| `review-lenses` | Use when reviewing a repository or diff for observability, configuration, concurrency, or idempotency defects. | yes | yes |
-| `sage` | Distill recurring, cited lessons from a repository's review and verification artifacts into durable WISDOM. | yes | yes |
-| `sift` | Collect, categorize, and route a broad public research source set for human triage. | yes | yes |
-| `slides` | Use when building a deck, poster or flyer: routes to a PowerPoint-native or an HTML build once the governing design language is read. | yes | yes |
-| `solo-review` | Use when one primary perspective should review a focused codebase or CAD target, with an optional verified fix loop. | yes | yes |
-| `spar` | Use when a bounded target needs adversarial break-fix rounds with independent attack lenses and evidence gates. | yes | yes |
+| `lego` | Catalog reusable implementation patterns into a cited LEGO.md library; /lego. | yes | yes |
+| `librarian` | Maintain Obsidian vault: broken links, orphans, duplicates, stale indexes, tags. | yes | yes |
+| `longrun` | Arm, run, resume or stop an unattended multi-hour project run across usage limits. | yes | yes |
+| `loop-engineer` | Author, check, arm or debug a bounded loop contract: /loop, verifier, trigger, stop bound. | yes | yes |
+| `loop-protocol` | Author, arm, revise or debug a loop, watchdog, or scheduled recurring run. | yes | yes |
+| `machine-ops` | Windows host fault: slow, app won't launch, broken PATH shim, leaked browsers. | yes | yes |
+| `make-api` | 'Build an API', 'expose X over HTTP', 'stand up a web service': REST, GraphQL, FastAPI, Hono, live-tested; '/make-api'. | yes | yes |
+| `make-mcp` | Build and verify an MCP server once existing servers are ruled out. | yes | yes |
+| `mission-control` | One-glance status of this machine and every project: attention, filed, health | yes | yes |
+| `modernize` | Check one codebase for adoptable harness or ecosystem changes. | yes | yes |
+| `multi-claude` | Several Claude accounts: profiles, sign-in, headless or resumed sessions, Remote Control, psmux, transcript search, school seat. | yes | yes |
+| `news-digest` | '/news-digest', 'build my news digest', 'refresh the news briefing'. | yes | yes |
+| `notes` | Terse, skimmable notes, student docs, or quick messages in Douglas's voice. | yes | yes |
+| `onboard` | Developer explainer (--dev) or in-app end-user help (--user) for a codebase. | yes | yes |
+| `orchestration-protocol` | Conductor lifecycle, delegation, verification, integration evidence. | yes | yes |
+| `package` | Make a repository portable and clean-clone-verified. | yes | yes |
+| `paper-read` | Close read of one research paper or preprint: claims, evidence, page locators. | yes | yes |
+| `present` | Test whether a rendered page, dashboard or chart is understood by a fresh viewer. | yes | yes |
+| `probe` | Test-suite effectiveness: coverage gaps, properties, mutation testing. | yes | yes |
+| `prompt` | '/prompt', 'shape this prompt', 'turn this dump into a brief': raw prompt to cited brief. | yes | yes |
+| `queue` | File a defect or idea in a project's discovery queue. | yes | yes |
+| `recon` | Map a field vs. | yes | yes |
+| `recording-ingest` | Voice memo, meeting recording or transcript to attributed tasks, decisions. | yes | yes |
+| `redact` | '/redact', 'redact my W-2', 'black out the SSN', 'remove the account number before I send this': PDF or image. | yes | yes |
+| `reference-hunt` | 'Find references', 'what should this look like', 'make it look less generic': moodboard, art direction before design. | yes | yes |
+| `remote-machine-protocol` | Remote GPU box agent CLIs: SSH, psmux, slot dispatch, dropped sessions. | yes | yes |
+| `replicate` | 'Match this' reference: feature-parity checklist, then item-by-item verification. | yes | yes |
+| `review` | Route any code, diff, UI, harness or skill review to its one owner, or run it: single-reviewer, harness, request, findings, stack. | yes | yes |
+| `review-lenses` | Review pass for obs/config, concurrency, race-condition, idempotency defects. | yes | yes |
+| `sage` | Mine review, probe, spar, verification artifacts into cited lessons in WISDOM.md. | yes | yes |
+| `scheme` | \"Plan this\", \"give me the plan\", a prompt-skill brief to walk unattended, loose ends: chunks, waves, approval packet. | yes | yes |
+| `sift` | Sift a topic: gather, categorize, route many public sources for human triage. | yes | yes |
+| `slides` | Deck, slide, presentation, poster, flyer, .pptx rebuild: pick the route first. | yes | yes |
+| `spar` | Adversarial break-fix rounds against a working target with independent attack lenses. | yes | yes |
 | `spec` | Write SPEC.md with testable acceptance criteria. | yes | yes |
-| `stack` | Use when a new app needs its stack chosen, scaffolded, and given an architecture before any feature is written. | yes | yes |
-| `start-project` | Scaffold a new project against the harness, or wire an unscaffolded folder into it, with connectors declared and verified. | yes | yes |
-| `stingy` | Audit a Claude Code session transcript for token waste and return a ranked, evidence-backed report with the fix for each class. | yes | yes |
-| `swe` | Route software engineering through skill selection, development, debugging, dispatch, review, and delivery. | yes | yes |
-| `syschaos-handoff` | Use when handing this session's work to a new Claude session on the second machine that Douglas can pilot. | yes | yes |
-| `systematic-debugging` | Find root cause before proposing any fix for a bug or test failure. | yes | yes |
-| `tactician` | Assess a project’s verified loose ends, choose the next moves inside a settled shape, and drive them through delegated builders to a pull request. | yes | yes |
-| `task` | Use when a substantive mixed prompt contains questions, rulings, intent, and executable work that must all be accounted for. | yes | yes |
-| `team-board` | Run a team status board for any teamboard program: scan Drive, ingest snapshots, refresh, build, preview, deploy, and manage sign-in. | yes | yes |
-| `tech-debt-audit` | Thorough, user-invoked tech debt and architecture audit of the current codebase. | yes | yes |
-| `test-driven-development` | Write a failing test before implementation code, and watch it fail, for any feature or bugfix. | yes | yes |
-| `todoist` | Read and manage Douglas's Todoist -- add, file, label, reschedule, complete, and review tasks -- through the Todoist v1 API. | yes | yes |
-| `trailblaze` | Author or revise evidence-backed reusable skill pathways; route one-off work and pathway execution to their existing owners. | yes | yes |
-| `trainer` | Mine a canonical skill's real usage history for evidence-backed improvement opportunities. | yes | yes |
-| `transcribe` | Use when transcribing user-authorized audio through an available trusted transcription process. | yes | yes |
-| `triage` | Deduplicate, invalidate, cluster, and recommend action for a whole open work set. | yes | yes |
-| `tune` | Calibrate active voice guides from supplied samples with measurement, reviewable changes, and backup-before-write. | yes | yes |
-| `ui-feature-ledger` | Protect approved interactive UI controls from unrequested removal across later edits. | yes | yes |
+| `stack` | 'What should I build this in', 'pick the stack', 'scaffold this', 'set up the project', 'where should this file go', /stack. | yes | yes |
+| `start-project` | Scaffold a new project or wire an unscaffolded folder into the harness; preflight an existing one. | yes | yes |
+| `stingy` | 'Where did the tokens go', 'audit this session', 'why was that session so expensive': rank a transcript's token waste with fixes. | yes | yes |
+| `swe` | Route software work: build, change, debug, test, review, package, deliver. | yes | yes |
+| `syschaos-handoff` | Hand this session to the other computer (SYSTEMATICCHAOS) or bring a remote one over. | yes | yes |
+| `systematic-debugging` | Find root cause before fixing any bug or test failure. | yes | yes |
+| `task` | '/task', '/task audit', 'break this prompt down', 'triage this', 'what did I ask for', 'record that preference', 'check my intent'. | yes | yes |
+| `team-board` | Team board: scan Drive, ingest, refresh, daily, digest, build, preview, deploy, sign-in, program.yaml, team work maps and repo facts. | yes | yes |
+| `tech-debt-audit` | Full-repo tech debt audit, architecture review, code quality assessment, codebase health check: TECH_DEBT_AUDIT.md. | yes | yes |
+| `test-driven-development` | Write a failing test first for any feature or bugfix. | yes | yes |
+| `todoist` | Todoist to-do list: 'add this to my list', 'what's on my plate', 'what's due'; add, label, reschedule, complete. | yes | yes |
+| `trainer` | Grade ONE named skill's usage history and recommend a change. | yes | yes |
+| `transcribe` | Transcribe one authorized audio file via a trusted transcription process. | yes | yes |
+| `triage` | Dedupe, cluster, recommend action across a whole open work set: lanes, intake, misfires. | yes | yes |
+| `tune` | Update the vault voice guide from writing samples, measured, with a backup first. | yes | yes |
+| `ui-feature-ledger` | Record UI controls and catch silent control removal across edits. | yes | yes |
 | `ultraskill` | Use when creating, editing, testing, installing, or retiring a skill across Claude, Codex, and Cursor. | yes | yes |
-| `usage-mode` | Show, set, clear, or list agent usage modes for sessions, projects, and the machine. | yes | yes |
-| `user` | Independently exercise a running product against its explicit claimed functionality. | yes | yes |
-| `vault-protocol` | The contract for every agent that reads, searches, writes, moves, links, or mirrors Douglas's Obsidian vault: placement, folder READMEs, authorship. | yes | yes |
-| `verification-before-completion` | Run and read verification output before claiming any work complete, fixed, passing, or ready to commit. | yes | yes |
-| `video-cut` | Cut video from transcript evidence, validate every seam, and retain a reversible cut plan. | yes | yes |
-| `viz` | Use when a chart, diagram or other visual must be picked or built for data, steps, causes, arguments, concepts or positions. | yes | yes |
-| `voice` | Rewrite existing prose in Douglas’s voice while preserving its facts, specifics, and meaning. | yes | yes |
-| `wayfinder` | Plan work too big for one session as a map of decision tickets in a local markdown tracker, resolved one ticket at a time. | yes | yes |
-| `wispr` | Use when a Wispr Flow meeting transcript is needed, or a notes.wisprflow.ai link is shared, on the Windows host. | yes | yes |
-| `work-scope` | Use when Get-WorkResume.ps1 returns state, or structured guarded task state is being adopted. | yes | yes |
-| `worktree-protocol` | Use for stable checkouts, one root per repository, cross-agent isolation, cloud-synced-folder exclusions, and worktree cleanup. | yes | yes |
+| `usage-mode` | Show, set, clear, list usage modes, including temporary and Mission Control. | yes | yes |
+| `user` | Exercise a RUNNING product against its claimed functionality as an independent tester. | yes | yes |
+| `vault-protocol` | Load before any Obsidian vault read, search, write, move, link, mirror. | yes | yes |
+| `verification-before-completion` | Verify before claiming work done, fixed, or passing. | yes | yes |
+| `video-cut` | Cut video: remove dead air or a passage, verify seams, keep a reversible plan. | yes | yes |
+| `viz` | 'Visualize this', 'make a chart', 'diagram this', 'map this argument', 'show this mechanism', 'catch-up visual', '/viz', 'what views am I missing'. | yes | yes |
+| `voice` | 'Put this in my voice', 'voice this', 'de-AI this draft': re-voice existing prose in Douglas's voice. | yes | yes |
+| `wayfinder` | Map work too big for one session as decision tickets: 'chart a map for this', 'plan this large effort', /wayfinder. | yes | yes |
+| `wispr` | Wispr Flow meeting transcript or notes.wisprflow.ai link on the Windows host. | yes | yes |
+| `work-scope` | Get-WorkResume.ps1 state, or adopting structured guarded task state. | yes | yes |
+| `worktree-protocol` | Stable checkouts, one root per repo, agent isolation, worktree cleanup. | yes | yes |
 
 ## Claude commands
 
