@@ -3,7 +3,7 @@
 This file is the portable project contract for local and cloud agents.
 
 <!-- agent-harness:portable:v4:start -->
-<!-- agent-harness:portable:content a4ae1f2fa3bb7742 -->
+<!-- agent-harness:portable:content a0ccab964f8616d7 -->
 <!-- contract-priority: P1; annotation only, applicability is unchanged -->
 **CONCISE, CONCISE. USE LESS WORDS. USE MINIMAL WORDS. IF I NEED MORE EXPLANATION, I'LL ASK.**
 
@@ -12,7 +12,7 @@ This file is the portable project contract for local and cloud agents.
 
 **Every sentence is paid for on every future read. Write less.** Never cut a prohibition, a measured number, a path, a version pin, a named owner, or the failure a rule prevents; relocate those to their owner instead.
 
-**Load the shared contract first; this block never restates it.** The marked safety floor below is the one exception. It is `~/.agents/AGENTS.md`. Each product's global loader injects it (`~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, Cursor's global rule, `~/.config/opencode/AGENTS.md`, `~/.gemini/config/AGENTS.md`), and in a container `.agents/cloud/setup.sh` installs it and those loaders from the harness commit pinned in `.agents/cloud/harness-pin.sh`, fetched read-only and never vendored; setup fails when it cannot, and Claude and Codex then refuse tool use. If it is not already in your context, read it now; if it cannot be read, stop and report, because no work is safe without it. Every rule below is one that contract does not carry, and every rule it carries lives there alone (spec `the-two-contracts-do-not-restate-each-other`, gated by `Test-ContractBudget.ps1` and `Test-ContractLoaderChain.ps1`).
+**Load the shared contract first; this block never restates it.** The marked safety floor below is the one exception. It is `~/.agents/AGENTS.md`. Each product's global loader injects it (`~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, Cursor's global rule, `~/.config/opencode/AGENTS.md`, `~/.gemini/config/AGENTS.md`), and in a container `.agents/cloud/setup.sh` installs it and those loaders from the harness commit pinned in `.agents/cloud/harness-pin.sh`, fetched read-only and never vendored; setup fails when it cannot, and Claude and Codex then refuse tool use. For a selected managed Codex Cloud task, `.agents/CLOUD-PROTOCOL.md` owns the normal pinned workspace loader through `.agents/cloud/start.mjs`, including unavailable platform identity and HOME-loader handling. It grants no authority and changes no desktop or other-provider defaults. If the applicable contract cannot be read, stop and report. Every rule below is one that contract does not carry, and every rule it carries lives there alone (spec `the-two-contracts-do-not-restate-each-other`, gated by `Test-ContractBudget.ps1` and `Test-ContractLoaderChain.ps1`).
 
 <!-- agent-harness:safety-floor:v1:start -->
 **Safety floor for products with no shared-contract loader (Cursor cloud agents); the one sanctioned restatement.**
@@ -48,6 +48,8 @@ A lane that created a worktree removes it once its work is committed and reachab
 
 <!-- contract-priority: P0; annotation only, applicability is unchanged -->
 ## Start and task state
+
+For an already-running managed Codex Cloud task, first apply `.agents/CLOUD-PROTOCOL.md` → **Codex Cloud portable startup and source development** when its observed-context and source-only conditions hold. Its pinned workspace loader is the normal source-startup path without HOME installation; canonical mode/state admission remains deferred. Every other task follows the startup steps below.
 
 1. Read the current routing mode by resolving `Get-AgentMode.ps1` at runtime the same way the shared contract resolves every other harness tool: `~/.agents/tools/Get-AgentMode.ps1` where a shared harness is installed, otherwise `.agents/tools/Get-AgentMode.ps1` from the harness repository `pyrgos-ai/doug-harness` (this repository's own copy when it is the harness) cloned read-only and never vendored into this project -- there is no project-local copy of this script. Run it with `& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -NonInteractive -File <resolved-path>` (in a container drop the `& '<path>'` prefix and call `pwsh <resolved-path>`); stop if it fails.
 2. Before interface or design work, invoke `craft`, which routes all design work. Read `.agents/INDEX.md` **Search surfaces** when looking for information.
