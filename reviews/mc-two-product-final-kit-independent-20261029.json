@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "task": "ga-c2f2cef4",
+  "stage": "review",
+  "reviewer": { "model": "claude-opus-5-5", "role": "reviewer", "subagents": 0, "workflow": false },
+  "provenance": {
+    "host": "SEEK_TO_SERVE",
+    "brief_named_host": "SYSTEMATICCHAOS",
+    "note": "Ran on the peer machine (qualified peer fallback). Brief-named worktree C:/Users/dougl/Worktrees/general-ai/mc-generalai-final-kit-review-20261029 does not exist here; used the peer worktree of the same branch agent/mc-generalai-final-kit-review-20261029.",
+    "session": "claude:388a3052-8b24-4138-9248-a168ce27d828",
+    "started_utc": "2026-10-29T23:29:47Z",
+    "evidence_finished_utc": "2026-10-29T23:45:04Z",
+    "checkouts": "Own isolated clones under %LOCALAPPDATA%/Temp/ga-c2f2cef4 (mc: depth-50 fetch of faceca and 08b from GitHub; ga, galf: --shared clones of the review worktree). No stable MC checkout, no source archives.",
+    "canonical_source": "C:/Users/dougl/Worktrees/doug-harness/mc-final-cloud-kit-source-20261029 at HEAD ae42d5a2f96a2f9db1c89b10c48603b19232c2e0, clean"
+  },
+  "artifacts": {
+    "general_ai": { "pr": "douglaspmcgowan/general-ai#23", "head": "17ccaaad9c9fddbfd4bc4927cd36e5923363079c", "base_reviewed": "16f4ba336 (prior ACCEPT 66e4315ee / PR24)" },
+    "mission_control": { "pr": "douglaspmcgowan/mission-control#172", "head": "faceca6803eb7757f7953ffea6b391fbabc2ea27", "base_reviewed": "08b3fc6c04cc81212232c3da19557ab163c3e05b", "base_tree": "601fa12c0c4cb8cf743bee5c00cbb546d3791b41 (verified)" },
+    "canonical": { "repo": "pyrgos-ai/doug-harness", "commit": "ae42d5a2f96a2f9db1c89b10c48603b19232c2e0", "harness_pin": "99d3cb0ac2536cb56e8d91b1bbdede77804e66d2 (both products' harness-pin.sh)" }
+  },
+  "verdicts": {
+    "general_ai_17ccaaad": "ACCEPT",
+    "mission_control_faceca68": "ACCEPT",
+    "scope": "Cloud kit projection only: exact shared blobs and modes, canonical consumers, delta hygiene. Not Cloud-installed acceptance, not provider readiness, not MC UI acceptance."
+  },
+  "deltas": {
+    "general_ai_16f_to_17cc": { "files": [".agents/cloud/setup.sh"], "insertions": 3, "deletions": 1, "content": "powershell_version probe gains `|| powershell_version=''` plus 2 comment lines (canonical #3119/#3120 fix)", "git_diff_check": 0, "gitleaks": "1 commit, no leaks, exit 0" },
+    "mission_control_08b_to_faceca": { "commits": 1, "files": 14, "insertions": 1030, "deletions": 148, "paths_outside_agents_cloud": 0, "new_file": ".agents/cloud/powershell-runtime.sh (100755)", "mode_changes_644_to_755": ["harness-pin.sh", "install-shared-contract.sh", "install-shared-contract.test.sh", "setup.sh", "vault-pull.sh"], "project_owned_changed": "none (.nvmrc, setup.project.sh, verify.project.sh, .claude, .codex, .cursor, .githooks, task-hooks: 0 changes)", "git_diff_check": 0, "gitleaks": "1 commit, no leaks, exit 0" }
+  },
+  "shared_blob_mode_check": {
+    "manifest": ".agents/manifests/cloud-kit.json at ae42 (shared=29, harnessOnly=10, projectOwned=7)",
+    "count_expected": 29, "count_real": 29, "general_ai_match": 29, "mission_control_match": 29,
+    "method": "git ls-tree mode+blob at each exact head vs ae42; CR bytes counted in canonical blobs",
+    "lf": "0 CR bytes in 28 blobs; tool-versions.sh carries one CR byte inside the literal `${pin//$'<CR>'/}` (line 33), canonical and identical in both products, line endings LF",
+    "files": [
+      ["Apply-CloudTask.ps1", "100644", "3b4ce2e53192f7e8dd080c298db1326f1ce40473"],
+      ["Apply-CloudTask.test.ps1", "100644", "61593c1d92f837a15a685dfae8030ab8c9fe099c"],
+      ["Capture-DuplicateDiscovery.test.ps1", "100644", "2f06f26f1360f0ed47872a536d41c4df160888b1"],
+      ["cloud-tests.ps1", "100644", "36cb3f522cc1515a612efb887573b5bad49a92b7"],
+      ["credential-profile.sh", "100644", "b6a1f560a587a67e0c0814edae5357692863e26a"],
+      ["credential-profile.test.sh", "100644", "5a1d9eb58373d2c2c43b60ced2dbaa9103aa010c"],
+      ["harness-pin.sh", "100755", "1ff8436b892a9e704b2aaf3dc01059f963bd8d8c"],
+      ["install-shared-contract.sh", "100755", "de6f7e2d9a0e0f2643de285098a661b0d8fb5892"],
+      ["install-shared-contract.test.sh", "100755", "69e6505681e1ba027ce541f93c43a013c7da8f84"],
+      ["FRESH-MACHINE-READINESS.md", "100644", "f7c013aa8d3c34f9e8c8f2eb6a72975b6c4d6a85"],
+      ["maintenance.sh", "100644", "7fd48925f8f13dc51b30646fdbad97654ab628e6"],
+      ["powershell-runtime.sh", "100755", "6cd0cd28f425265b7c118341abcf0d3625391aba"],
+      ["secretguard-client.mjs", "100644", "8df9cade1d758a77b012f795a3ab8cc8f3e7030f"],
+      ["secretguard-client.test.mjs", "100644", "8a45d7d0ba855eb137dfceb43e2a258858bc968c"],
+      ["secretguard-client.test.sh", "100644", "ed63c5dabc94b0122866305d0a91f4745aa7063f"],
+      ["setup.sh", "100755", "56a2fa84a21af2f8c697dad5c16f5869674b6d55"],
+      ["setup.test.sh", "100644", "8cbed3725d5efb09dee9d6abf3e97ec56bf22e45"],
+      ["Test-CloudAgentPreflight.ps1", "100644", "a1806f34744cbc0dbe3740e0d93c6f6487a0eb96"],
+      ["Test-CloudAgentPreflight.test.ps1", "100644", "b461b15f2ed7af40693dcb926814af1dd98da838"],
+      ["Test-DispatchLanded.ps1", "100644", "fdb8cd323ba8d788f8685dd9001974b763bed6dd"],
+      ["Test-DispatchLanded.test.ps1", "100644", "1181c4733e560d1bd62c5b0365610e73607cdc79"],
+      ["tool-versions.sh", "100644", "5db27da0dd2d5e34f611cd8388f84d74592257bd"],
+      ["VAULT-CONTRACT.md", "100644", "de8a3552e34d81ef4ec98a6e90c6153d135cef8b"],
+      ["vault-pull.sh", "100755", "25c3350d878026e89e3e4e8422a6098a2d662dab"],
+      ["verify-workflow.test.sh", "100644", "da3d748aa5d5581d07515cd5e98f254511c7133f"],
+      ["verify.sh", "100644", "dffd21bcf03ab0614127a5d8310b2b5158244389"],
+      ["with-secrets.sh", "100644", "6b2f0497b55ed4462e051fda88a3764fad9f52a9"],
+      ["with-secrets.test.sh", "100644", "30e67f6724c9121a25badb973a9935ca0e844962"],
+      ["work-scope-roundtrip.ps1", "100644", "eafe62506626e80441e7be721c7026eb83083fc0"]
+    ]
+  },
+  "native_consumer_evidence": [
+    { "command": "canonical(ae42) Sync-CloudKit.ps1 -Repository <ga@17cc> -Verify", "exit": 0, "result": "29 shared file(s) checked, 0 drifted (28 reported 'line endings differ only in this working copy' under core.autocrlf=true; committed blobs LF)" },
+    { "command": "canonical(ae42) Sync-CloudKit.ps1 -Repository <mc@faceca> -Verify", "exit": 0, "result": "29 shared file(s) checked, 0 drifted" },
+    { "command": "canonical(ae42) Manage-Harness.ps1 -Action VerifyProject -Repository <ga@17cc>", "exit": 0, "result": "Project harness verification passed; changed/preserved/gates empty" },
+    { "command": "canonical(ae42) Manage-Harness.ps1 -Action VerifyProject -Repository <mc@faceca>", "exit": 0, "result": "Project harness verification passed; changed/preserved/gates empty" },
+    { "command": "bash -n on every committed *.sh (git show HEAD:<f> | bash -n)", "ga_files": 16, "mc_files": 16, "errors": 0 }
+  ],
+  "node_runtime": {
+    "owner": "tool-versions.sh resolve_node_release_line (canonical default NODE_RELEASE_LINE=22, NODE_MIN_MAJOR=22); setup.sh node_matches_release uses the resolved line",
+    "mission_control": "committed .nvmrc '24' -> NODE_RELEASE_LINE=24, no pin error",
+    "general_ai": "no .nvmrc -> NODE_RELEASE_LINE=22 (default)",
+    "negative_control": ".nvmrc 'lts/*' -> NODE_PIN_ERROR 'unsupported .nvmrc ... not an alias', line stays 22 (fails closed in caller)",
+    "saved_environment": "MC saved Cloud environment reported at 22 by the brief; alignment to 24 is a parent-owned external gate, not verified here"
+  },
+  "install_shared_contract_test_investigation": {
+    "claim_under_test": "MC producer: install-shared-contract.test.sh 33 FAIL in product vs canonical 45/0, attributed to installed-home dependence",
+    "measured": {
+      "canonical_ae42_harness_tree": "45 passed, 0 failed, exit 0",
+      "mission_control_faceca": "11 passed, 32 failed, exit 1 (one skip: shallow clone cannot see pin)",
+      "mission_control_baseline_08b": "11 passed, 32 failed, exit 1",
+      "general_ai_17cc_lf_checkout": "12 passed, 32 failed, exit 1 (pin check ok instead of skip)",
+      "case_list_mc_vs_ga": "identical except that pin case"
+    },
+    "baseline_blob": "test blob 69e6505681e1 identical at 08b and faceca (mode-only change)",
+    "actual_cause": "install-shared-contract.test.sh line 10 sets harness=\"$(cd \"$here/..\" && pwd)\" (the repository's own .agents) and make_package copies $harness/AGENTS.md, templates/AGENTS.md and adapters/{claude,codex,opencode,agy}/*. Those exist only in the harness repository; neither product carries them (all six absent in both). Every fixture case therefore builds an empty package. Not installed-home (~/.agents) dependence: the test never reads ~/.agents as its source.",
+    "classification": "Inherited canonical defect, not a product regression: identical blob, identical failure at MC baseline and in GA. The installer's own fail-closed behaviour is not exercised by this failure.",
+    "consequence": "Product Cloud verify.sh (line 566 globs .agents/cloud/*.test.sh and runs each) will report install-shared-contract.test.sh FAIL in both products until canonical fixes the test's fixture source. Cloud verification is therefore not full-green for either product.",
+    "harness_defect": { "first_error_line": "  FAIL  harness repo: 'shared_contract=absent source=none reason=harness-unreachable guard=written' exit 1", "fix_location": "pyrgos-ai/doug-harness .agents/cloud/install-shared-contract.test.sh, harness= assignment (line 10) and make_package", "recommended_fix": "Source the fixture package from the pinned harness (or skip the fixture cases with an explicit not-harness reason that verify.sh does not count as pass) when $here/.. is not a harness root (is_harness_root false)", "why": "A shared suite that verify.sh globs must pass, or report a non-pass state honestly, in every receiving project" }
+  },
+  "not_run": [
+    "setup.test.sh whole suite (canonical reports both runs timed out at 600s; brief forbids timeout increase); GA delta is the 3+/1- setup.sh probe line already covered by canonical #3119/#3120 focused 5PASS/0FAIL, not re-run here",
+    "with-secrets.test.sh (ambient-token-name baseline 12 FAIL not re-measured; no secret names or values inspected)",
+    "1866 unit / 370 browser MC suites (unchanged app source; out of scope per brief)",
+    "Cloud-installed setup/verify in a real container for either product"
+  ],
+  "remaining_external_gates": [
+    "Canonical fix of install-shared-contract.test.sh fixture source (product verify.sh red until then)",
+    "Cloud-installed acceptance per product (setup.sh + verify.sh in the saved environment)",
+    "MC saved environment Node 22 -> 24 alignment (parent-owned)",
+    "Provider readiness not proven for either product",
+    "MC #165/#166/#169 held for independent installed UI acceptance; dependency hold stands",
+    "Default-branch merge of GA#23 and MC#172 needs Douglas's authorization; this review merges nothing"
+  ]
+}

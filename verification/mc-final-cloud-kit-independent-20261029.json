@@ -1,0 +1,122 @@
+{
+  "schema": "independent-review/v1",
+  "task": "ga-802ea02e",
+  "stage": "review",
+  "reviewer": "claude-opus-5-5 (claude-local-direct, xhigh brief)",
+  "host": "SEEK_TO_SERVE (Windows 11, Git Bash 5.2.37, pwsh 7, node v24.15.0)",
+  "reviewed_utc_window": "2026-10-29T21:43Z..2026-10-29T21:56Z",
+  "verdict": "ACCEPT",
+  "verdict_scope": "General AI cloud kit candidate 16f4ba3 (PR #23) is byte- and mode-identical to the 29 manifest-shared files of canonical pyrgos-ai/doug-harness c524d856 and passes the native verifiers. This does NOT establish Cloud readiness, G1-G5, or a green Test-ContractLoaderChain.",
+  "bound": {
+    "candidate_repository": "douglaspmcgowan/general-ai",
+    "candidate_head": "16f4ba3366bdadaaeb0391dff8288c7ed3dcad9e",
+    "candidate_pr": 23,
+    "candidate_pr_head_branch": "agent/mc-generalai-cloud-kit-20261029",
+    "candidate_parents": "16f4ba3 <- 199c5a7 <- 31c3e9d",
+    "canonical_repository": "pyrgos-ai/doug-harness",
+    "canonical_commit": "c524d8563eaa713103d198a607bb648f94bdb642",
+    "canonical_commit_subject": "Merge pull request #3115 from pyrgos-ai/agent/mc-cloud-runtime-pin-20261029 (2026-10-29 14:19:03 -0700)",
+    "canonical_on_origin_master": true,
+    "pinned_harness_commit": "99d3cb0ac2536cb56e8d91b1bbdede77804e66d2",
+    "pinned_on_origin_master": true,
+    "canonical_checkout": "standalone read-only git clone --shared, detached at c524, at %TEMP%\\ga802-c524-src (status clean)"
+  },
+  "files": {
+    "manifest": ".agents/manifests/cloud-kit.json at c524",
+    "manifest_shared_count": 29,
+    "candidate_agents_cloud_tracked_count": 29,
+    "candidate_entries_outside_shared": 0,
+    "blob_and_mode_match": 29,
+    "blob_or_mode_mismatch": 0,
+    "modes_100755": ["harness-pin.sh", "install-shared-contract.sh", "install-shared-contract.test.sh", "powershell-runtime.sh", "setup.sh", "vault-pull.sh"],
+    "modes_100644_count": 23,
+    "method": "git ls-tree mode+blob at c524 vs 16f for each manifest path, plus git hash-object of the candidate working copy",
+    "diff_31c3e9d_to_16f4ba3": "29 files added, all under .agents/cloud/; 0 files outside it (managed contracts, provenance, stamp untouched)",
+    "diff_199c5a7_to_16f4ba3": "9 files: harness-pin.sh, setup.sh, setup.test.sh, tool-versions.sh, verify.sh content changes; powershell-runtime.sh created 100755; mode 100644->100755 on harness-pin.sh, install-shared-contract.sh, install-shared-contract.test.sh, setup.sh, vault-pull.sh",
+    "candidate_harness_pin": "HARNESS_COMMIT='99d3cb0ac2536cb56e8d91b1bbdede77804e66d2'",
+    "project_owned_absent_by_design": ["setup.project.sh", "verify.project.sh", "secret-bindings.json", "codex-sandbox-fallback-documented-check.ps1", "codex-sandbox-fallback-documented-check.test.ps1", "codex-workscope-read-check.ps1", "codex-workscope-write-check.ps1"],
+    "windows_working_copy_note": "28 of 29 files are CRLF in this Windows working copy (system core.autocrlf=true; General AI has no eol=lf attribute for these paths, unlike the harness). Committed blobs are LF and identical; a Linux container clone gets LF. Not a candidate defect."
+  },
+  "checks": [
+    {
+      "name": "canonical Sync-CloudKit.ps1 -Verify",
+      "command": "pwsh -NoProfile -NonInteractive -File %TEMP%\\ga802-c524-src\\.agents\\tools\\Sync-CloudKit.ps1 -Repository <GA worktree> -HarnessRoot %TEMP%\\ga802-c524-src\\.agents -Verify",
+      "exit": 0,
+      "result": "Cloud kit is in step: 29 shared file(s) checked, 0 drifted. (28 lines 'line endings differ only in this working copy; a clone gets the committed LF')",
+      "limit": "Sync-CloudKit compares content only; Git modes were proven separately by ls-tree."
+    },
+    {
+      "name": "Manage-Harness.ps1 -Action VerifyProject",
+      "command": "pwsh -NoProfile -NonInteractive -File C:\\Users\\dougl\\.agents\\tools\\Manage-Harness.ps1 -Action VerifyProject -Repository <GA worktree at 16f4ba3>",
+      "exit": 0,
+      "result": "Project harness verification passed. changed={} preserved={}",
+      "limit": "Ran the installed ~/.agents copy through normal admission; its exact harness revision was not independently bound."
+    },
+    {
+      "name": "bash -n on committed LF bytes of every .sh",
+      "count": 16,
+      "pass": 16,
+      "fail": 0
+    },
+    {
+      "name": "node --check secretguard-client.mjs and .test.mjs",
+      "pass": 2,
+      "fail": 0,
+      "limit": "host node v24.15.0, not the Node 22 a General AI container defaults to (no .nvmrc)"
+    },
+    {
+      "name": "credential-profile.test.sh",
+      "exit": 0,
+      "result": "credential-profile tests passed (17 cases)"
+    },
+    {
+      "name": "secretguard-client.test.sh",
+      "exit": 0,
+      "result": "secretguard-client.test.mjs passed"
+    },
+    {
+      "name": "with-secrets.test.sh without jq",
+      "exit": 0,
+      "result": "SKIP: jq is not installed on this host, so none of this suite's 31 checks ran"
+    },
+    {
+      "name": "with-secrets.test.sh with jq 1.8.2 (official winget jqlang.jq), host environment as-is",
+      "exit": 1,
+      "result": "FAILED (12): the suite inherited four host Bitwarden token variables (names only printed, no values) and with-secrets refused 'more than one Bitwarden token is set'",
+      "finding": "Test isolation weakness: the suite does not scrub host Bitwarden token variables before its cases, so it fails on a host carrying several. Not a candidate byte defect (blob identical to canonical); owner is the canonical harness with-secrets.test.sh."
+    },
+    {
+      "name": "with-secrets.test.sh with jq 1.8.2, the four host Bitwarden token names unset in the child only (env -u)",
+      "exit": 0,
+      "result": "PASS (31 checks), 0 FAIL",
+      "limit": "Not run in a Linux container; whether the suite passes in a container that carries exactly one real token was not tested (could-not-tell)."
+    },
+    {
+      "name": "gitleaks 8.30.1 git --log-opts=31c3e9d..16f4ba3 --redact",
+      "exit": 0,
+      "result": "2 commits scanned, ~349 KB, no leaks found"
+    },
+    {
+      "name": "git diff --check 31c3e9d 16f4ba3",
+      "exit": 0
+    },
+    {
+      "name": "untracked files in candidate worktree before report",
+      "count": 0
+    }
+  ],
+  "not_run": [
+    "Test-ContractLoaderChain.ps1 / whole harness suite (out of scope; known baseline 3 PASS 2 FAIL held separately)",
+    "install-shared-contract.test.sh, setup.test.sh, verify-workflow.test.sh, cloud-tests.ps1 and PowerShell *.test.ps1 suites (out of scope; bash -n only)",
+    "any real cloud environment, job, secret read, credential grant or spend"
+  ],
+  "remaining_gates": {
+    "fixture": "mc-contract-failclosed-fixture-20261029 (sole harness builder) owns the causal LoaderChain fixture fix; if it changes production kit bytes, General AI must be re-synced and re-reviewed.",
+    "provider": "Cloud provider readiness (G1-G5) is not established by this review; parent owns the default-branch merge and provider environment."
+  },
+  "host_side_effects": [
+    "winget installed jqlang.jq 1.8.2 (official package, intent-open-source-installs-allowed)",
+    "read-only clone left at %TEMP%\\ga802-c524-src and LF probe copies at %TEMP%\\ga802-lf (inert; not deleted because the bulk-delete guard requires allow-delete)",
+    "one hook-misfire record filed: security-checks-fast.js#checkSecretDump refused a path-name filter over git ls-tree output"
+  ]
+}
